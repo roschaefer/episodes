@@ -39,13 +39,13 @@ Danach committen wir das Submodul.
 
 ## Wo ein Submodul seinen Zustand ablegt
 
-![Die Ordner und Dateien des Monorepos, in denen ein Submodul seinen Zustand ablegt: 1 der Commit in .git/objects, 2 der Index, 3 .gitmodules, 4 .git/config, 5 die Datei vendor/lib/.git, die auf 6 zeigt, das Repository der Bibliothek in .git/modules/vendor/lib, das zurückzeigt](../git-splice/test/comparisons/git-submodule-state.drawio.svg)
+![Die Ordner und Dateien des Monorepos, in denen ein Submodul seinen Zustand ablegt: 1 der Commit in .git/objects, 2 .gitmodules, 3 der Index, 4 .git/config, 5 die Datei vendor/lib/.git, die auf 6 zeigt, das Repository der Bibliothek in .git/modules/vendor/lib, das zurückzeigt](../git-splice/test/comparisons/git-submodule-state.drawio.svg)
 
 Erstens der Commit. Der Tree des Monorepos hat einen Eintrag mit dem Modus 160000, einen sogenannten Gitlink. Er enthält die ID eines Commits der Bibliothek. Nur die ID: Den Commit selbst hat das Monorepo nicht.
 
-Zweitens der Index, die Datei in `.git`, in der Git den nächsten Commit vorbereitet. Er hat denselben Eintrag. Ob sich das Submodul geändert hat, sieht Git nicht an den Dateien der Bibliothek. Es vergleicht den `HEAD` der Bibliothek mit dieser ID.
+Zweitens `.gitmodules`, eine Datei, die wie jede andere committet wird. Sie gibt dem Submodul einen Namen und ordnet dem Namen einen Pfad und eine URL zu.
 
-Drittens `.gitmodules`, eine Datei, die wie jede andere committet wird. Sie gibt dem Submodul einen Namen und ordnet dem Namen einen Pfad und eine URL zu.
+Drittens der Index, die Datei in `.git`, in der Git den nächsten Commit vorbereitet. Er hat denselben Eintrag wie der Commit. Ob sich das Submodul geändert hat, sieht Git nicht an den Dateien der Bibliothek. Es vergleicht den `HEAD` der Bibliothek mit dieser ID.
 
 Viertens die `.git/config` des Monorepos. Git hat die URL hierher kopiert. In einem frischen Klon macht `git submodule init` diese Kopie. Und um die Bibliothek zu klonen, nimmt Git diese Kopie, nicht `.gitmodules`.
 
