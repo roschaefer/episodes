@@ -14,17 +14,11 @@ The oldest way to have one repository inside another is called `git submodule`. 
 
 Let's take an example:
 
-```console
-$ ./example.sh
-$ export GIT_CONFIG_GLOBAL=$PWD/submodule-example/gitconfig
-$ cd submodule-example/monorepo
-```
-
-[`example.sh`](https://github.com/roschaefer/episodes/blob/HEAD/01-submodule-problems/example.sh) builds a library with 30 commits and a monorepo with an app. You'll find the script in this episode's repository, so you can try every command yourself. Then it adds the library as a submodule and commits it:
+[The example shell script](https://github.com/roschaefer/episodes/blob/HEAD/01-submodule-problems/example.sh) builds a library with 30 commits and a monorepo with an app. Then it adds the library to the monorepo as a submodule:
 
 ```console
-$ git submodule add https://git.example.com/lib.git vendor/lib
-$ git commit -m "add lib as a submodule"
+git submodule add https://git.example.com/lib.git vendor/lib
+git commit -m "add lib as a submodule"
 ```
 
 That one command, `git submodule add`, writes to six places.
