@@ -39,11 +39,20 @@ Then we commit the submodule.
 
 ## Where a submodule keeps its state
 
-![The monorepo's folders and files where a submodule keeps its state: 1 the commit in .git/objects, 2 .gitmodules, 3 the index, 4 .git/config, 5 the file vendor/lib/.git, which points to 6, the library's repository in .git/modules/vendor/lib, which points back](../git-splice/test/comparisons/git-submodule-state.drawio.svg)
+```text
+monorepo/
+├── .gitmodules      2  name, path and URL
+├── app/
+│   └── main.txt
+└── vendor/
+    └── lib          1  gitlink: 160000 commit bafd496
+```
 
 First, the commit. The monorepo's tree has an entry with the mode 160000, a so-called gitlink. It holds the ID of one library commit. Only the ID: the library's commit itself isn't in the monorepo.
 
 Second, `.gitmodules`, a file that is committed like any other. It gives the submodule a name and maps the name to a path and a URL.
+
+![The monorepo's folders and files where a submodule keeps its state: 1 the commit in .git/objects, 2 .gitmodules, 3 the index, 4 .git/config, 5 the file vendor/lib/.git, which points to 6, the library's repository in .git/modules/vendor/lib, which points back](../git-splice/test/comparisons/git-submodule-state.drawio.svg)
 
 Third, the index, the file in `.git` where Git prepares the next commit. It has the same entry as the commit. To see whether the submodule changed, Git doesn't look at the library's files. It compares the library's `HEAD` with this ID.
 

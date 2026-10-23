@@ -39,11 +39,20 @@ Danach committen wir das Submodul.
 
 ## Wo ein Submodul seinen Zustand ablegt
 
-![Die Ordner und Dateien des Monorepos, in denen ein Submodul seinen Zustand ablegt: 1 der Commit in .git/objects, 2 .gitmodules, 3 der Index, 4 .git/config, 5 die Datei vendor/lib/.git, die auf 6 zeigt, das Repository der Bibliothek in .git/modules/vendor/lib, das zurückzeigt](../git-splice/test/comparisons/git-submodule-state.drawio.svg)
+```text
+monorepo/
+├── .gitmodules      2  Name, Pfad und URL
+├── app/
+│   └── main.txt
+└── vendor/
+    └── lib          1  Gitlink: 160000 commit bafd496
+```
 
 Erstens der Commit. Der Tree des Monorepos hat einen Eintrag mit dem Modus 160000, einen sogenannten Gitlink. Er enthält die ID eines Commits der Bibliothek. Nur die ID: Den Commit selbst hat das Monorepo nicht.
 
 Zweitens `.gitmodules`, eine Datei, die wie jede andere committet wird. Sie gibt dem Submodul einen Namen und ordnet dem Namen einen Pfad und eine URL zu.
+
+![Die Ordner und Dateien des Monorepos, in denen ein Submodul seinen Zustand ablegt: 1 der Commit in .git/objects, 2 .gitmodules, 3 der Index, 4 .git/config, 5 die Datei vendor/lib/.git, die auf 6 zeigt, das Repository der Bibliothek in .git/modules/vendor/lib, das zurückzeigt](../git-splice/test/comparisons/git-submodule-state.drawio.svg)
 
 Drittens der Index, die Datei in `.git`, in der Git den nächsten Commit vorbereitet. Er hat denselben Eintrag wie der Commit. Ob sich das Submodul geändert hat, sieht Git nicht an den Dateien der Bibliothek. Es vergleicht den `HEAD` der Bibliothek mit dieser ID.
 
