@@ -61,7 +61,7 @@ echo "fix" >>vendor/lib/src/parse.txt
 echo "call parse()" >>app/main.txt
 ```
 
-Dann zeigt mir `git status` die Änderungen innerhalb des Submoduls gar nicht. Es meldet nur, dass sich der Zeiger auf das Submodul geändert hat:
+Dann zeigt mir `git status` die Änderungen innerhalb des Submoduls gar nicht an. Es meldet nur, dass sich der Zeiger auf das Submodul geändert hat:
 
 ```console
 $ git status --short
