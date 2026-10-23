@@ -93,9 +93,11 @@ The video and its subtitles (`.srt`) are written to
 `media/videos/episode/<quality>/` as `<nn>-<id>-<lang>.mp4`; a preview adds
 `-piper` or `-silence`.
 
-To record, `just record <id> <lang>` shows each paragraph not recorded yet: hold
-`r` (right Shift on Wayland) while speaking. Ctrl-C keeps the takes so far,
-and the next run goes on from there.
+To record, `just record <id> <lang>` asks for the microphone, then shows
+each paragraph not recorded yet: press Enter, wait a second, speak, and
+press Enter again. Then `l` listens to the take, `r` records it again and
+`a` accepts it. Ctrl-C keeps the takes accepted so far, and the next run
+goes on from there.
 
 ```sh
 just voiceovers <id> <lang>              # the paragraphs, numbered, and which are recorded

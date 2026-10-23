@@ -246,9 +246,9 @@ class Episode(VoiceoverScene):
         voiceovers.mkdir(parents=True, exist_ok=True)
         voice = os.environ.get("VOICE", "piper")
         if voice == "recorder":
-            from manim_voiceover.services.recorder import RecorderService
+            from recorder import EnterRecorderService
 
-            self.set_speech_service(RecorderService(cache_dir=voiceovers, transcription_model=None))
+            self.set_speech_service(EnterRecorderService(cache_dir=voiceovers, transcription_model=None))
         else:
             if voice == "piper":
                 self.set_speech_service(Piper(lang, cache_dir=voiceovers / voice))
