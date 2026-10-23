@@ -31,49 +31,17 @@ That one command, `git submodule add`, writes to six places.
 
 ## Where a submodule keeps its state
 
-```console
-$ git ls-tree HEAD vendor/lib
-160000 commit bafd496b1f4512a95b69464604f3da428aa9e33b	vendor/lib
-```
+![The monorepo's folders and files where a submodule keeps its state: 1 the commit in .git/objects, 2 the index, 3 .gitmodules, 4 .git/config, 5 the file vendor/lib/.git, which points to 6, the library's repository in .git/modules/vendor/lib, which points back](../git-splice/test/comparisons/git-submodule-state.drawio.svg)
 
 First, the commit. The monorepo's tree has an entry with the mode 160000, a so-called gitlink. It holds the ID of one library commit. Only the ID: the library's commit itself isn't in the monorepo.
 
-```console
-$ git ls-files --stage vendor/lib
-160000 bafd496b1f4512a95b69464604f3da428aa9e33b 0	vendor/lib
-```
-
 Second, the index, the file in `.git` where Git prepares the next commit. It has the same entry. To see whether the submodule changed, Git doesn't look at the library's files. It compares the library's `HEAD` with this ID.
-
-```console
-$ cat .gitmodules
-[submodule "vendor/lib"]
-	path = vendor/lib
-	url = https://git.example.com/lib.git
-```
 
 Third, `.gitmodules`, a file that is committed like any other. It gives the submodule a name and maps the name to a path and a URL.
 
-```console
-$ git config --get-regexp '^submodule\.'
-submodule.vendor/lib.url https://git.example.com/lib.git
-submodule.vendor/lib.active true
-```
-
 Fourth, the monorepo's `.git/config`. Git copied the URL here. In a fresh clone, `git submodule init` makes that copy. And to clone the library, Git uses this copy, not `.gitmodules`.
 
-```console
-$ cat vendor/lib/.git
-gitdir: ../../.git/modules/vendor/lib
-```
-
 Fifth, the library's folder. Its `.git` isn't a repository, only a file that points to one.
-
-```console
-$ git -C vendor/lib config --get-regexp 'core.worktree|remote.origin.url'
-core.worktree ../../../../vendor/lib
-remote.origin.url https://git.example.com/lib.git
-```
 
 Sixth, the library's own repository, hidden in `.git/modules`. Its config points back at the folder. And it has the URL a third time, the one its fetches use.
 

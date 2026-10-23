@@ -27,8 +27,28 @@ $ git submodule add -q https://git.example.com/lib.git vendor/lib &&
 
 ## Where a submodule keeps its state
 
-That one `git submodule add` wrote to six places. The commit records the
-library's commit as a gitlink, an entry of mode `160000` in the tree:
+That one `git submodule add` wrote to six places:
+
+<div align="center">
+
+![The monorepo's folders and files where a submodule keeps its state: 1 the commit in .git/objects, 2 the index, 3 .gitmodules, 4 .git/config, 5 the file vendor/lib/.git, which points to 6, the library's repository in .git/modules/vendor/lib, which points back](git-submodule-state.drawio.svg)
+
+</div>
+
+<!-- Each path the drawing shows exists:
+```scrut
+$ ls -d .gitmodules vendor/lib/.git .git/objects .git/index .git/config .git/modules/vendor/lib
+.git/config
+.git/index
+.git/modules/vendor/lib
+.git/objects
+.gitmodules
+vendor/lib/.git
+```
+-->
+
+The commit records the library's commit as a gitlink, an entry of mode
+`160000` in the tree:
 
 ```scrut
 $ git ls-tree HEAD vendor/lib

@@ -31,49 +31,17 @@ Dieser eine Befehl, `git submodule add`, schreibt an sechs Stellen.
 
 ## Wo ein Submodul seinen Zustand ablegt
 
-```console
-$ git ls-tree HEAD vendor/lib
-160000 commit bafd496b1f4512a95b69464604f3da428aa9e33b	vendor/lib
-```
+![Die Ordner und Dateien des Monorepos, in denen ein Submodul seinen Zustand ablegt: 1 der Commit in .git/objects, 2 der Index, 3 .gitmodules, 4 .git/config, 5 die Datei vendor/lib/.git, die auf 6 zeigt, das Repository der Bibliothek in .git/modules/vendor/lib, das zurückzeigt](../git-splice/test/comparisons/git-submodule-state.drawio.svg)
 
 Erstens der Commit. Der Tree des Monorepos hat einen Eintrag mit dem Modus 160000, einen sogenannten Gitlink. Er enthält die ID eines Commits der Bibliothek. Nur die ID: Den Commit selbst hat das Monorepo nicht.
 
-```console
-$ git ls-files --stage vendor/lib
-160000 bafd496b1f4512a95b69464604f3da428aa9e33b 0	vendor/lib
-```
-
 Zweitens der Index, die Datei in `.git`, in der Git den nächsten Commit vorbereitet. Er hat denselben Eintrag. Ob sich das Submodul geändert hat, sieht Git nicht an den Dateien der Bibliothek. Es vergleicht den `HEAD` der Bibliothek mit dieser ID.
-
-```console
-$ cat .gitmodules
-[submodule "vendor/lib"]
-	path = vendor/lib
-	url = https://git.example.com/lib.git
-```
 
 Drittens `.gitmodules`, eine Datei, die wie jede andere committet wird. Sie gibt dem Submodul einen Namen und ordnet dem Namen einen Pfad und eine URL zu.
 
-```console
-$ git config --get-regexp '^submodule\.'
-submodule.vendor/lib.url https://git.example.com/lib.git
-submodule.vendor/lib.active true
-```
-
 Viertens die `.git/config` des Monorepos. Git hat die URL hierher kopiert. In einem frischen Klon macht `git submodule init` diese Kopie. Und um die Bibliothek zu klonen, nimmt Git diese Kopie, nicht `.gitmodules`.
 
-```console
-$ cat vendor/lib/.git
-gitdir: ../../.git/modules/vendor/lib
-```
-
 Fünftens der Ordner der Bibliothek. Sein `.git` ist kein Repository, nur eine Datei, die auf eines zeigt.
-
-```console
-$ git -C vendor/lib config --get-regexp 'core.worktree|remote.origin.url'
-core.worktree ../../../../vendor/lib
-remote.origin.url https://git.example.com/lib.git
-```
 
 Sechstens das eigene Repository der Bibliothek, versteckt in `.git/modules`. Seine Konfiguration zeigt zurück auf den Ordner. Und sie enthält die URL ein drittes Mal, die, von der es fetcht.
 
