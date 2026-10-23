@@ -28,6 +28,11 @@ for technical feedback, e.g. "Have you ever used Git submodules, and what
 was your developer experience?" The post and the video add "Write it in
 the comments below." The build refuses to publish an episode without one.
 
+The thorough documentation lives in git-splice, in texts and diagrams
+its tests check. An episode is a short, easy summary of the essentials,
+and points to its chapter for the rest: episode 01 shows the two places
+of a submodule a user sees, and only says that there are four more.
+
 An episode and its chapter grow together: when explaining something
 shows that the chapter is unclear or missing a step, fix the chapter in
 `git-splice/` in the same commit, then `git splice push git-splice`.

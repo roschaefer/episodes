@@ -52,15 +52,7 @@ monorepo/
 
 2. `.gitmodules`, a file that is committed like any other. It gives the submodule a name and maps the name to a path and a URL.
 
-![The monorepo's folders and files where a submodule keeps its state: 1 the commit in .git/objects, 2 .gitmodules, 3 the index, 4 .git/config, 5 the file vendor/lib/.git, which points to 6, the library's repository in .git/modules/vendor/lib, which points back](../git-splice/test/comparisons/git-submodule-state.drawio.svg)
-
-3. The index, the file in `.git` where Git prepares the next commit. It has the same entry as the commit. To see whether the submodule changed, Git doesn't look at the library's files. It compares the library's `HEAD` with this ID.
-
-4. The monorepo's `.git/config`. Git copied the URL here. In a fresh clone, `git submodule init` makes that copy. And to clone the library, Git uses this copy, not `.gitmodules`.
-
-5. The library's folder. Its `.git` isn't a repository, only a file that points to one.
-
-6. The library's own repository, hidden in `.git/modules`. Its config points back at the folder. And it has the URL a third time, the one its fetches use.
+There are also [four more places](https://roschaefer.github.io/git-splice/test/comparisons/git-submodule/#where-a-submodule-keeps-its-state), which we don't see, where Git stores a submodule.
 
 I think this design makes two mistakes, and everything else follows from them.
 
@@ -90,9 +82,9 @@ A commit is supposed to be a snapshot of what I changed. With a submodule, half 
 
 "Shared mutable state is the root of all evil" is an old rule from programming, and submodules run right into it.
 
-The six places don't even live equally long. The gitlink and `.gitmodules` are committed, so everyone gets them. The index, the pointer file and the library's repository belong to one worktree. I use `git worktree` a lot, to have a second branch checked out next to the first one. In a new worktree, the submodule is empty, and it gets its own clone of the library under `.git/worktrees/<name>/modules/`.
+These places don't even live equally long. The gitlink and `.gitmodules` are committed, so everyone gets them. Others belong to a single worktree. I use `git worktree` a lot, to have a second branch checked out next to the first one. In a new worktree, the submodule is empty, and it gets its own clone of the library under `.git/worktrees/<name>/modules/`.
 
-But the config belongs to the clone, and all of its worktrees share it. If I point the submodule at my fork in one worktree, I've changed it in all of them:
+But a copy of the URL is in the monorepo's `.git/config`, and all worktrees share that file. If I point the submodule at my fork in one worktree, I've changed it in all of them:
 
 ```console
 $ git -C ../feature config submodule.vendor/lib.url https://git.example.com/lib-fork.git

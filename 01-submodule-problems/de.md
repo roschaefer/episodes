@@ -52,15 +52,7 @@ monorepo/
 
 2. `.gitmodules`, eine Datei, die wie jede andere committet wird. Sie gibt dem Submodul einen Namen und ordnet dem Namen einen Pfad und eine URL zu.
 
-![Die Ordner und Dateien des Monorepos, in denen ein Submodul seinen Zustand ablegt: 1 der Commit in .git/objects, 2 .gitmodules, 3 der Index, 4 .git/config, 5 die Datei vendor/lib/.git, die auf 6 zeigt, das Repository der Bibliothek in .git/modules/vendor/lib, das zurückzeigt](../git-splice/test/comparisons/git-submodule-state.drawio.svg)
-
-3. Der Index, die Datei in `.git`, in der Git den nächsten Commit vorbereitet. Er hat denselben Eintrag wie der Commit. Ob sich das Submodul geändert hat, sieht Git nicht an den Dateien der Bibliothek. Es vergleicht den `HEAD` der Bibliothek mit dieser ID.
-
-4. Die `.git/config` des Monorepos. Git hat die URL hierher kopiert. In einem frischen Klon macht `git submodule init` diese Kopie. Und um die Bibliothek zu klonen, nimmt Git diese Kopie, nicht `.gitmodules`.
-
-5. Der Ordner der Bibliothek. Sein `.git` ist kein Repository, nur eine Datei, die auf eines zeigt.
-
-6. Das eigene Repository der Bibliothek, versteckt in `.git/modules`. Seine Konfiguration zeigt zurück auf den Ordner. Und sie enthält die URL ein drittes Mal, die, von der es fetcht.
+Außerdem gibt es noch [vier Stellen](https://roschaefer.github.io/git-splice/test/comparisons/git-submodule/#where-a-submodule-keeps-its-state), die wir nicht sehen, an denen Git ein Submodul speichert.
 
 Ich halte zwei Entscheidungen in diesem Design für Fehler, und alles andere folgt daraus.
 
@@ -90,9 +82,9 @@ Ein Commit soll eine Momentaufnahme dessen sein, was ich geändert habe. Mit ein
 
 „Geteilter, veränderlicher Zustand ist die Wurzel allen Übels“ ist eine alte Regel aus der Programmierung, und Submodule laufen direkt hinein.
 
-Die sechs Stellen leben nicht einmal gleich lang. Gitlink und `.gitmodules` werden committet, alle bekommen sie. Der Index, die Zeigerdatei und das Repository der Bibliothek gehören zu einem Worktree. Ich nutze oft `git worktree`, um einen zweiten Branch neben dem ersten ausgecheckt zu haben. In einem neuen Worktree ist das Submodul leer, und es bekommt einen eigenen Klon der Bibliothek unter `.git/worktrees/<name>/modules/`.
+Diese Stellen leben nicht einmal gleich lang. Gitlink und `.gitmodules` werden committet, alle bekommen sie. Andere gehören zu einem einzelnen Worktree. Ich nutze oft `git worktree`, um einen zweiten Branch neben dem ersten ausgecheckt zu haben. In einem neuen Worktree ist das Submodul leer, und es bekommt einen eigenen Klon der Bibliothek unter `.git/worktrees/<name>/modules/`.
 
-Aber die Konfiguration gehört zum Klon, und alle seine Worktrees teilen sie sich. Zeige ich das Submodul in einem Worktree auf meinen Fork, habe ich es in allen geändert:
+Aber eine Kopie der URL steht in der `.git/config` des Monorepos, und diese Datei teilen sich alle Worktrees. Zeige ich das Submodul in einem Worktree auf meinen Fork, habe ich es in allen geändert:
 
 ```console
 $ git -C ../feature config submodule.vendor/lib.url https://git.example.com/lib-fork.git
