@@ -10,22 +10,37 @@ question: "Habt ihr schon mal Git-Submodule benutzt, und wie war eure Erfahrung 
 docs: ../git-splice/test/comparisons/git-submodule.md
 ---
 
-Die älteste Implementierung von einem Repository, das in einem anderen steckt, heißt `git submodule`. Leider haben `git submodule`s eine ausgesprochen schlechte Reputation. Wir schauen uns mal an, woran das liegt.
+Die älteste Implementierung von einem Repository, das in einem anderen steckt, heißt `git submodule`. Leider haben Submodule eine ausgesprochen schlechte Reputation. Wir schauen uns mal an, woran das liegt.
 
 Wir nehmen ein Beispiel:
+
+```console
+$ ./example.sh
+$ export GIT_CONFIG_GLOBAL=$PWD/submodule-example/gitconfig
+$ cd submodule-example/monorepo
+```
+
+[`example.sh`](https://github.com/roschaefer/episodes/blob/HEAD/01-submodule-problems/example.sh) baut eine Bibliothek mit 30 Commits und ein Monorepo mit einer App. Ihr findet das Skript im Repository zu dieser Episode und könnt jeden Befehl selbst ausprobieren. Dann fügt es die Bibliothek als Submodul hinzu und committet sie:
+
+```console
+$ git submodule add https://git.example.com/lib.git vendor/lib
+$ git commit -m "add lib as a submodule"
+```
+
+Dieser eine Befehl, `git submodule add`, schreibt an sechs Stellen.
 
 ## Wo ein Submodul seinen Zustand ablegt
 
 ```console
 $ git ls-tree HEAD vendor/lib
-160000 commit bafd496b1f4512a95b69464604f3da428aa9e33b vendor/lib
+160000 commit bafd496b1f4512a95b69464604f3da428aa9e33b	vendor/lib
 ```
 
 Erstens der Commit. Der Tree des Monorepos hat einen Eintrag mit dem Modus 160000, einen sogenannten Gitlink. Er enthält die ID eines Commits der Bibliothek. Nur die ID: Den Commit selbst hat das Monorepo nicht.
 
 ```console
 $ git ls-files --stage vendor/lib
-160000 bafd496b1f4512a95b69464604f3da428aa9e33b 0 vendor/lib
+160000 bafd496b1f4512a95b69464604f3da428aa9e33b 0	vendor/lib
 ```
 
 Zweitens der Index, die Datei in `.git`, in der Git den nächsten Commit vorbereitet. Er hat denselben Eintrag. Ob sich das Submodul geändert hat, sieht Git nicht an den Dateien der Bibliothek. Es vergleicht den `HEAD` der Bibliothek mit dieser ID.
@@ -33,8 +48,8 @@ Zweitens der Index, die Datei in `.git`, in der Git den nächsten Commit vorbere
 ```console
 $ cat .gitmodules
 [submodule "vendor/lib"]
- path = vendor/lib
- url = https://git.example.com/lib.git
+	path = vendor/lib
+	url = https://git.example.com/lib.git
 ```
 
 Drittens `.gitmodules`, eine Datei, die wie jede andere committet wird. Sie gibt dem Submodul einen Namen und ordnet dem Namen einen Pfad und eine URL zu.

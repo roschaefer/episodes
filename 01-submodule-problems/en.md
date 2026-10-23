@@ -10,9 +10,24 @@ question: "Have you ever used Git submodules, and what was your developer experi
 docs: ../git-splice/test/comparisons/git-submodule.md
 ---
 
-I work on an app that uses a library from another repository. While working on the app I find a bug in the library. The bugfix and the code that calls it belong together, so I want to make them in one go, test them together and commit them together.
+The oldest way to have one repository inside another is called `git submodule`. Unfortunately, submodules have a remarkably bad reputation. Let's have a look at why.
 
-With the library as a submodule, that's where it starts to go wrong. To see why, I first show how a submodule works. I add the library to my monorepo with one command, `git submodule add`. That one command writes to six places.
+Let's take an example:
+
+```console
+$ ./example.sh
+$ export GIT_CONFIG_GLOBAL=$PWD/submodule-example/gitconfig
+$ cd submodule-example/monorepo
+```
+
+[`example.sh`](https://github.com/roschaefer/episodes/blob/HEAD/01-submodule-problems/example.sh) builds a library with 30 commits and a monorepo with an app. You'll find the script in this episode's repository, so you can try every command yourself. Then it adds the library as a submodule and commits it:
+
+```console
+$ git submodule add https://git.example.com/lib.git vendor/lib
+$ git commit -m "add lib as a submodule"
+```
+
+That one command, `git submodule add`, writes to six places.
 
 ## Where a submodule keeps its state
 
