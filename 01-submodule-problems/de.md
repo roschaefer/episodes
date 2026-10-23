@@ -48,19 +48,19 @@ monorepo/
     └── lib          1  Gitlink: 160000 commit bafd496
 ```
 
-Erstens der Commit. Der Tree des Monorepos hat einen Eintrag mit dem Modus 160000, einen sogenannten Gitlink. Er enthält die ID eines Commits der Bibliothek. Nur die ID: Den Commit selbst hat das Monorepo nicht.
+1. Der Commit. Der Tree des Monorepos hat einen Eintrag mit dem Modus 160000, einen sogenannten Gitlink. Er enthält die ID eines Commits der Bibliothek. Nur die ID: Den Commit selbst hat das Monorepo nicht.
 
-Zweitens `.gitmodules`, eine Datei, die wie jede andere committet wird. Sie gibt dem Submodul einen Namen und ordnet dem Namen einen Pfad und eine URL zu.
+2. `.gitmodules`, eine Datei, die wie jede andere committet wird. Sie gibt dem Submodul einen Namen und ordnet dem Namen einen Pfad und eine URL zu.
 
 ![Die Ordner und Dateien des Monorepos, in denen ein Submodul seinen Zustand ablegt: 1 der Commit in .git/objects, 2 .gitmodules, 3 der Index, 4 .git/config, 5 die Datei vendor/lib/.git, die auf 6 zeigt, das Repository der Bibliothek in .git/modules/vendor/lib, das zurückzeigt](../git-splice/test/comparisons/git-submodule-state.drawio.svg)
 
-Drittens der Index, die Datei in `.git`, in der Git den nächsten Commit vorbereitet. Er hat denselben Eintrag wie der Commit. Ob sich das Submodul geändert hat, sieht Git nicht an den Dateien der Bibliothek. Es vergleicht den `HEAD` der Bibliothek mit dieser ID.
+3. Der Index, die Datei in `.git`, in der Git den nächsten Commit vorbereitet. Er hat denselben Eintrag wie der Commit. Ob sich das Submodul geändert hat, sieht Git nicht an den Dateien der Bibliothek. Es vergleicht den `HEAD` der Bibliothek mit dieser ID.
 
-Viertens die `.git/config` des Monorepos. Git hat die URL hierher kopiert. In einem frischen Klon macht `git submodule init` diese Kopie. Und um die Bibliothek zu klonen, nimmt Git diese Kopie, nicht `.gitmodules`.
+4. Die `.git/config` des Monorepos. Git hat die URL hierher kopiert. In einem frischen Klon macht `git submodule init` diese Kopie. Und um die Bibliothek zu klonen, nimmt Git diese Kopie, nicht `.gitmodules`.
 
-Fünftens der Ordner der Bibliothek. Sein `.git` ist kein Repository, nur eine Datei, die auf eines zeigt.
+5. Der Ordner der Bibliothek. Sein `.git` ist kein Repository, nur eine Datei, die auf eines zeigt.
 
-Sechstens das eigene Repository der Bibliothek, versteckt in `.git/modules`. Seine Konfiguration zeigt zurück auf den Ordner. Und sie enthält die URL ein drittes Mal, die, von der es fetcht.
+6. Das eigene Repository der Bibliothek, versteckt in `.git/modules`. Seine Konfiguration zeigt zurück auf den Ordner. Und sie enthält die URL ein drittes Mal, die, von der es fetcht.
 
 Ich halte zwei Entscheidungen in diesem Design für Fehler, und alles andere folgt daraus.
 

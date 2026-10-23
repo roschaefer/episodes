@@ -55,7 +55,7 @@ company/
 └── team-c/       <-->   team-c.git, eigene CI
 ```
 
-Einige Freunde von mir arbeiten in großen Unternehmen mit vielen Teams. Sie wollen nicht in einem Monorepo arbeiten, weil sie getrennte CI-Pipelines haben wollen. Würde das ganze Unternehmen in einem Monorepo arbeiten, gäbe das ein ziemliches Durcheinander, und die Teams würden sich auf CI gegenseitig blockieren.
+Einige Freunde von mir arbeiten in großen Unternehmen mit vielen Teams. Sie wollen nicht in einem Monorepo arbeiten, weil sie getrennte CI-Pipelines haben wollen. Würde das ganze Unternehmen in einem Monorepo arbeiten, gäbe das ein ziemliches Durcheinander, und die Teams würden sich in der CI gegenseitig blockieren.
 
 ## Dreimal dasselbe Problem
 

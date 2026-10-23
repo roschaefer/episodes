@@ -48,19 +48,19 @@ monorepo/
     └── lib          1  gitlink: 160000 commit bafd496
 ```
 
-First, the commit. The monorepo's tree has an entry with the mode 160000, a so-called gitlink. It holds the ID of one library commit. Only the ID: the library's commit itself isn't in the monorepo.
+1. The commit. The monorepo's tree has an entry with the mode 160000, a so-called gitlink. It holds the ID of one library commit. Only the ID: the library's commit itself isn't in the monorepo.
 
-Second, `.gitmodules`, a file that is committed like any other. It gives the submodule a name and maps the name to a path and a URL.
+2. `.gitmodules`, a file that is committed like any other. It gives the submodule a name and maps the name to a path and a URL.
 
 ![The monorepo's folders and files where a submodule keeps its state: 1 the commit in .git/objects, 2 .gitmodules, 3 the index, 4 .git/config, 5 the file vendor/lib/.git, which points to 6, the library's repository in .git/modules/vendor/lib, which points back](../git-splice/test/comparisons/git-submodule-state.drawio.svg)
 
-Third, the index, the file in `.git` where Git prepares the next commit. It has the same entry as the commit. To see whether the submodule changed, Git doesn't look at the library's files. It compares the library's `HEAD` with this ID.
+3. The index, the file in `.git` where Git prepares the next commit. It has the same entry as the commit. To see whether the submodule changed, Git doesn't look at the library's files. It compares the library's `HEAD` with this ID.
 
-Fourth, the monorepo's `.git/config`. Git copied the URL here. In a fresh clone, `git submodule init` makes that copy. And to clone the library, Git uses this copy, not `.gitmodules`.
+4. The monorepo's `.git/config`. Git copied the URL here. In a fresh clone, `git submodule init` makes that copy. And to clone the library, Git uses this copy, not `.gitmodules`.
 
-Fifth, the library's folder. Its `.git` isn't a repository, only a file that points to one.
+5. The library's folder. Its `.git` isn't a repository, only a file that points to one.
 
-Sixth, the library's own repository, hidden in `.git/modules`. Its config points back at the folder. And it has the URL a third time, the one its fetches use.
+6. The library's own repository, hidden in `.git/modules`. Its config points back at the folder. And it has the URL a third time, the one its fetches use.
 
 I think this design makes two mistakes, and everything else follows from them.
 

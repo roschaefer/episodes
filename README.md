@@ -98,6 +98,12 @@ just voiceovers-prune <id>               # discard takes of text the scripts no 
 
 `just check` fails while an episode has takes of text it no longer has.
 
+The text is written for readers, and I speak it in my own words: what
+reads best isn't always what I'd say. A numbered list reads better than
+"First, … Second, …", and "in der CI" is correct where I'd say "auf CI".
+So the post says "1." and "in der CI", and the recording says "Erstens"
+and "auf CI". The subtitles show the text, not the recording.
+
 Commands and URLs are shown, not said. A command goes in a code block,
 and so does a URL that viewers should see, e.g. as a `#` line above the
 commands it explains; the prose says what they are. In prose, a link's
