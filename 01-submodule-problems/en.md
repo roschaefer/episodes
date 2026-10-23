@@ -12,9 +12,7 @@ docs: ../git-splice/test/comparisons/git-submodule.md
 
 Git has its own implementation of nested repositories: submodules.
 
-"Submodule" – that sounds like the right concept. But unfortunately, using them is quite error-prone. Let's have a look at why.
-
-So let's build an example:
+"Submodule" – that sounds like the right concept. But unfortunately, using them is quite error-prone. Let's have a look at why. So let's build an example:
 
 ```console
 # roschaefer.github.io/git-splice/docs/sandbox
