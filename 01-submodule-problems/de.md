@@ -27,10 +27,15 @@ Das Beispiel baut eine Bibliothek mit 30 Commits und ein Monorepo mit einer App.
 
 ```console
 git submodule add https://git.example.com/lib.git vendor/lib
-git commit -m "add lib as a submodule"
 ```
 
 Dieser eine Befehl, `git submodule add`, schreibt an sechs Stellen.
+
+```console
+git commit -m "add lib as a submodule"
+```
+
+Danach committen wir das Submodul.
 
 ## Wo ein Submodul seinen Zustand ablegt
 

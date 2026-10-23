@@ -27,10 +27,15 @@ The example builds a library with 30 commits and a monorepo with an app. Then it
 
 ```console
 git submodule add https://git.example.com/lib.git vendor/lib
-git commit -m "add lib as a submodule"
 ```
 
 That one command, `git submodule add`, writes to six places.
+
+```console
+git commit -m "add lib as a submodule"
+```
+
+Then we commit the submodule.
 
 ## Where a submodule keeps its state
 
