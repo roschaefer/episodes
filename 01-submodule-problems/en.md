@@ -10,7 +10,7 @@ question: "Have you ever used Git submodules, and what was your developer experi
 docs: ../git-splice/test/comparisons/git-submodule.md
 ---
 
-The oldest way to have one repository inside another is called `git submodule`. Unfortunately, submodules have a remarkably bad reputation. Let's have a look at why.
+Git has its own implementation of nested repositories, called `git submodule`. Unfortunately, submodules have a remarkably bad reputation. Let's have a look at why.
 
 Let's build an example.
 
@@ -23,19 +23,19 @@ nix develop -c just sandbox comparisons/git-submodule
 
 You can run the example yourself: these commands open a sandbox with the library and the monorepo, and every command there prints what you see here. The [git-splice documentation](https://roschaefer.github.io/git-splice/docs/sandbox/#any-page-in-a-sandbox) explains how.
 
-The example builds a library with 30 commits and a monorepo with an app. Then it adds the library to the monorepo as a submodule:
+The example builds a library with 30 commits and a monorepo with an app.
+
+Then we add the library to the monorepo as a submodule. That one command, `git submodule add`, writes to six places:
 
 ```console
 git submodule add https://git.example.com/lib.git vendor/lib
 ```
 
-That one command, `git submodule add`, writes to six places.
+Then we commit the submodule:
 
 ```console
 git commit -m "add lib as a submodule"
 ```
-
-Then we commit the submodule.
 
 ## Where a submodule keeps its state
 
@@ -48,17 +48,15 @@ monorepo/
     └── lib          1  gitlink: 160000 commit bafd496
 ```
 
-1. The commit. The monorepo's tree has an entry with the mode 160000, a so-called gitlink. It holds the ID of one library commit. Only the ID: the library's commit itself isn't in the monorepo.
+1. The gitlink. Where the library is, the monorepo's commit holds only the ID of the library's checked-out commit. The commit itself isn't stored in the monorepo.
 
-2. `.gitmodules`, a file that is committed like any other. It gives the submodule a name and maps the name to a path and a URL.
+2. `.gitmodules`, a file that is committed like any other. It gives the submodule a name and maps it to a path and an upstream URL.
 
-There are also [four more places](https://roschaefer.github.io/git-splice/test/comparisons/git-submodule/#where-a-submodule-keeps-its-state), which we don't see, where Git stores a submodule.
-
-I think this design makes two mistakes, and everything else follows from them.
+There are also [four more places](https://roschaefer.github.io/git-splice/test/comparisons/git-submodule/#where-a-submodule-keeps-its-state) outside the commit where Git keeps a submodule.
 
 ## Mistake 1: what belongs together is stored apart
 
-The monorepo stores a URL and one library commit, but never the library's files. So when I change a file in the library and a file in the app, `git status` doesn't even show me the library file. It only tells me that the submodule changed:
+Because the monorepo stores only the ID, it doesn't see the library's files. So when I change a file in the library and a file in the app, `git status` doesn't even show me the library file. It only tells me that the pointer to the submodule changed:
 
 ```console
 $ git status --short
@@ -66,25 +64,30 @@ $ git status --short
  m vendor/lib
 ```
 
-To commit, I need two commits in two repositories. First the bugfix *f* in the library, then *b* in the monorepo, which records nothing but the new pointer to *f*:
+For this one change I need two commits in two repositories, and the second one feels redundant. First the bugfix *f* in the library, then *b* in the monorepo, which records nothing but the new pointer to *f*:
 
 ![The monorepo's a and b in a line. Below it, the library's l and f, each under the monorepo commit that records it](../git-splice/test/comparisons/git-submodule-fix.drawio.svg)
 
-The monorepo commit *b* doesn't carry the change. It carries a reference to a commit that, at this point, exists only on my machine. That has consequences:
+That has consequences. For example, I can push the monorepo and forget the library commit that goes with it. Then my colleagues get an error when they clone:
 
-- `git log -- vendor/lib/src/parse.txt` in the monorepo is empty. The monorepo has no history of the library's files.
-- I have to push in the right order. If I push the monorepo first, my colleagues get a commit they can't check out: `fatal: remote error: upload-pack: not our ref`.
-- My colleagues end up in the library on a detached `HEAD`. If they want to fix something there, they need to create a branch first.
+```console
+$ git clone --recurse-submodules ../origin.git ../colleague
+fatal: remote error: upload-pack: not our ref a6152f5cee8b2bfd6b5dfc7bbb2bf5d8a7562325
+```
 
-A commit is supposed to be a snapshot of what I changed. With a submodule, half of my change is somewhere else.
+Other commands like `git log` don't look past the submodule's border either, because the monorepo only knows the pointer. The history of a library file is empty in the monorepo:
 
-## Mistake 2: shared mutable state
+```console
+git log --oneline -- vendor/lib/src/parse.txt
+```
 
-"Shared mutable state is the root of all evil" is an old rule from programming, and submodules run right into it.
+And why is the submodule's path in `.gitmodules` again? The gitlink already sits at that path.
 
-These places don't even live equally long. The gitlink and `.gitmodules` are committed, so everyone gets them. Others belong to a single worktree. I use `git worktree` a lot, to have a second branch checked out next to the first one. In a new worktree, the submodule is empty, and it gets its own clone of the library under `.git/worktrees/<name>/modules/`.
+## Mistake 2: "Shared mutable state is the root of all evil"
 
-But a copy of the URL is in the monorepo's `.git/config`, and all worktrees share that file. If I point the submodule at my fork in one worktree, I've changed it in all of them:
+That's an old piece of wisdom from programming, and submodules run right into it.
+
+Submodules also keep state outside the worktree, for example in the monorepo's `.git/config`. All worktrees share that file. I often use several worktrees to work in parallel. If I change the configuration in one worktree, for example the upstream URL, I've changed it *in all worktrees*:
 
 ```console
 $ git -C ../feature config submodule.vendor/lib.url https://git.example.com/lib-fork.git
@@ -92,16 +95,19 @@ $ git config submodule.vendor/lib.url
 https://git.example.com/lib-fork.git
 ```
 
-And the copies drift apart. If a colleague changes the URL in `.gitmodules`, my clone keeps fetching from the old one, until I run `git submodule sync`. Nothing tells me which of the places is right. Git also refuses to move or remove a worktree that contains submodules, unless I use `--force`. The Git documentation is honest about it: "the support for submodules is incomplete. It is NOT recommended to make multiple checkouts of a superproject."
+A classic case of shared mutable state. According to the Git documentation, the support for submodules in worktrees is incomplete. If you try anyway and want to remove a worktree with submodules again, you get a scary error:
+
+```console
+$ git worktree remove ../feature
+fatal: working trees containing submodules cannot be moved or removed
+```
 
 ## What I want instead
 
-The library's files should be in the monorepo commit, like any other files. Then the bugfix and the code that calls it are one commit, `status` and `log` see every file, and every worktree has the library without any setup:
+Shouldn't the monorepo carry everything it needs to live? Why is a submodule's state kept in so many different places? The library's files could be in the monorepo commit like any other files, and a single file in the library's folder would be enough to remember where it came from.
+
+Then a single commit *c* changes the library and the app:
 
 ![The monorepo's s and c in a line. Below it, the library's l, with main at l](../git-splice/test/comparisons/git-submodule-splice-fix.drawio.svg)
 
-Here *c* changes the library and the app in one commit. The library has no new commit yet. Its `main` stays at *l* until I decide to send the bugfix there. How that works is what this series is about.
-
-## Where submodules are still better
-
-Submodules have real strengths. A clone without `--recurse-submodules` doesn't download the library at all. The monorepo commit pins an exact library commit. And the library can stay private while the monorepo is public, or the other way round. If those things matter most to you, submodules are a reasonable choice.
+The library has no new commit yet. Its `main` stays at *l* until I decide to send the bugfix there.

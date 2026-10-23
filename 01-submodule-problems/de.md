@@ -10,7 +10,7 @@ question: "Habt ihr schon mal Git-Submodule benutzt, und wie war eure Erfahrung 
 docs: ../git-splice/test/comparisons/git-submodule.md
 ---
 
-Die älteste Implementierung von einem Repository, das in einem anderen steckt, heißt `git submodule`. Leider haben Submodule eine ausgesprochen schlechte Reputation. Wir schauen uns mal an, woran das liegt.
+Git hat eine eigene Implementierung von verschachtelten Repositories, sie heißt `git submodule`. Leider haben Submodule eine ausgesprochen schlechte Reputation. Wir schauen uns mal an, woran das liegt.
 
 Wir bauen uns ein Beispiel.
 
@@ -23,19 +23,19 @@ nix develop -c just sandbox comparisons/git-submodule
 
 Ihr könnt das Beispiel selbst ausführen: Diese Befehle öffnen eine Sandbox mit der Bibliothek und dem Monorepo, und jeder Befehl gibt dort aus, was ihr hier seht. Wie das geht, steht in der [Dokumentation von git-splice](https://roschaefer.github.io/git-splice/docs/sandbox/#any-page-in-a-sandbox).
 
-Das Beispiel baut eine Bibliothek mit 30 Commits und ein Monorepo mit einer App. Dann fügt es die Bibliothek als Submodul zum Monorepo hinzu:
+Das Beispiel baut eine Bibliothek mit 30 Commits und ein Monorepo mit einer App.
+
+Dann fügen wir die Bibliothek als Submodul zum Monorepo hinzu. Dieser eine Befehl, `git submodule add`, schreibt an sechs Stellen:
 
 ```console
 git submodule add https://git.example.com/lib.git vendor/lib
 ```
 
-Dieser eine Befehl, `git submodule add`, schreibt an sechs Stellen.
+Danach committen wir das Submodul:
 
 ```console
 git commit -m "add lib as a submodule"
 ```
-
-Danach committen wir das Submodul.
 
 ## Wo ein Submodul seinen Zustand ablegt
 
@@ -48,17 +48,15 @@ monorepo/
     └── lib          1  Gitlink: 160000 commit bafd496
 ```
 
-1. Der Commit. Der Tree des Monorepos hat einen Eintrag mit dem Modus 160000, einen sogenannten Gitlink. Er enthält die ID eines Commits der Bibliothek. Nur die ID: Den Commit selbst hat das Monorepo nicht.
+1. Der Gitlink. Wo die Bibliothek liegt, steht im Commit des Monorepos nur die ID ihres ausgecheckten Commits. Den Commit selbst speichert das Monorepo nicht.
 
-2. `.gitmodules`, eine Datei, die wie jede andere committet wird. Sie gibt dem Submodul einen Namen und ordnet dem Namen einen Pfad und eine URL zu.
+2. `.gitmodules`, eine Datei, die wie jede andere committet wird. Sie gibt dem Submodul einen Namen und ordnet ihm einen Pfad und eine Upstream-URL zu.
 
-Außerdem gibt es noch [vier Stellen](https://roschaefer.github.io/git-splice/test/comparisons/git-submodule/#where-a-submodule-keeps-its-state), die wir nicht sehen, an denen Git ein Submodul speichert.
-
-Ich halte zwei Entscheidungen in diesem Design für Fehler, und alles andere folgt daraus.
+Außerdem gibt es noch [vier weitere Stellen](https://roschaefer.github.io/git-splice/test/comparisons/git-submodule/#where-a-submodule-keeps-its-state) außerhalb des Commits, an denen Git ein Submodul ablegt.
 
 ## Fehler 1: Was zusammengehört, wird getrennt gespeichert
 
-Das Monorepo speichert eine URL und einen Commit der Bibliothek, aber nie die Dateien der Bibliothek. Wenn ich also eine Datei in der Bibliothek und eine in der App ändere, zeigt mir `git status` die Datei der Bibliothek gar nicht. Es meldet nur, dass sich das Submodul geändert hat:
+Weil das Monorepo nur die ID speichert, sieht es die Dateien der Bibliothek nicht. Wenn ich also eine Datei in der Bibliothek und eine in der App ändere, zeigt mir `git status` die Datei der Bibliothek gar nicht. Es meldet nur, dass sich der Zeiger auf das Submodul geändert hat:
 
 ```console
 $ git status --short
@@ -66,25 +64,30 @@ $ git status --short
  m vendor/lib
 ```
 
-Zum Committen brauche ich zwei Commits in zwei Repositories. Erst den Bugfix *f* in der Bibliothek, dann *b* im Monorepo, der nichts weiter speichert als den neuen Zeiger auf *f*:
+Für diese eine Änderung brauche ich zwei Commits in zwei Repositories, und der zweite fühlt sich überflüssig an. Erst den Bugfix *f* in der Bibliothek, dann *b* im Monorepo, der nichts weiter speichert als den neuen Zeiger auf *f*:
 
 ![Die Commits a und b des Monorepos in einer Reihe. Darunter die Commits l und f der Bibliothek, jeweils unter dem Monorepo-Commit, der sie speichert](../git-splice/test/comparisons/git-submodule-fix.drawio.svg)
 
-Der Monorepo-Commit *b* enthält die Änderung nicht. Er enthält einen Verweis auf einen Commit, den es in diesem Moment nur auf meinem Rechner gibt. Das hat Folgen:
+Das hat Folgen. Ich kann zum Beispiel das Monorepo pushen und den dazugehörigen Commit der Bibliothek vergessen. Dann bekommen meine Kollegen beim Klonen einen Fehler:
 
-- `git log -- vendor/lib/src/parse.txt` ist im Monorepo leer. Das Monorepo hat keine Historie der Bibliotheksdateien.
-- Ich muss in der richtigen Reihenfolge pushen. Pushe ich zuerst das Monorepo, bekommen meine Kolleginnen und Kollegen einen Commit, den sie nicht auschecken können: `fatal: remote error: upload-pack: not our ref`.
-- Bei ihnen steht die Bibliothek auf einem losgelösten `HEAD`. Wer dort etwas fixen will, muss zuerst einen Branch anlegen.
+```console
+$ git clone --recurse-submodules ../origin.git ../colleague
+fatal: remote error: upload-pack: not our ref a6152f5cee8b2bfd6b5dfc7bbb2bf5d8a7562325
+```
 
-Ein Commit soll eine Momentaufnahme dessen sein, was ich geändert habe. Mit einem Submodul liegt die Hälfte meiner Änderung woanders.
+Auch andere Befehle wie `git log` schauen nicht über die Grenze des Submoduls, weil das Monorepo nur den Zeiger kennt. Die Historie einer Datei der Bibliothek ist im Monorepo leer:
 
-## Fehler 2: Geteilter, veränderlicher Zustand
+```console
+git log --oneline -- vendor/lib/src/parse.txt
+```
 
-„Geteilter, veränderlicher Zustand ist die Wurzel allen Übels“ ist eine alte Regel aus der Programmierung, und Submodule laufen direkt hinein.
+Und warum steht der Pfad des Submoduls noch einmal in `.gitmodules`? Der Gitlink liegt doch schon an diesem Pfad.
 
-Diese Stellen leben nicht einmal gleich lang. Gitlink und `.gitmodules` werden committet, alle bekommen sie. Andere gehören zu einem einzelnen Worktree. Ich nutze oft `git worktree`, um einen zweiten Branch neben dem ersten ausgecheckt zu haben. In einem neuen Worktree ist das Submodul leer, und es bekommt einen eigenen Klon der Bibliothek unter `.git/worktrees/<name>/modules/`.
+## Fehler 2: „Geteilter, veränderlicher Zustand ist die Wurzel allen Übels“
 
-Aber eine Kopie der URL steht in der `.git/config` des Monorepos, und diese Datei teilen sich alle Worktrees. Zeige ich das Submodul in einem Worktree auf meinen Fork, habe ich es in allen geändert:
+Das ist eine alte Weisheit aus der Programmierung, und Submodule laufen direkt hinein.
+
+Submodule legen auch Zustand außerhalb des Worktrees ab, zum Beispiel in der `.git/config` des Monorepos. Diese Datei teilen sich alle Worktrees. Ich nutze oft mehrere Worktrees, um parallel zu arbeiten. Ändere ich in einem Worktree die Konfiguration, zum Beispiel die Upstream-URL, dann habe ich sie *in allen Worktrees* geändert:
 
 ```console
 $ git -C ../feature config submodule.vendor/lib.url https://git.example.com/lib-fork.git
@@ -92,16 +95,19 @@ $ git config submodule.vendor/lib.url
 https://git.example.com/lib-fork.git
 ```
 
-Und die Kopien laufen auseinander. Ändert jemand im Team die URL in `.gitmodules`, fetcht mein Klon weiter von der alten, bis ich `git submodule sync` aufrufe. Nichts zeigt mir, welche der Stellen recht hat. Außerdem weigert sich Git, einen Worktree mit Submodulen zu verschieben oder zu entfernen, außer mit `--force`. Die Git-Dokumentation sagt es offen: Die Unterstützung für Submodule ist unvollständig, und mehrere Checkouts eines Superprojects werden ausdrücklich nicht empfohlen.
+Ein klassischer Fall von geteiltem, veränderlichem Zustand. Laut Git-Dokumentation ist die Unterstützung für Submodule in Worktrees unvollständig. Wer es trotzdem versucht und einen Worktree mit Submodulen wieder entfernen will, bekommt eine gruselige Fehlermeldung:
+
+```console
+$ git worktree remove ../feature
+fatal: working trees containing submodules cannot be moved or removed
+```
 
 ## Was ich stattdessen will
 
-Die Dateien der Bibliothek sollen im Monorepo-Commit stehen, wie alle anderen Dateien auch. Dann sind der Bugfix und der Code, der ihn aufruft, ein Commit, `status` und `log` sehen jede Datei, und jeder Worktree hat die Bibliothek ohne weitere Einrichtung:
+Sollte das Monorepo nicht alles mit sich tragen, was es zum Leben braucht? Warum liegt der Zustand eines Submoduls an so vielen verschiedenen Stellen? Die Dateien der Bibliothek könnten im Monorepo-Commit stehen wie alle anderen Dateien, und eine einzige Datei im Ordner der Bibliothek würde reichen, um sich ihre Herkunft zu merken.
+
+Dann ändert ein einziger Commit *c* Bibliothek und App:
 
 ![Die Commits s und c des Monorepos in einer Reihe. Darunter der Commit l der Bibliothek, main zeigt auf l](../git-splice/test/comparisons/git-submodule-splice-fix.drawio.svg)
 
-Hier ändert *c* Bibliothek und App in einem Commit. Die Bibliothek hat noch keinen neuen Commit. Ihr `main` bleibt bei *l*, bis ich mich entscheide, den Bugfix dorthin zu schicken. Wie das funktioniert, darum geht es in dieser Serie.
-
-## Wo Submodule trotzdem besser sind
-
-Submodule haben echte Stärken. Ein Klon ohne `--recurse-submodules` lädt die Bibliothek gar nicht erst herunter. Der Monorepo-Commit legt einen exakten Commit der Bibliothek fest. Und die Bibliothek kann privat bleiben, während das Monorepo öffentlich ist, oder umgekehrt. Wenn diese Punkte am wichtigsten sind, sind Submodule eine vernünftige Wahl.
+Die Bibliothek hat noch keinen neuen Commit. Ihr `main` bleibt bei *l*, bis ich mich entscheide, den Bugfix dorthin zu schicken.
