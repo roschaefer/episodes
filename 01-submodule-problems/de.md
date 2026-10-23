@@ -12,7 +12,7 @@ docs: ../git-splice/test/comparisons/git-submodule.md
 
 Die älteste Implementierung von einem Repository, das in einem anderen steckt, heißt `git submodule`. Leider haben Submodule eine ausgesprochen schlechte Reputation. Wir schauen uns mal an, woran das liegt.
 
-Wir nehmen ein Beispiel:
+Wir bauen uns ein Beispiel.
 
 ```console
 # roschaefer.github.io/git-splice/docs/sandbox
