@@ -10,22 +10,22 @@ question: "Habt ihr schon mal Git-Submodule benutzt, und wie war eure Erfahrung 
 docs: ../git-splice/test/comparisons/git-submodule.md
 ---
 
-Ich arbeite an einer App, die eine Bibliothek aus einem anderen Repository nutzt. Dabei finde ich einen Fehler in der Bibliothek. Der Bugfix und der Code, der ihn aufruft, gehören zusammen. Also will ich sie in einem Rutsch ändern, zusammen testen und zusammen committen.
+Die älteste Implementierung von einem Repository, das in einem anderen steckt, heißt `git submodule`. Leider haben `git submodule`s eine ausgesprochen schlechte Reputation. Wir schauen uns mal an, woran das liegt.
 
-Ist die Bibliothek ein Submodul, fängt genau hier der Ärger an. Um zu verstehen, warum, zeige ich zuerst, wie ein Submodul funktioniert. Ich füge meinem Monorepo die Bibliothek mit einem Befehl hinzu, `git submodule add`. Dieser eine Befehl schreibt an sechs Stellen.
+Wir nehmen ein Beispiel:
 
 ## Wo ein Submodul seinen Zustand ablegt
 
 ```console
 $ git ls-tree HEAD vendor/lib
-160000 commit bafd496b1f4512a95b69464604f3da428aa9e33b	vendor/lib
+160000 commit bafd496b1f4512a95b69464604f3da428aa9e33b vendor/lib
 ```
 
 Erstens der Commit. Der Tree des Monorepos hat einen Eintrag mit dem Modus 160000, einen sogenannten Gitlink. Er enthält die ID eines Commits der Bibliothek. Nur die ID: Den Commit selbst hat das Monorepo nicht.
 
 ```console
 $ git ls-files --stage vendor/lib
-160000 bafd496b1f4512a95b69464604f3da428aa9e33b 0	vendor/lib
+160000 bafd496b1f4512a95b69464604f3da428aa9e33b 0 vendor/lib
 ```
 
 Zweitens der Index, die Datei in `.git`, in der Git den nächsten Commit vorbereitet. Er hat denselben Eintrag. Ob sich das Submodul geändert hat, sieht Git nicht an den Dateien der Bibliothek. Es vergleicht den `HEAD` der Bibliothek mit dieser ID.
@@ -33,8 +33,8 @@ Zweitens der Index, die Datei in `.git`, in der Git den nächsten Commit vorbere
 ```console
 $ cat .gitmodules
 [submodule "vendor/lib"]
-	path = vendor/lib
-	url = https://git.example.com/lib.git
+ path = vendor/lib
+ url = https://git.example.com/lib.git
 ```
 
 Drittens `.gitmodules`, eine Datei, die wie jede andere committet wird. Sie gibt dem Submodul einen Namen und ordnet dem Namen einen Pfad und eine URL zu.
