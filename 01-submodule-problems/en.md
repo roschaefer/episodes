@@ -10,11 +10,11 @@ question: "Have you ever used Git submodules, and what was your developer experi
 docs: ../git-splice/test/comparisons/git-submodule.md
 ---
 
-Git has its own implementation of nested repositories: submodules, with the command `git submodule`.
+Git has its own implementation of nested repositories: submodules.
 
 "Submodule" – that sounds like the right concept. But unfortunately, using them is quite error-prone. Let's have a look at why.
 
-Let's build an example.
+So let's build an example:
 
 ```console
 # roschaefer.github.io/git-splice/docs/sandbox

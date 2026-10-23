@@ -10,11 +10,11 @@ question: "Habt ihr schon mal Git-Submodule benutzt, und wie war eure Erfahrung 
 docs: ../git-splice/test/comparisons/git-submodule.md
 ---
 
-Git hat eine eigene Implementierung von verschachtelten Repositories: Submodule, mit dem Befehl `git submodule`.
+Git hat eine eigene Implementierung von verschachtelten Repositories: Submodule.
 
 „Submodul“ – das klingt nach dem richtigen Konzept. Aber leider ist die Anwendung ziemlich fehleranfällig. Wir schauen uns mal an, woran das liegt.
 
-Wir bauen uns mal ein Beispiel.
+Also bauen wir uns mal ein Beispiel:
 
 ```console
 # roschaefer.github.io/git-splice/docs/sandbox
