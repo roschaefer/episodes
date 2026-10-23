@@ -1,7 +1,8 @@
+import json
 from pathlib import Path
 
 import pytest
-from episode import Block, default_stroke_width, find_episode, parse, spoken
+from episode import Block, append_new_take, default_stroke_width, find_episode, parse, spoken
 
 POST = """---
 slug: example
@@ -149,3 +150,11 @@ def test_a_diagrams_1px_lines_stay_visible():
     assert default_stroke_width(svg) == (
         '<rect stroke-width="1" x="1" stroke="#000000"/><rect stroke="#000000" stroke-width="2"/><rect stroke="none"/><path d="M 0 0" fill="#000"/>'
     )
+
+
+def test_a_take_is_listed_in_the_cache_once_however_often_the_video_renders(tmp_path):
+    cache = tmp_path / "cache.json"
+    take = {"input_text": "Hi.", "input_data": {"input_text": "Hi.", "service": "recorder"}, "original_audio": "hi.mp3"}
+    append_new_take(cache, take)
+    append_new_take(cache, take)
+    assert [entry["original_audio"] for entry in json.loads(cache.read_text())] == ["hi.mp3"]

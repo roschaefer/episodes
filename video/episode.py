@@ -9,6 +9,7 @@ over a title card. Each language's <lang>.md makes its own video. See ../README.
 """
 
 import hashlib
+import json
 import os
 import re
 import subprocess
@@ -17,6 +18,7 @@ from pathlib import Path
 
 from manim import DOWN, WHITE, Code, FadeIn, FadeOut, Mobject, SVGMobject, Text, VGroup, config
 from manim_voiceover import VoiceoverScene
+import manim_voiceover.services.base as voiceover_base
 from manim_voiceover.services.base import SpeechService
 from pydub import AudioSegment
 
@@ -114,6 +116,18 @@ def find_episode(name: str, episodes: Path = EPISODES) -> Path:
         if name in (folder.name, id) or name.lstrip("0") == number.lstrip("0"):
             return folder
     raise SystemExit(f"No episode {name!r}. Episodes: {', '.join(folder.name for folder in folders)}")
+
+
+def append_new_take(json_file, entry) -> None:
+    """manim-voiceover lists a voiceover in cache.json on every render, even one it found there."""
+    cache = Path(json_file)
+    if cache.exists() and any(take["input_data"] == entry["input_data"] for take in json.loads(cache.read_text())):
+        return
+    append_voiceover_cache_entry(json_file, entry)
+
+
+append_voiceover_cache_entry = voiceover_base.append_voiceover_cache_entry
+voiceover_base.append_voiceover_cache_entry = append_new_take
 
 
 class GeneratedVoice(SpeechService):
