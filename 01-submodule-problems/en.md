@@ -10,7 +10,9 @@ question: "Have you ever used Git submodules, and what was your developer experi
 docs: ../git-splice/test/comparisons/git-submodule.md
 ---
 
-Git has its own implementation of nested repositories, called `git submodule`. Unfortunately, submodules have a remarkably bad reputation. Let's have a look at why.
+Git has its own implementation of nested repositories: submodules, with the command `git submodule`.
+
+"Submodule" – that sounds like the right concept. But unfortunately, using them is quite error-prone. Let's have a look at why.
 
 Let's build an example.
 
@@ -21,17 +23,17 @@ cd git-splice
 nix develop -c just sandbox comparisons/git-submodule
 ```
 
-You can run the example yourself: these commands open a sandbox with the library and the monorepo, and every command there prints what you see here. The [git-splice documentation](https://roschaefer.github.io/git-splice/docs/sandbox/#any-page-in-a-sandbox) explains how.
+By the way: you can run the example yourself. These commands open a sandbox with the submodule and the monorepo, and every command prints what you see here. The [git-splice documentation](https://roschaefer.github.io/git-splice/docs/sandbox/#any-page-in-a-sandbox) explains how.
 
-The example builds a library with 30 commits and a monorepo with an app.
+The example builds a monorepo and another repository with 30 commits.
 
-Then we add the library to the monorepo as a submodule. That one command, `git submodule add`, writes to six places:
+Then we add the other repository to the monorepo as a submodule. That one command, `git submodule add`, writes to six places in total:
 
 ```console
 git submodule add https://git.example.com/lib.git vendor/lib
 ```
 
-Then we commit the submodule:
+Now we commit the submodule in the monorepo:
 
 ```console
 git commit -m "add lib as a submodule"
@@ -48,15 +50,22 @@ monorepo/
     └── lib          1  gitlink: 160000 commit bafd496
 ```
 
-1. The gitlink. Where the library is, the monorepo's commit holds only the ID of the library's checked-out commit. The commit itself isn't stored in the monorepo.
+1. At the submodule's folder path, the monorepo's commit holds only a so-called gitlink, with the ID of the submodule's checked-out commit. The commit itself isn't stored in the monorepo.
 
-2. `.gitmodules`, a file that is committed like any other. It gives the submodule a name and maps it to a path and an upstream URL.
+2. The root folder has one more file, `.gitmodules`. It gives the submodule a name and stores the folder path to the submodule and its upstream URL, much like a `git remote`.
 
-There are also [four more places](https://roschaefer.github.io/git-splice/test/comparisons/git-submodule/#where-a-submodule-keeps-its-state) outside the commit where Git keeps a submodule.
+There are also [four more places](https://roschaefer.github.io/git-splice/test/comparisons/git-submodule/#where-a-submodule-keeps-its-state) where Git keeps a submodule. But only the two above end up in the commit.
 
 ## Mistake 1: what belongs together is stored apart
 
-Because the monorepo stores only the ID, it doesn't see the library's files. So when I change a file in the library and a file in the app, `git status` doesn't even show me the library file. It only tells me that the pointer to the submodule changed:
+Because the monorepo stores only the submodule's commit ID, it doesn't see the submodule's files. Say I change one file inside the submodule and one outside it:
+
+```console
+echo "fix" >>vendor/lib/src/parse.txt
+echo "call parse()" >>app/main.txt
+```
+
+Then `git status` doesn't even show me the changes inside the submodule. It only tells me that the pointer to the submodule changed:
 
 ```console
 $ git status --short
@@ -64,18 +73,18 @@ $ git status --short
  m vendor/lib
 ```
 
-For this one change I need two commits in two repositories, and the second one feels redundant. First the bugfix *f* in the library, then *b* in the monorepo, which records nothing but the new pointer to *f*:
+For this one change I need two commits in two repositories. First the bugfix *f* in the submodule, then *b* in the monorepo, which records nothing but the new pointer to *f*:
 
-![The monorepo's a and b in a line. Below it, the library's l and f, each under the monorepo commit that records it](../git-splice/test/comparisons/git-submodule-fix.drawio.svg)
+![The monorepo's a and b in a line. Below it, the submodule's l and f, each under the monorepo commit that records it](../git-splice/test/comparisons/git-submodule-fix.drawio.svg)
 
-That has consequences. For example, I can push the monorepo and forget the library commit that goes with it. Then my colleagues get an error when they clone:
+That has consequences. For example, I can push the monorepo and forget the submodule's commit that goes with it. Then my colleagues get an error when they clone:
 
 ```console
 $ git clone --recurse-submodules ../origin.git ../colleague
 fatal: remote error: upload-pack: not our ref a6152f5cee8b2bfd6b5dfc7bbb2bf5d8a7562325
 ```
 
-Other commands like `git log` don't look past the submodule's border either, because the monorepo only knows the pointer. The history of a library file is empty in the monorepo:
+Other commands like `git log` don't look past the submodule's border either, because the monorepo only knows the pointer. The history of a file in the submodule is empty in the monorepo:
 
 ```console
 git log --oneline -- vendor/lib/src/parse.txt
@@ -94,9 +103,9 @@ And why is the submodule's path in `.gitmodules` again? The gitlink already sits
 
 ## Mistake 2: "Shared mutable state is the root of all evil"
 
-That's an old piece of wisdom from programming, and submodules run right into it.
+"Shared mutable state is the root of all evil" – that's a well-known trap in programming, and submodules run right into it.
 
-Submodules also keep state outside the worktree, for example in the monorepo's `.git/config`. All worktrees share that file. I often use several worktrees to work in parallel. If I change the configuration in one worktree, for example the upstream URL, I've changed it *in all worktrees*:
+Submodules also keep global state outside the worktree, for example in the monorepo's `.git/config`. All worktrees share that file. I often use several worktrees to work in parallel. If I change the configuration in one worktree, for example the upstream URL, I've changed it *in all worktrees*:
 
 ```console
 $ git -C ../feature config submodule.vendor/lib.url https://git.example.com/lib-fork.git
@@ -113,10 +122,10 @@ fatal: working trees containing submodules cannot be moved or removed
 
 ## What I want instead
 
-Shouldn't the monorepo carry everything it needs to live? Why is a submodule's state kept in so many different places? The library's files could be in the monorepo commit like any other files, and a single file in the library's folder would be enough to remember where it came from.
+Shouldn't the monorepo carry everything it needs to live? Why is a submodule's state scattered across so many different places? The submodule's files could just be in the monorepo commit, like all other files.
 
-Then a single commit *c* changes the library and the app:
+From within the monorepo, a single commit *c* could change the submodule's files and the monorepo's at the same time:
 
 ![The monorepo's s and c in a line. Below it, the library's l, with main at l](../git-splice/test/comparisons/git-submodule-splice-fix.drawio.svg)
 
-The library has no new commit yet. Its `main` stays at *l* until I decide to send the bugfix there.
+Only when I decide to bring the bugfix to the submodule's repository would I send a commit there.

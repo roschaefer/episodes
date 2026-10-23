@@ -10,9 +10,9 @@ question: "Habt ihr schon mal Git-Submodule benutzt, und wie war eure Erfahrung 
 docs: ../git-splice/test/comparisons/git-submodule.md
 ---
 
-Git hat eine eigene Implementierung von verschachtelten Repositories: `git submodule`s.
+Git hat eine eigene Implementierung von verschachtelten Repositories: Submodule, mit dem Befehl `git submodule`.
 
-"Submodule" - das klingt nach dem richtigen Konzept. Aber leider ist ihre Anwendung ziemlich fehleranfällig. Wir schauen uns mal an, woran das liegt.
+„Submodul“ – das klingt nach dem richtigen Konzept. Aber leider ist die Anwendung ziemlich fehleranfällig. Wir schauen uns mal an, woran das liegt.
 
 Wir bauen uns mal ein Beispiel.
 
@@ -25,9 +25,9 @@ nix develop -c just sandbox comparisons/git-submodule
 
 Übrigens: Ihr könnt das Beispiel selbst ausführen. Diese Befehle öffnen eine Sandbox mit dem Submodul und dem Monorepo, und jeder Befehl gibt aus, was ihr hier seht. Wie das geht, steht in der [Dokumentation von git-splice](https://roschaefer.github.io/git-splice/docs/sandbox/#any-page-in-a-sandbox).
 
-Das Beispiel baut ein Szenario mit einem Monorepo und einem weiteren Repository mit 30 commits.
+Das Beispiel baut ein Monorepo und ein weiteres Repository mit 30 Commits.
 
-Dann fügen wir das andere Repsitory als Submodul zum Monorepo hinzu. Dieser eine Befehl, `git submodule add`, schreibt an insgesamt sechs Stellen:
+Dann fügen wir das andere Repository als Submodul zum Monorepo hinzu. Dieser eine Befehl, `git submodule add`, schreibt an insgesamt sechs Stellen:
 
 ```console
 git submodule add https://git.example.com/lib.git vendor/lib
@@ -50,17 +50,20 @@ monorepo/
     └── lib          1  Gitlink: 160000 commit bafd496
 ```
 
-1. Im Worktree des Monorepos befindet sich am Ordnerpfad des Submoduls nur der sogenannte "Gitlink" mit der ID vom ausgecheckten Commit des Submoduls. Den Commit selbst speichert das Monorepo nicht.
+1. Im Commit des Monorepos steht am Ordnerpfad des Submoduls nur ein sogenannter Gitlink mit der ID des ausgecheckten Commits des Submoduls. Den Commit selbst speichert das Monorepo nicht.
 
-2. Im Wurzelverzeichnis befindet sich eine weitere Datei, die `.gitmodules`. Sie gibt dem Submodul einen Namen, speichert den Ordnerpfad zum Submodul sowie die Upstream Konfiguration, ähnlich wie bei einem `git remote`.
+2. Im Wurzelverzeichnis befindet sich eine weitere Datei, die `.gitmodules`. Sie gibt dem Submodul einen Namen, speichert den Ordnerpfad zum Submodul sowie die Upstream-URL, ähnlich wie bei einem `git remote`.
 
-Außerdem gibt es noch [vier weitere Stellen](https://roschaefer.github.io/git-splice/test/comparisons/git-submodule/#where-a-submodule-keeps-its-state) an denen Git ein Submodul ablegt. Aber die beiden oben genannten Dateien sieht man später in den commits.
+Außerdem gibt es noch [vier weitere Stellen](https://roschaefer.github.io/git-splice/test/comparisons/git-submodule/#where-a-submodule-keeps-its-state), an denen Git ein Submodul ablegt. Aber nur die beiden oben genannten landen im Commit.
 
 ## Fehler 1: Was zusammengehört, wird getrennt gespeichert
 
-Weil das Monorepo nur die commit ID vom Submodul speichert, sieht es die Dateien des Submoduls nicht. Wenn ich z.B. Dateien innerhalb und außerhalb des Submoduls ändere:
+Weil das Monorepo nur die Commit-ID des Submoduls speichert, sieht es die Dateien des Submoduls nicht. Wenn ich zum Beispiel eine Datei innerhalb und eine außerhalb des Submoduls ändere:
 
-<code-example></code-example>
+```console
+echo "fix" >>vendor/lib/src/parse.txt
+echo "call parse()" >>app/main.txt
+```
 
 Dann zeigt mir `git status` die Änderungen innerhalb des Submoduls gar nicht. Es meldet nur, dass sich der Zeiger auf das Submodul geändert hat:
 
@@ -89,18 +92,18 @@ git log --oneline -- vendor/lib/src/parse.txt
 
 ```console
 $ git ls-tree HEAD vendor/lib
-160000 commit a6152f5cee8b2bfd6b5dfc7bbb2bf5d8a7562325 vendor/lib
+160000 commit a6152f5cee8b2bfd6b5dfc7bbb2bf5d8a7562325	vendor/lib
 $ cat .gitmodules
 [submodule "vendor/lib"]
- path = vendor/lib
- url = https://git.example.com/lib.git
+	path = vendor/lib
+	url = https://git.example.com/lib.git
 ```
 
 Und warum steht der Pfad des Submoduls noch einmal in `.gitmodules`? Der Gitlink liegt doch schon an diesem Pfad.
 
 ## Fehler 2: „Geteilter, veränderlicher Zustand ist die Wurzel allen Übels“
 
-„Geteilter, veränderlicher Zustand ist die Wurzel allen Übels“ - Das ist eine bekannte Falle in der Programmierung, und Submodule laufen direkt hinein.
+„Geteilter, veränderlicher Zustand ist die Wurzel allen Übels“ – das ist eine bekannte Falle in der Programmierung, und Submodule laufen direkt hinein.
 
 Submodule legen auch globalen Zustand außerhalb des Worktrees ab, zum Beispiel in der `.git/config` des Monorepos. Diese Datei teilen sich alle Worktrees. Ich nutze oft mehrere Worktrees, um parallel zu arbeiten. Ändere ich in einem Worktree die Konfiguration, zum Beispiel die Upstream-URL, dann habe ich sie *in allen Worktrees* geändert:
 
