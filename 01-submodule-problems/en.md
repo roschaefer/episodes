@@ -1,7 +1,7 @@
 ---
-slug: what-goes-wrong-with-git-submodules
+slug: git-submodules
 id: submodule-problems
-title: "What goes wrong with Git submodules"
+title: "git submodules"
 description: "One git submodule add writes to six places. The commit records a pointer, not the change, and the rest is state that clones and worktrees share in different ways."
 series: why-splicing
 seriesOrder: 2
@@ -79,6 +79,15 @@ Other commands like `git log` don't look past the submodule's border either, bec
 
 ```console
 git log --oneline -- vendor/lib/src/parse.txt
+```
+
+```console
+$ git ls-tree HEAD vendor/lib
+160000 commit a6152f5cee8b2bfd6b5dfc7bbb2bf5d8a7562325	vendor/lib
+$ cat .gitmodules
+[submodule "vendor/lib"]
+	path = vendor/lib
+	url = https://git.example.com/lib.git
 ```
 
 And why is the submodule's path in `.gitmodules` again? The gitlink already sits at that path.

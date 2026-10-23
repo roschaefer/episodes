@@ -1,7 +1,7 @@
 ---
-slug: was-bei-git-submodulen-schiefgeht
+slug: git-submodules
 id: submodule-problems
-title: "Was bei Git-Submodulen schiefgeht"
+title: "git submodules"
 description: "Ein git submodule add schreibt an sechs Stellen. Der Commit speichert einen Zeiger, nicht die Änderung, und der Rest ist Zustand, den Klone und Worktrees auf unterschiedliche Weise teilen."
 series: why-splicing
 seriesOrder: 2
@@ -79,6 +79,15 @@ Auch andere Befehle wie `git log` schauen nicht über die Grenze des Submoduls, 
 
 ```console
 git log --oneline -- vendor/lib/src/parse.txt
+```
+
+```console
+$ git ls-tree HEAD vendor/lib
+160000 commit a6152f5cee8b2bfd6b5dfc7bbb2bf5d8a7562325	vendor/lib
+$ cat .gitmodules
+[submodule "vendor/lib"]
+	path = vendor/lib
+	url = https://git.example.com/lib.git
 ```
 
 Und warum steht der Pfad des Submoduls noch einmal in `.gitmodules`? Der Gitlink liegt doch schon an diesem Pfad.
