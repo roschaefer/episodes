@@ -31,7 +31,7 @@ That one `git submodule add` wrote to six places:
 
 <div align="center">
 
-![The monorepo's folders and files where a submodule keeps its state: 1 the commit in .git/objects, 2 the index, 3 .gitmodules, 4 .git/config, 5 the file vendor/lib/.git, which points to 6, the library's repository in .git/modules/vendor/lib, which points back](git-submodule-state.drawio.svg)
+![The monorepo's folders and files where a submodule keeps its state: 1 the commit in .git/objects, 2 .gitmodules, 3 the index, 4 .git/config, 5 the file vendor/lib/.git, which points to 6, the library's repository in .git/modules/vendor/lib, which points back](git-submodule-state.drawio.svg)
 
 </div>
 
@@ -55,15 +55,6 @@ $ git ls-tree HEAD vendor/lib
 160000 commit bafd496b1f4512a95b69464604f3da428aa9e33b	vendor/lib
 ```
 
-The index has the same entry. Git ignores its file stats: to see whether
-the submodule changed, it compares the submodule's `HEAD` with this
-commit:
-
-```scrut
-$ git ls-files --stage vendor/lib
-160000 bafd496b1f4512a95b69464604f3da428aa9e33b 0	vendor/lib
-```
-
 `.gitmodules`, committed too, maps the submodule's name to its path and
 URL:
 
@@ -72,6 +63,15 @@ $ cat .gitmodules
 [submodule "vendor/lib"]
 	path = vendor/lib
 	url = https://git.example.com/lib.git
+```
+
+The index has the same entry as the commit. Git ignores its file stats: to see whether
+the submodule changed, it compares the submodule's `HEAD` with this
+commit:
+
+```scrut
+$ git ls-files --stage vendor/lib
+160000 bafd496b1f4512a95b69464604f3da428aa9e33b 0	vendor/lib
 ```
 
 `git submodule add` (in a clone, `git submodule init`) copied the URL
@@ -101,7 +101,7 @@ core.worktree ../../../../vendor/lib
 remote.origin.url https://git.example.com/lib.git
 ```
 
-So the submodule's state is in the commit, the index, a committed file,
+So the submodule's state is in the commit, a committed file, the index,
 the monorepo's config, a file in the worktree and a repository of its own.
 Each worktree adds its own index, pointer file and repository, see
 [problem 3](#problem-3-worktrees-barely-support-submodules).
