@@ -1,0 +1,275 @@
+[
+  {
+    "input_text": "Git hat eine eigene Implementierung von verschachtelten Repositories, sie hei\u00dft git submodule. Leider haben Submodule eine ausgesprochen schlechte Reputation. Wir schauen uns mal an, woran das liegt.",
+    "input_data": {
+      "input_text": "Git hat eine eigene Implementierung von verschachtelten Repositories, sie hei\u00dft git submodule. Leider haben Submodule eine ausgesprochen schlechte Reputation. Wir schauen uns mal an, woran das liegt.",
+      "service": "recorder",
+      "config": {
+        "rate": 48000,
+        "channels": 1
+      }
+    },
+    "original_audio": "git-hat-eine-eigene-implementierung-von-31d066d1.mp3",
+    "final_audio": "git-hat-eine-eigene-implementierung-von-31d066d1.mp3"
+  },
+  {
+    "input_text": "Wir bauen uns ein Beispiel.",
+    "input_data": {
+      "input_text": "Wir bauen uns ein Beispiel.",
+      "service": "recorder",
+      "config": {
+        "rate": 48000,
+        "channels": 1
+      }
+    },
+    "original_audio": "wir-bauen-uns-ein-beispiel-e14f18f3.mp3",
+    "final_audio": "wir-bauen-uns-ein-beispiel-e14f18f3.mp3"
+  },
+  {
+    "input_text": "Ihr k\u00f6nnt das Beispiel selbst ausf\u00fchren: Diese Befehle \u00f6ffnen eine Sandbox mit der Bibliothek und dem Monorepo, und jeder Befehl gibt dort aus, was ihr hier seht. Wie das geht, steht in der Dokumentation von git-splice.",
+    "input_data": {
+      "input_text": "Ihr k\u00f6nnt das Beispiel selbst ausf\u00fchren: Diese Befehle \u00f6ffnen eine Sandbox mit der Bibliothek und dem Monorepo, und jeder Befehl gibt dort aus, was ihr hier seht. Wie das geht, steht in der Dokumentation von git-splice.",
+      "service": "recorder",
+      "config": {
+        "rate": 48000,
+        "channels": 1
+      }
+    },
+    "original_audio": "ihr-konnt-das-beispiel-selbst-ausfuhren-diese-14f65f1f.mp3",
+    "final_audio": "ihr-konnt-das-beispiel-selbst-ausfuhren-diese-14f65f1f.mp3"
+  },
+  {
+    "input_text": "Das Beispiel baut eine Bibliothek mit 30 Commits und ein Monorepo mit einer App.",
+    "input_data": {
+      "input_text": "Das Beispiel baut eine Bibliothek mit 30 Commits und ein Monorepo mit einer App.",
+      "service": "recorder",
+      "config": {
+        "rate": 48000,
+        "channels": 1
+      }
+    },
+    "original_audio": "das-beispiel-baut-eine-bibliothek-mit-30-commits-9516347b.mp3",
+    "final_audio": "das-beispiel-baut-eine-bibliothek-mit-30-commits-9516347b.mp3"
+  },
+  {
+    "input_text": "Dann f\u00fcgen wir die Bibliothek als Submodul zum Monorepo hinzu. Dieser eine Befehl, git submodule add, schreibt an sechs Stellen:",
+    "input_data": {
+      "input_text": "Dann f\u00fcgen wir die Bibliothek als Submodul zum Monorepo hinzu. Dieser eine Befehl, git submodule add, schreibt an sechs Stellen:",
+      "service": "recorder",
+      "config": {
+        "rate": 48000,
+        "channels": 1
+      }
+    },
+    "original_audio": "dann-fugen-wir-die-bibliothek-als-submodul-zum-d2aea6f8.mp3",
+    "final_audio": "dann-fugen-wir-die-bibliothek-als-submodul-zum-d2aea6f8.mp3"
+  },
+  {
+    "input_text": "Danach committen wir das Submodul:",
+    "input_data": {
+      "input_text": "Danach committen wir das Submodul:",
+      "service": "recorder",
+      "config": {
+        "rate": 48000,
+        "channels": 1
+      }
+    },
+    "original_audio": "danach-committen-wir-das-submodul-95e32cd0.mp3",
+    "final_audio": "danach-committen-wir-das-submodul-95e32cd0.mp3"
+  },
+  {
+    "input_text": "1. Der Gitlink. Wo die Bibliothek liegt, steht im Commit des Monorepos nur die ID ihres ausgecheckten Commits. Den Commit selbst speichert das Monorepo nicht.",
+    "input_data": {
+      "input_text": "1. Der Gitlink. Wo die Bibliothek liegt, steht im Commit des Monorepos nur die ID ihres ausgecheckten Commits. Den Commit selbst speichert das Monorepo nicht.",
+      "service": "recorder",
+      "config": {
+        "rate": 48000,
+        "channels": 1
+      }
+    },
+    "original_audio": "1-der-gitlink-wo-die-bibliothek-liegt-steht-im-08bda5a9.mp3",
+    "final_audio": "1-der-gitlink-wo-die-bibliothek-liegt-steht-im-08bda5a9.mp3"
+  },
+  {
+    "input_text": "2. .gitmodules, eine Datei, die wie jede andere committet wird. Sie gibt dem Submodul einen Namen und ordnet ihm einen Pfad und eine Upstream-URL zu.",
+    "input_data": {
+      "input_text": "2. .gitmodules, eine Datei, die wie jede andere committet wird. Sie gibt dem Submodul einen Namen und ordnet ihm einen Pfad und eine Upstream-URL zu.",
+      "service": "recorder",
+      "config": {
+        "rate": 48000,
+        "channels": 1
+      }
+    },
+    "original_audio": "2-gitmodules-eine-datei-die-wie-jede-andere-3761732f.mp3",
+    "final_audio": "2-gitmodules-eine-datei-die-wie-jede-andere-3761732f.mp3"
+  },
+  {
+    "input_text": "Au\u00dferdem gibt es noch vier weitere Stellen au\u00dferhalb des Commits, an denen Git ein Submodul ablegt.",
+    "input_data": {
+      "input_text": "Au\u00dferdem gibt es noch vier weitere Stellen au\u00dferhalb des Commits, an denen Git ein Submodul ablegt.",
+      "service": "recorder",
+      "config": {
+        "rate": 48000,
+        "channels": 1
+      }
+    },
+    "original_audio": "ausserdem-gibt-es-noch-vier-weitere-stellen-6f71fea7.mp3",
+    "final_audio": "ausserdem-gibt-es-noch-vier-weitere-stellen-6f71fea7.mp3"
+  },
+  {
+    "input_text": "Weil das Monorepo nur die ID speichert, sieht es die Dateien der Bibliothek nicht. Wenn ich also eine Datei in der Bibliothek und eine in der App \u00e4ndere, zeigt mir git status die Datei der Bibliothek gar nicht. Es meldet nur, dass sich der Zeiger auf das Submodul ge\u00e4ndert hat:",
+    "input_data": {
+      "input_text": "Weil das Monorepo nur die ID speichert, sieht es die Dateien der Bibliothek nicht. Wenn ich also eine Datei in der Bibliothek und eine in der App \u00e4ndere, zeigt mir git status die Datei der Bibliothek gar nicht. Es meldet nur, dass sich der Zeiger auf das Submodul ge\u00e4ndert hat:",
+      "service": "recorder",
+      "config": {
+        "rate": 48000,
+        "channels": 1
+      }
+    },
+    "original_audio": "weil-das-monorepo-nur-die-id-speichert-sieht-es-48dd1d47.mp3",
+    "final_audio": "weil-das-monorepo-nur-die-id-speichert-sieht-es-48dd1d47.mp3"
+  },
+  {
+    "input_text": "F\u00fcr diese eine \u00c4nderung brauche ich zwei Commits in zwei Repositories, und der zweite f\u00fchlt sich \u00fcberfl\u00fcssig an. Erst den Bugfix f in der Bibliothek, dann b im Monorepo, der nichts weiter speichert als den neuen Zeiger auf f:",
+    "input_data": {
+      "input_text": "F\u00fcr diese eine \u00c4nderung brauche ich zwei Commits in zwei Repositories, und der zweite f\u00fchlt sich \u00fcberfl\u00fcssig an. Erst den Bugfix f in der Bibliothek, dann b im Monorepo, der nichts weiter speichert als den neuen Zeiger auf f:",
+      "service": "recorder",
+      "config": {
+        "rate": 48000,
+        "channels": 1
+      }
+    },
+    "original_audio": "fur-diese-eine-anderung-brauche-ich-zwei-commits-a3322604.mp3",
+    "final_audio": "fur-diese-eine-anderung-brauche-ich-zwei-commits-a3322604.mp3"
+  },
+  {
+    "input_text": "Das hat Folgen. Ich kann zum Beispiel das Monorepo pushen und den dazugeh\u00f6rigen Commit der Bibliothek vergessen. Dann bekommen meine Kollegen beim Klonen einen Fehler:",
+    "input_data": {
+      "input_text": "Das hat Folgen. Ich kann zum Beispiel das Monorepo pushen und den dazugeh\u00f6rigen Commit der Bibliothek vergessen. Dann bekommen meine Kollegen beim Klonen einen Fehler:",
+      "service": "recorder",
+      "config": {
+        "rate": 48000,
+        "channels": 1
+      }
+    },
+    "original_audio": "das-hat-folgen-ich-kann-zum-beispiel-das-monorepo-4ba85331.mp3",
+    "final_audio": "das-hat-folgen-ich-kann-zum-beispiel-das-monorepo-4ba85331.mp3"
+  },
+  {
+    "input_text": "Auch andere Befehle wie git log schauen nicht \u00fcber die Grenze des Submoduls, weil das Monorepo nur den Zeiger kennt. Die Historie einer Datei der Bibliothek ist im Monorepo leer:",
+    "input_data": {
+      "input_text": "Auch andere Befehle wie git log schauen nicht \u00fcber die Grenze des Submoduls, weil das Monorepo nur den Zeiger kennt. Die Historie einer Datei der Bibliothek ist im Monorepo leer:",
+      "service": "recorder",
+      "config": {
+        "rate": 48000,
+        "channels": 1
+      }
+    },
+    "original_audio": "auch-andere-befehle-wie-git-log-schauen-nicht-uber-201c941f.mp3",
+    "final_audio": "auch-andere-befehle-wie-git-log-schauen-nicht-uber-201c941f.mp3"
+  },
+  {
+    "input_text": "Und warum steht der Pfad des Submoduls noch einmal in .gitmodules? Der Gitlink liegt doch schon an diesem Pfad.",
+    "input_data": {
+      "input_text": "Und warum steht der Pfad des Submoduls noch einmal in .gitmodules? Der Gitlink liegt doch schon an diesem Pfad.",
+      "service": "recorder",
+      "config": {
+        "rate": 48000,
+        "channels": 1
+      }
+    },
+    "original_audio": "und-warum-steht-der-pfad-des-submoduls-noch-einmal-2c4e8a28.mp3",
+    "final_audio": "und-warum-steht-der-pfad-des-submoduls-noch-einmal-2c4e8a28.mp3"
+  },
+  {
+    "input_text": "Das ist eine alte Weisheit aus der Programmierung, und Submodule laufen direkt hinein.",
+    "input_data": {
+      "input_text": "Das ist eine alte Weisheit aus der Programmierung, und Submodule laufen direkt hinein.",
+      "service": "recorder",
+      "config": {
+        "rate": 48000,
+        "channels": 1
+      }
+    },
+    "original_audio": "das-ist-eine-alte-weisheit-aus-der-programmierung-5e1f92b2.mp3",
+    "final_audio": "das-ist-eine-alte-weisheit-aus-der-programmierung-5e1f92b2.mp3"
+  },
+  {
+    "input_text": "Submodule legen auch Zustand au\u00dferhalb des Worktrees ab, zum Beispiel in der .git/config des Monorepos. Diese Datei teilen sich alle Worktrees. Ich nutze oft mehrere Worktrees, um parallel zu arbeiten. \u00c4ndere ich in einem Worktree die Konfiguration, zum Beispiel die Upstream-URL, dann habe ich sie in allen Worktrees ge\u00e4ndert:",
+    "input_data": {
+      "input_text": "Submodule legen auch Zustand au\u00dferhalb des Worktrees ab, zum Beispiel in der .git/config des Monorepos. Diese Datei teilen sich alle Worktrees. Ich nutze oft mehrere Worktrees, um parallel zu arbeiten. \u00c4ndere ich in einem Worktree die Konfiguration, zum Beispiel die Upstream-URL, dann habe ich sie in allen Worktrees ge\u00e4ndert:",
+      "service": "recorder",
+      "config": {
+        "rate": 48000,
+        "channels": 1
+      }
+    },
+    "original_audio": "submodule-legen-auch-zustand-ausserhalb-des-3d4cb82e.mp3",
+    "final_audio": "submodule-legen-auch-zustand-ausserhalb-des-3d4cb82e.mp3"
+  },
+  {
+    "input_text": "Ein klassischer Fall von geteiltem, ver\u00e4nderlichem Zustand. Laut Git-Dokumentation ist die Unterst\u00fctzung f\u00fcr Submodule in Worktrees unvollst\u00e4ndig. Wer es trotzdem versucht und einen Worktree mit Submodulen wieder entfernen will, bekommt eine gruselige Fehlermeldung:",
+    "input_data": {
+      "input_text": "Ein klassischer Fall von geteiltem, ver\u00e4nderlichem Zustand. Laut Git-Dokumentation ist die Unterst\u00fctzung f\u00fcr Submodule in Worktrees unvollst\u00e4ndig. Wer es trotzdem versucht und einen Worktree mit Submodulen wieder entfernen will, bekommt eine gruselige Fehlermeldung:",
+      "service": "recorder",
+      "config": {
+        "rate": 48000,
+        "channels": 1
+      }
+    },
+    "original_audio": "ein-klassischer-fall-von-geteiltem-veranderlichem-d5b066b9.mp3",
+    "final_audio": "ein-klassischer-fall-von-geteiltem-veranderlichem-d5b066b9.mp3"
+  },
+  {
+    "input_text": "Sollte das Monorepo nicht alles mit sich tragen, was es zum Leben braucht? Warum liegt der Zustand eines Submoduls an so vielen verschiedenen Stellen? Die Dateien der Bibliothek k\u00f6nnten im Monorepo-Commit stehen wie alle anderen Dateien, und eine einzige Datei im Ordner der Bibliothek w\u00fcrde reichen, um sich ihre Herkunft zu merken.",
+    "input_data": {
+      "input_text": "Sollte das Monorepo nicht alles mit sich tragen, was es zum Leben braucht? Warum liegt der Zustand eines Submoduls an so vielen verschiedenen Stellen? Die Dateien der Bibliothek k\u00f6nnten im Monorepo-Commit stehen wie alle anderen Dateien, und eine einzige Datei im Ordner der Bibliothek w\u00fcrde reichen, um sich ihre Herkunft zu merken.",
+      "service": "recorder",
+      "config": {
+        "rate": 48000,
+        "channels": 1
+      }
+    },
+    "original_audio": "sollte-das-monorepo-nicht-alles-mit-sich-tragen-46c0bcc6.mp3",
+    "final_audio": "sollte-das-monorepo-nicht-alles-mit-sich-tragen-46c0bcc6.mp3"
+  },
+  {
+    "input_text": "Dann \u00e4ndert ein einziger Commit c Bibliothek und App:",
+    "input_data": {
+      "input_text": "Dann \u00e4ndert ein einziger Commit c Bibliothek und App:",
+      "service": "recorder",
+      "config": {
+        "rate": 48000,
+        "channels": 1
+      }
+    },
+    "original_audio": "dann-andert-ein-einziger-commit-c-bibliothek-und-fd817552.mp3",
+    "final_audio": "dann-andert-ein-einziger-commit-c-bibliothek-und-fd817552.mp3"
+  },
+  {
+    "input_text": "Die Bibliothek hat noch keinen neuen Commit. Ihr main bleibt bei l, bis ich mich entscheide, den Bugfix dorthin zu schicken.",
+    "input_data": {
+      "input_text": "Die Bibliothek hat noch keinen neuen Commit. Ihr main bleibt bei l, bis ich mich entscheide, den Bugfix dorthin zu schicken.",
+      "service": "recorder",
+      "config": {
+        "rate": 48000,
+        "channels": 1
+      }
+    },
+    "original_audio": "die-bibliothek-hat-noch-keinen-neuen-commit-ihr-d89d1178.mp3",
+    "final_audio": "die-bibliothek-hat-noch-keinen-neuen-commit-ihr-d89d1178.mp3"
+  },
+  {
+    "input_text": "Habt ihr schon mal Git-Submodule benutzt, und wie war eure Erfahrung damit? Schreibt es mir in die Kommentare.",
+    "input_data": {
+      "input_text": "Habt ihr schon mal Git-Submodule benutzt, und wie war eure Erfahrung damit? Schreibt es mir in die Kommentare.",
+      "service": "recorder",
+      "config": {
+        "rate": 48000,
+        "channels": 1
+      }
+    },
+    "original_audio": "habt-ihr-schon-mal-git-submodule-benutzt-und-wie-084cb9a2.mp3",
+    "final_audio": "habt-ihr-schon-mal-git-submodule-benutzt-und-wie-084cb9a2.mp3"
+  }
+]
