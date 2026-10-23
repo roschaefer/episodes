@@ -1,0 +1,16 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "packages": {
+    ".": {
+      "release-type": "simple",
+      "package-name": "git-splice",
+      "bump-minor-pre-major": true,
+      "extra-files": [
+        "git-splice"
+      ],
+      "initial-version": "0.1.0",
+      "include-component-in-tag": false
+    }
+  },
+  "bootstrap-sha": "f5ba99f61c564da045c022c7a349c3c3875a7964"
+}

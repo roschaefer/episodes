@@ -1,0 +1,17 @@
+[project]
+name = "episodes"
+version = "0"
+description = "Renders the episodes' videos with Manim"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "manim",
+    "manim-voiceover[recorder]",
+]
+
+[tool.uv]
+package = false
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+]

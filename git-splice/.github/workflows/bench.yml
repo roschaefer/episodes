@@ -1,0 +1,42 @@
+name: Benchmark
+
+# Informational only: shared runners vary too much between runs for a
+# timing threshold to be a reliable check. Skipped for draft PRs, like
+# other expensive jobs; ready_for_review runs it once a PR leaves draft.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+jobs:
+  benchmark:
+    if: ${{ !github.event.pull_request.draft }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: DeterminateSystems/nix-installer-action@dbbcd8c3ec10ff26bded0022d5b9c00c1c3b687a # main
+      - uses: DeterminateSystems/magic-nix-cache-action@f69a2d3e148e90223fe63ab6e3f6331f2e7e33dc # main
+      - uses: ./.github/actions/scrut-cache
+
+      - name: benchmark this PR, merged into its base, against the base
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          git worktree add --detach "$RUNNER_TEMP/base" "$BASE_SHA"
+          {
+            echo "## Benchmark: this PR vs. its base"
+            echo
+            echo "\`this\` is this PR merged into its base, \`compared\` is the base alone (${BASE_SHA:0:7})."
+            echo
+            # The base predates git-splice until the rewrite has landed.
+            if [ -x "$RUNNER_TEMP/base/git-splice" ]; then
+              nix develop --command bench/run.sh --compare "$RUNNER_TEMP/base/git-splice"
+            else
+              nix develop --command bench/run.sh
+            fi
+          } >>"$GITHUB_STEP_SUMMARY"
