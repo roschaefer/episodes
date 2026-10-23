@@ -90,15 +90,6 @@ Other commands like `git log` don't look past the submodule's border either, bec
 git log --oneline -- vendor/lib/src/parse.txt
 ```
 
-```console
-$ git ls-tree HEAD vendor/lib
-160000 commit a6152f5cee8b2bfd6b5dfc7bbb2bf5d8a7562325	vendor/lib
-$ cat .gitmodules
-[submodule "vendor/lib"]
-	path = vendor/lib
-	url = https://git.example.com/lib.git
-```
-
 And why is the submodule's path in `.gitmodules` again? The gitlink already sits at that path:
 
 ```text
