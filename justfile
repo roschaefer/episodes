@@ -8,7 +8,7 @@ default:
     @just --list
 
 # Run the checks of the episodes, their videos' glue, and the git-splice docs they cite
-check: video-test voiceovers-check examples-check
+check: video-test voiceovers-check
     cd git-splice && nix develop --command just docs-check
 
 # Preview an episode's video in a language (en, de) with a computer voice (voice=silence for none): quality l(ow), m(edium), h(igh) or k (4K)
@@ -38,14 +38,3 @@ voiceovers-check:
 # Test the glue that turns an episode into video blocks
 video-test:
     {{shell}} 'uv run pytest -q video'
-
-# Build each episode's example, to see that it still builds
-examples-check:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    for script in */example.sh; do
-      tmp=$(mktemp -d)
-      "$script" "$tmp/example" >/dev/null
-      rm -rf "$tmp"
-      echo "ok   $script"
-    done

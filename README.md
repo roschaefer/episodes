@@ -10,7 +10,6 @@ Each language has its own post and its own video, which I speak myself.
 episodes/<nn>-<id>/en.md   the English post, and the script for the English video
 episodes/<nn>-<id>/de.md   the German post, and the script for the German video
 episodes/<nn>-<id>/*.svg   diagrams that belong to this episode only
-episodes/<nn>-<id>/example.sh  builds the episode's example, to try its commands
 episodes/git-splice/       git-splice, spliced in: the docs and diagrams the episodes cite
 ```
 
@@ -34,9 +33,10 @@ shows that the chapter is unclear or missing a step, fix the chapter in
 `git-splice/` in the same commit, then `git splice push git-splice`.
 `just check` runs the git-splice docs' tests along with the episodes'.
 
-An `example.sh` builds the repositories an episode shows, from the same
-setup as the git-splice chapter it cites, so their commits and hashes are
-the episode's. `just examples-check` builds each one.
+An episode that runs a chapter's commands tells viewers how to run them
+too: `just comparison <page>`, in a clone of git-splice, opens a shell in
+the state the page starts from (see `git-splice/docs/sandbox.md`). The
+first such episode, 01, explains it.
 
 Images use paths relative to the file, so they render in any Markdown
 preview. Diagrams the git-splice docs already test are referenced where
