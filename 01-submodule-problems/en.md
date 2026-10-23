@@ -12,14 +12,13 @@ docs: ../git-splice/test/comparisons/git-submodule.md
 
 The oldest way to have one repository inside another is called `git submodule`. Unfortunately, submodules have a remarkably bad reputation. Let's have a look at why.
 
-Let's take an example:
+Let's build an example.
 
 ```console
 # roschaefer.github.io/git-splice/docs/sandbox
 git clone https://github.com/roschaefer/git-splice.git
 cd git-splice
-nix develop
-just sandbox comparisons/git-submodule
+nix develop -c just sandbox comparisons/git-submodule
 ```
 
 You can run the example yourself: these commands open a sandbox with the library and the monorepo, and every command there prints what you see here. The [git-splice documentation](https://roschaefer.github.io/git-splice/docs/sandbox/#any-page-in-a-sandbox) explains how.

@@ -18,8 +18,7 @@ Wir bauen uns ein Beispiel.
 # roschaefer.github.io/git-splice/docs/sandbox
 git clone https://github.com/roschaefer/git-splice.git
 cd git-splice
-nix develop
-just sandbox comparisons/git-submodule
+nix develop -c just sandbox comparisons/git-submodule
 ```
 
 Ihr könnt das Beispiel selbst ausführen: Diese Befehle öffnen eine Sandbox mit der Bibliothek und dem Monorepo, und jeder Befehl gibt dort aus, was ihr hier seht. Wie das geht, steht in der [Dokumentation von git-splice](https://roschaefer.github.io/git-splice/docs/sandbox/#any-page-in-a-sandbox).
