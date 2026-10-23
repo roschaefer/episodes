@@ -69,8 +69,10 @@ episode references any more.
 Each video comes from the post in its language, `en.md` or `de.md`, with
 Manim and manim-voiceover (`video/episode.py`). Each heading, diagram, or
 code block becomes a block of the video, and the prose after it, up to
-the next block, is what I say over it, one voiceover per paragraph. The
-prose before the first block plays over a title card. The two videos
+the next block, is what I say over it, one voiceover per paragraph. A
+paragraph that ends in a colon introduces the next block, so it plays
+over that one: "This command writes to six places:" shows the command
+while I say it. The prose before the first block plays over a title card. The two videos
 don't share timing: each block lasts as long as I take to say it in that
 language, so they are two files, not one with two audio tracks.
 

@@ -1,8 +1,9 @@
 """Renders an episode's en.md as a video, block by block.
 
 A block starts at each heading, diagram, or code block, and its narration is
-the prose up to the next one. The prose before the first block plays over a
-title card. Each language's <lang>.md makes its own video. See ../README.md.
+the prose up to the next one. A paragraph ending in a colon introduces the
+next block, so it plays over that one. The prose before the first block plays
+over a title card. Each language's <lang>.md makes its own video. See ../README.md.
 
     EPISODE=<id> [EPISODE_LANG=en|de] [VOICE=piper|silence|recorder] manim video/episode.py Episode
 """
@@ -54,32 +55,41 @@ def parse(path: Path) -> list[Block]:
     question = re.search(r'^question: *"?(.*?)"?$', frontmatter, re.MULTILINE)
     paragraph: list[str] = []
 
+    lead_in: list[str] = []
+
     def end_paragraph() -> None:
         if paragraph:
-            blocks[-1].narration.append(spoken("\n".join(paragraph)))
+            blocks[-1].narration.extend(lead_in)
+            lead_in.clear()
+            text = spoken("\n".join(paragraph))
+            (lead_in if text.endswith(":") else blocks[-1].narration).append(text)
             paragraph.clear()
+
+    def start(block: Block) -> None:
+        end_paragraph()
+        block.narration.extend(lead_in)
+        lead_in.clear()
+        blocks.append(block)
 
     lines = iter(body.splitlines())
     for line in lines:
         if line.startswith("```"):
-            end_paragraph()
             code = []
             for code_line in lines:
                 if code_line.startswith("```"):
                     break
                 code.append(code_line)
-            blocks.append(Block("code", "\n".join(code)))
+            start(Block("code", "\n".join(code)))
         elif image := re.fullmatch(r"!\[[^\]]*\]\(([^)]+)\)", line.strip()):
-            end_paragraph()
-            blocks.append(Block("image", str((path.parent / image.group(1)).resolve())))
+            start(Block("image", str((path.parent / image.group(1)).resolve())))
         elif heading := re.fullmatch(r"#+ +(.*)", line):
-            end_paragraph()
-            blocks.append(Block("heading", spoken(heading.group(1))))
+            start(Block("heading", spoken(heading.group(1))))
         elif line.strip():
             paragraph.append(line)
         else:
             end_paragraph()
     end_paragraph()
+    blocks[-1].narration.extend(lead_in)
     if docs:
         chapter = (path.parent / docs.group(1)).resolve()
         chapter_title = spoken(re.search(r"^# +(.+)$", chapter.read_text(), re.MULTILINE).group(1))

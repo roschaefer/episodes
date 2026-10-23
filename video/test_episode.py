@@ -57,6 +57,35 @@ def test_each_paragraph_up_to_the_next_block_is_one_voiceover(tmp_path):
     ]
 
 
+def test_a_paragraph_ending_in_a_colon_plays_over_the_block_it_introduces(tmp_path):
+    post = tmp_path / "example" / "en.md"
+    post.parent.mkdir()
+    post.write_text(POST.replace("Second paragraph.", "Second paragraph.\n\nThe diagram shows:"))
+    code, image = parse(post)[2:]
+    assert code.narration[-1] == "Second paragraph."
+    assert image.narration == ["The diagram shows:", "Read over the diagram."]
+
+
+def test_a_colon_introduces_only_the_next_block(tmp_path):
+    post = tmp_path / "example" / "en.md"
+    post.parent.mkdir()
+    post.write_text(POST.replace("Read over the heading.", "Read over the heading.\n\nThe output:\n\nIt changed."))
+    heading, code = parse(post)[1:3]
+    assert heading.narration == ["Read over the heading.", "The output:", "It changed."]
+    assert code.narration[0] == "First paragraph about the output. Still the first paragraph."
+
+
+def test_a_block_introduced_by_a_colon_keeps_it_when_the_next_block_follows_directly(tmp_path):
+    post = tmp_path / "example" / "en.md"
+    post.parent.mkdir()
+    post.write_text(POST.replace("Read over the heading.", "The output:").replace(
+        "First paragraph about the output.\nStill the first paragraph.\n\nSecond paragraph.\n", ""))
+    heading, code, image = parse(post)[1:]
+    assert heading.narration == []
+    assert code.narration == ["The output:"]
+    assert image.narration == ["Read over the diagram."]
+
+
 def test_diagram_paths_are_relative_to_the_post(tmp_path):
     assert blocks(tmp_path)[3].content == str(tmp_path / "diagram.svg")
 
