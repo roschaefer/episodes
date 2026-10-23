@@ -14,17 +14,11 @@ Die älteste Implementierung von einem Repository, das in einem anderen steckt, 
 
 Wir nehmen ein Beispiel:
 
-```console
-$ ./example.sh
-$ export GIT_CONFIG_GLOBAL=$PWD/submodule-example/gitconfig
-$ cd submodule-example/monorepo
-```
-
-[`example.sh`](https://github.com/roschaefer/episodes/blob/HEAD/01-submodule-problems/example.sh) baut eine Bibliothek mit 30 Commits und ein Monorepo mit einer App. Ihr findet das Skript im Repository zu dieser Episode und könnt jeden Befehl selbst ausprobieren. Dann fügt es die Bibliothek als Submodul hinzu und committet sie:
+[Das Beispiel Shell-Script](https://github.com/roschaefer/episodes/blob/HEAD/01-submodule-problems/example.sh) baut eine Bibliothek mit 30 Commits und ein Monorepo mit einer App. Dann fügt es die Bibliothek als Submodul zum Monorepo hinzu:
 
 ```console
-$ git submodule add https://git.example.com/lib.git vendor/lib
-$ git commit -m "add lib as a submodule"
+git submodule add https://git.example.com/lib.git vendor/lib
+git commit -m "add lib as a submodule"
 ```
 
 Dieser eine Befehl, `git submodule add`, schreibt an sechs Stellen.
