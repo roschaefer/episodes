@@ -21,7 +21,7 @@ from pydub import AudioSegment
 
 EPISODES = Path(__file__).resolve().parent.parent
 GIT_SPLICE = EPISODES / "git-splice"
-GIT_SPLICE_URL = "https://github.com/roschaefer/git-splice/blob/main"
+DOCS_SITE = "roschaefer.github.io/git-splice"
 WORDS_PER_MINUTE = 150
 COMMENT_PROMPT = {"en": "Write it in the comments below.", "de": "Schreibt es mir in die Kommentare."}
 DOCS_LABEL = {"en": "More in the git-splice docs", "de": "Mehr in der Dokumentation von git-splice"}
@@ -83,7 +83,9 @@ def parse(path: Path) -> list[Block]:
     if docs:
         chapter = (path.parent / docs.group(1)).resolve()
         chapter_title = spoken(re.search(r"^# +(.+)$", chapter.read_text(), re.MULTILINE).group(1))
-        url = f"{GIT_SPLICE_URL}/{chapter.relative_to(GIT_SPLICE.resolve())}"
+        # Its page on the docs site, as I'd type it: no scheme, a README is its folder.
+        page = re.sub(r"(^|/)README\.md$|\.md$", "", str(chapter.relative_to(GIT_SPLICE.resolve())))
+        url = f"{DOCS_SITE}/{page}".rstrip("/")
         blocks.append(Block("docs", f"{DOCS_LABEL[lang]}\n{chapter_title}\n{url}"))
     if question:
         prompt = COMMENT_PROMPT[lang]

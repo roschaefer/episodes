@@ -111,7 +111,7 @@ def test_an_episode_with_a_docs_chapter_ends_on_a_link_to_it(tmp_path, monkeypat
 
     assert parse(post)[-1] == Block(
         "docs",
-        "More in the git-splice docs\ngit subtree compared\nhttps://github.com/roschaefer/git-splice/blob/main/test/chapter.md",
+        "More in the git-splice docs\ngit subtree compared\nroschaefer.github.io/git-splice/test/chapter",
     )
 
 

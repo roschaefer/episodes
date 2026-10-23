@@ -98,6 +98,12 @@ just voiceovers-prune <id>               # discard takes of text the scripts no 
 
 `just check` fails while an episode has takes of text it no longer has.
 
+Commands and URLs are shown, not said. A command goes in a code block,
+and so does a URL that viewers should see, e.g. as a `#` line above the
+commands it explains; the prose says what they are. In prose, a link's
+text is read out, never its URL. The docs card at the end shows the
+chapter's address on the docs site.
+
 Code blocks are shown, not run. scrut checks that they behave as shown,
 in the git-splice docs they come from.
 
