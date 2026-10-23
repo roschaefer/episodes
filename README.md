@@ -93,11 +93,14 @@ The video and its subtitles (`.srt`) are written to
 `media/videos/episode/<quality>/` as `<nn>-<id>-<lang>.mp4`; a preview adds
 `-piper` or `-silence`.
 
-To record, `just record <id> <lang>` asks for the microphone, then shows
+To record, `just record <id> <lang>` shows
 each paragraph not recorded yet: press Enter, wait a second, speak, and
 press Enter again. Then `l` listens to the take, `r` records it again and
 `a` accepts it. Ctrl-C keeps the takes accepted so far, and the next run
-goes on from there.
+goes on from there. It records from the default microphone and plays
+through the default speakers, as PipeWire has them, and says which
+microphone it records from (`wpctl status` lists them, `wpctl set-default
+<id>` picks one).
 
 ```sh
 just voiceovers <id> <lang>              # the paragraphs, numbered, and which are recorded
