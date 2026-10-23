@@ -146,6 +146,19 @@ class Piper(GeneratedVoice):
         )
 
 
+def default_stroke_width(svg: str) -> str:
+    """Gives each stroked shape without a stroke-width SVG's default, 1.
+
+    draw.io leaves the attribute out of 1px lines, and Manim would draw
+    them 0 wide, so the boxes of a folder layout would vanish.
+    """
+    return re.sub(
+        r'<(rect|path|ellipse|circle|line|polyline|polygon)\b(?![^>]*\bstroke-width=)(?=[^>]*\bstroke="(?!none)[^"]*")',
+        r'<\1 stroke-width="1"',
+        svg,
+    )
+
+
 def plain_svg(path: Path) -> Path:
     """The SVG as Manim can draw it.
 
@@ -159,6 +172,7 @@ def plain_svg(path: Path) -> Path:
     svg = re.sub(r"<style[^>]*>.*?</style>", "", svg, flags=re.DOTALL)
     svg = re.sub(r' style="[^"]*"', "", svg)
     svg = re.sub(r'<rect [^>]*width="100%"[^>]*/>', "", svg)
+    svg = default_stroke_width(svg)
     out_dir = EPISODES / "media" / "svg"
     out_dir.mkdir(parents=True, exist_ok=True)
     out = out_dir / f"{path.stem}-{hashlib.sha256(svg.encode()).hexdigest()[:8]}.svg"

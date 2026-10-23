@@ -1,7 +1,7 @@
 from pathlib import Path
 
 import pytest
-from episode import Block, find_episode, parse, spoken
+from episode import Block, default_stroke_width, find_episode, parse, spoken
 
 POST = """---
 slug: example
@@ -112,4 +112,11 @@ def test_an_episode_with_a_docs_chapter_ends_on_a_link_to_it(tmp_path, monkeypat
     assert parse(post)[-1] == Block(
         "docs",
         "More in the git-splice docs\ngit subtree compared\nhttps://github.com/roschaefer/git-splice/blob/main/test/chapter.md",
+    )
+
+
+def test_a_diagrams_1px_lines_stay_visible():
+    svg = '<rect x="1" stroke="#000000"/><rect stroke="#000000" stroke-width="2"/><rect stroke="none"/><path d="M 0 0" fill="#000"/>'
+    assert default_stroke_width(svg) == (
+        '<rect stroke-width="1" x="1" stroke="#000000"/><rect stroke="#000000" stroke-width="2"/><rect stroke="none"/><path d="M 0 0" fill="#000"/>'
     )
