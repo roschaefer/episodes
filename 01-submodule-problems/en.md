@@ -14,7 +14,7 @@ The oldest way to have one repository inside another is called `git submodule`. 
 
 Let's take an example:
 
-You can run the example yourself: in a clone of git-splice, [`just comparison git-submodule`](https://github.com/roschaefer/git-splice/blob/main/docs/sandbox.md#a-comparisons-sandbox) opens a shell with the library and the monorepo, and every command there prints what you see here.
+You can run the example yourself: in a clone of git-splice, [`just sandbox comparisons/git-submodule`](https://github.com/roschaefer/git-splice/blob/main/docs/sandbox.md#any-page-in-a-sandbox) opens a shell with the library and the monorepo, and every command there prints what you see here.
 
 The example builds a library with 30 commits and a monorepo with an app. Then it adds the library to the monorepo as a submodule:
 

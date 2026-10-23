@@ -34,7 +34,7 @@ shows that the chapter is unclear or missing a step, fix the chapter in
 `just check` runs the git-splice docs' tests along with the episodes'.
 
 An episode that runs a chapter's commands tells viewers how to run them
-too: `just comparison <page>`, in a clone of git-splice, opens a shell in
+too: `just sandbox <page>`, in a clone of git-splice, opens a shell in
 the state the page starts from (see `git-splice/docs/sandbox.md`). The
 first such episode, 01, explains it.
 

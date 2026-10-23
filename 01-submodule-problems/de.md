@@ -14,7 +14,7 @@ Die älteste Implementierung von einem Repository, das in einem anderen steckt, 
 
 Wir nehmen ein Beispiel:
 
-Ihr könnt das Beispiel selbst ausführen: In einem Klon von git-splice öffnet [`just comparison git-submodule`](https://github.com/roschaefer/git-splice/blob/main/docs/sandbox.md#a-comparisons-sandbox) eine Shell mit der Bibliothek und dem Monorepo, und jeder Befehl gibt dort aus, was ihr hier seht.
+Ihr könnt das Beispiel selbst ausführen: In einem Klon von git-splice öffnet [`just sandbox comparisons/git-submodule`](https://github.com/roschaefer/git-splice/blob/main/docs/sandbox.md#any-page-in-a-sandbox) eine Shell mit der Bibliothek und dem Monorepo, und jeder Befehl gibt dort aus, was ihr hier seht.
 
 Das Beispiel baut eine Bibliothek mit 30 Commits und ein Monorepo mit einer App. Dann fügt es die Bibliothek als Submodul zum Monorepo hinzu:
 
