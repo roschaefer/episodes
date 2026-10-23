@@ -99,7 +99,16 @@ $ cat .gitmodules
 	url = https://git.example.com/lib.git
 ```
 
-And why is the submodule's path in `.gitmodules` again? The gitlink already sits at that path.
+And why is the submodule's path in `.gitmodules` again? The gitlink already sits at that path:
+
+```text
+monorepo/
+├── .gitmodules      2  path: vendor/lib
+├── app/
+│   └── main.txt
+└── vendor/
+    └── lib          1  here the path is implicit
+```
 
 ## Mistake 2: "Shared mutable state is the root of all evil"
 

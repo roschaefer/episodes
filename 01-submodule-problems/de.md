@@ -99,7 +99,16 @@ $ cat .gitmodules
 	url = https://git.example.com/lib.git
 ```
 
-Und warum steht der Pfad des Submoduls noch einmal in `.gitmodules`? Der Gitlink liegt doch schon an diesem Pfad.
+Und warum steht der Pfad des Submoduls noch einmal in `.gitmodules`? Der Gitlink liegt doch schon an diesem Pfad:
+
+```text
+monorepo/
+├── .gitmodules      2  Pfad: vendor/lib
+├── app/
+│   └── main.txt
+└── vendor/
+    └── lib          1  Hier ist der Pfad implizit
+```
 
 ## Fehler 2: „Geteilter, veränderlicher Zustand ist die Wurzel allen Übels“
 
