@@ -225,15 +225,29 @@ def plain_svg(path: Path) -> Path:
     return out
 
 
-def shown_link(block: Block) -> str | None:
-    """The address a block shows viewers: the docs card's, or a code block's # line."""
+ADDRESS_LINE = re.compile(r"^# (\S+\.\S+)$\n?", re.MULTILINE)
+
+
+def shown_address(block: Block) -> str | None:
+    """The address a block shows viewers, as written: the docs card's, or a code block's # line."""
     if block.kind == "docs":
-        address = block.content.split("\n")[2]
-    elif block.kind == "code" and (line := re.search(r"^# (\S+\.\S+)$", block.content, re.MULTILINE)):
-        address = line.group(1)
-    else:
+        return block.content.split("\n")[2]
+    if block.kind == "code" and (line := ADDRESS_LINE.search(block.content)):
+        return line.group(1)
+    return None
+
+
+def shown_link(block: Block) -> str | None:
+    """The link to a block's address, for its QR code."""
+    address = shown_address(block)
+    if address is None:
         return None
     return address if "://" in address else f"https://{address}"
+
+
+def shown_code(block: Block) -> str:
+    """A code block's code: its # address line is no code, the video shows it beside the QR code."""
+    return ADDRESS_LINE.sub("", block.content, count=1)
 
 
 def qr_code(link: str) -> Mobject:
@@ -245,16 +259,24 @@ def qr_code(link: str) -> Mobject:
     return SVGMobject(out).set_fill(BLACK, 1).set_stroke(width=0).scale_to_fit_height(2.5)
 
 
-def with_qr_code(block: Block, mobject: Mobject) -> Mobject:
+def with_link(block: Block, mobject: Mobject) -> Mobject:
+    """The docs card with its QR code beside it; any other block with its
+    address small at the bottom right, by the QR code, out of its way."""
     link = shown_link(block)
     if not link:
         return mobject
-    beside = VGroup(mobject, qr_code(link)).arrange(RIGHT, buff=0.6)
-    return beside if beside.width <= FRAME_WIDTH else VGroup(mobject, qr_code(link)).arrange(DOWN, buff=0.4)
-
-
-def visual(block: Block) -> Mobject:
-    return with_qr_code(block, drawing(block))
+    if block.kind == "docs":
+        return VGroup(mobject, qr_code(link)).arrange(RIGHT, buff=0.6)
+    corner = VGroup(
+        Text(shown_address(block), color="#5d7189", font_size=18),
+        qr_code(link).scale_to_fit_height(1.4),
+    ).arrange(RIGHT, buff=0.3, aligned_edge=DOWN)
+    corner.to_corner(DOWN + RIGHT, buff=0.3)
+    top, bottom = config.frame_height / 2 - 0.3, corner.get_top()[1] + 0.3
+    if mobject.height > top - bottom:
+        mobject.scale_to_fit_height(top - bottom)
+    mobject.move_to([0, (top + bottom) / 2, 0])
+    return VGroup(mobject, corner)
 
 
 def drawing(block: Block) -> Mobject:
@@ -280,7 +302,7 @@ def drawing(block: Block) -> Mobject:
     if block.kind == "image":
         return SVGMobject(plain_svg(Path(block.content)))
     return Code(
-        code_string=block.content,
+        code_string=shown_code(block),
         language="console",
         formatter_style="default",
         background="rectangle",
@@ -293,14 +315,14 @@ def drawing(block: Block) -> Mobject:
 def framed(block: Block) -> Mobject:
     """The block's visual, sized to fit the frame. Code keeps its font size,
     so every block reads the same, unless it doesn't fit."""
-    mobject = visual(block)
+    mobject = drawing(block)
     if block.kind == "image":
         mobject.scale_to_fit_width(12)
     if mobject.width > FRAME_WIDTH or mobject.height > FRAME_HEIGHT:
         if block.kind == "code":
             print(f"A code block doesn't fit the frame and shrinks; shorten its lines:\n{block.content}", file=sys.stderr)
         mobject.scale(min(FRAME_WIDTH / mobject.width, FRAME_HEIGHT / mobject.height))
-    return mobject
+    return with_link(block, mobject)
 
 
 if "EPISODE" in os.environ:

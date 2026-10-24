@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 
 import pytest
-from episode import FRAME_WIDTH, Block, append_new_take, drawing, framed, shown_link, default_stroke_width, find_episode, parse, spoken
+from episode import FRAME_WIDTH, Block, append_new_take, drawing, framed, shown_code, shown_link, default_stroke_width, find_episode, parse, spoken
 
 POST = """---
 slug: example
@@ -181,7 +181,9 @@ def test_a_code_block_too_wide_for_the_frame_shrinks_to_fit(capsys):
     assert "shorten its lines" in capsys.readouterr().err
 
 
-def test_a_qr_code_goes_below_a_code_block_too_wide_for_it_beside():
-    block = Block("code", "# roschaefer.github.io/git-splice/test/comparisons/git-subtree\ngit subtree add --squash --prefix=vendor/lib https://git.example.com/lib.git main")
-    code, qr = framed(block)
-    assert qr.get_top()[1] < code.get_bottom()[1]
+def test_a_code_blocks_address_line_is_no_code_but_goes_below_it_by_the_qr_code():
+    block = Block("code", "# roschaefer.github.io/git-splice/docs/sandbox\nnix develop -c just sandbox")
+    assert shown_code(block) == "nix develop -c just sandbox"
+    code, corner = framed(block)
+    assert corner.get_top()[1] < code.get_bottom()[1]
+    assert corner.get_right()[0] > code.get_right()[0]
