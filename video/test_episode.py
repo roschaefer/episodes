@@ -6,7 +6,6 @@ from episode import Block, append_new_take, shown_link, default_stroke_width, fi
 
 POST = """---
 slug: example
-id: example
 title: "What goes wrong"
 ---
 

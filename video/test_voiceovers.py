@@ -5,7 +5,6 @@ from voiceovers import check, prune, retake, status
 
 POST = """---
 slug: example
-id: example
 title: "Example"
 ---
 

@@ -15,11 +15,13 @@ episodes/git-splice/       git-splice, spliced in: the docs and diagrams the epi
 
 `<nn>` is the episode's place in the publication plan: the build writes
 the plan (`roschaefer.de/src/lib/blog/plan.ts`) in the folders' order. To
-reorder, rename the folders. `<id>` is the post's `id`.
+reorder, rename the folders. `<id>` is the post's `id`, the same in both
+languages.
 
 The frontmatter is the blog's (see
-`roschaefer.de/src/lib/blog/posts.ts`), plus `slug`, the post's file name
-in that language, and optionally `docs`, the chapter of the git-splice
+`roschaefer.de/src/lib/blog/posts.ts`), without `id`, which the build
+adds from the folder name, plus `slug`, the post's file name in that
+language, and optionally `docs`, the chapter of the git-splice
 docs the episode goes with, e.g. `../git-splice/test/comparisons/git-subtree.md`.
 The post and the video end with a link to it.
 
