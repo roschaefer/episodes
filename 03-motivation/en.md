@@ -13,6 +13,8 @@ Neither Git submodules nor `git subtree` are a good way to keep two repositories
 
 To combine the best of both worlds, we need separate histories, as with submodules. At the same time, the monorepo should contain the sub-repository's files, as with `git subtree`. That way, the standard commands like `git status` and `git log` keep working the way you're used to.
 
+So everything that belongs together comes together, unlike with submodules: a fix in the sub-repository and the code that calls it are one commit.
+
 ## A sync point
 
 For recomputing the commits to scale, we need a sync point. It's similar to a gitlink, but it doesn't promise to be the checked-out commit. It's enough for it to be the last *synced* commit.
@@ -26,7 +28,7 @@ The same file can also hold the configuration we know from `.gitmodules`, like t
 	url = git@github.com:x/a.git
 ```
 
-The file lives in the sub-repository's folder. So it always moves along with the folder, and because it's committed in the worktree, it works with several worktrees by design. Nor can rewriting the commits lose it, unlike `git subtree`'s sync points in the commit messages.
+The file lives in the sub-repository's folder. So it always moves along with the folder. And because it's committed in the worktree, every worktree has its own: mutable state is kept apart, instead of being shared in `.git/config` as with submodules. Nor can rewriting the commits lose it, unlike `git subtree`'s sync points in the commit messages.
 
 ## A three-way merge
 
