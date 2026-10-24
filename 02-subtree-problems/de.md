@@ -5,31 +5,31 @@ description: "git subtree fügt überflüssige Merge-Commits in die Git-Historie
 series: why-splicing
 seriesOrder: 3
 topics: [git]
-question: "Habt ihr schon mal Git-Subtrees benutzt, um eine Bibliothek zu vendoren?"
+question: "Habt ihr schon mal Git-Subtrees benutzt, um ein anderes Repository zu vendoren?"
 docs: ../git-splice/test/comparisons/git-subtree.md
 ---
 
-`git subtree` macht den ersten Teil richtig. Es legt die Dateien der Bibliothek in einen Ordner des Monorepos. Ein Fix in der Bibliothek und der Code, der ihn aufruft, können also ein Commit sein. `git subtree split` und `git subtree push` machen aus den Monorepo-Commits, die den Ordner geändert haben, wieder Commits der Bibliothek.
+`git subtree` macht den ersten Teil richtig. Es legt die Dateien eines anderen Repositorys in einen Ordner des Monorepos. Ein Fix im Sub-Repository und der Code, der ihn aufruft, können also ein Commit sein. `git subtree split` und `git subtree push` machen aus den Monorepo-Commits, die den Ordner geändert haben, wieder Commits des Sub-Repositorys.
 
 git-splice hat als Wrapper um `git subtree` angefangen. Aus zwei Gründen habe ich es aufgegeben.
 
-## Grund 1: Ich will die Historie der Bibliothek nicht
+## Grund 1: Ich will die Historie des Sub-Repositorys nicht
 
-Ohne `--squash` merged `git subtree add` alle Commits der Bibliothek ins Monorepo. In meinem Testaufbau hat ein Monorepo mit 40 Commits danach 71, weil die Bibliothek 30 Commits mitbringt.
+Ohne `--squash` merged `git subtree add` alle Commits des Sub-Repositorys ins Monorepo. In meinem Testaufbau hat ein Monorepo mit 40 Commits danach 71, weil das Sub-Repository 30 Commits mitbringt.
 
-Das Monorepo nutzt die Bibliothek. Es entwickelt nicht ihre Vergangenheit weiter. Die Änderungen, die das Monorepo interessieren, also die, die die Bibliothek in die App einpassen, sind ohnehin Monorepo-Commits.
+Das Monorepo nutzt das Sub-Repository. Es entwickelt nicht dessen Vergangenheit weiter. Die Änderungen, die das Monorepo interessieren, also die, die das Sub-Repository in die App einpassen, sind ohnehin Monorepo-Commits.
 
 ## Grund 2: Mit `--squash` skaliert es nicht
 
-`--squash` hält die Historie der Bibliothek draußen. `add` erzeugt einen Commit *q* mit den Dateien der Bibliothek und ohne Eltern und merged ihn als *s*:
+`--squash` hält die Historie des Sub-Repositorys draußen. `add` erzeugt einen Commit *q* mit den Dateien des Sub-Repositorys und ohne Eltern und merged ihn als *s*:
 
 ![Die Commits a und s des Monorepos in einer Reihe, und q, ein Commit ohne Eltern, als zweiter Elternteil von s](../git-splice/test/comparisons/git-subtree-squash-add.drawio.svg)
 
-Dann arbeite ich. *c* und *e* fixen die Bibliothek, *b* und *d* ändern die App:
+Dann arbeite ich. *c* und *e* fixen das Sub-Repository, *b* und *d* ändern die App:
 
 ![Die Commits a, s, b, c, d und e des Monorepos in einer Reihe, und q als zweiter Elternteil von s](../git-splice/test/comparisons/git-subtree-squashed.drawio.svg)
 
-Um die beiden Fixes zu pushen, muss `split` herausfinden, welche Commits die Bibliothek geändert haben. Mit `--squash` enthält das Monorepo keinen Commit der Bibliothek, bei dem es anfangen könnte. Also durchläuft `split` die ganze Historie des Monorepos, bei jedem Push. In meinem Aufbau sind das 46 Commits, obwohl nur zwei davon zählen. In einem Monorepo mit Jahren an Historie wird das langsam.
+Um die beiden Fixes zu pushen, muss `split` herausfinden, welche Commits das Sub-Repository geändert haben. Mit `--squash` enthält das Monorepo keinen Commit des Sub-Repositorys, bei dem es anfangen könnte. Also durchläuft `split` die ganze Historie des Monorepos, bei jedem Push. In meinem Aufbau sind das 46 Commits, obwohl nur zwei davon zählen. In einem Monorepo mit Jahren an Historie wird das langsam.
 
 `split --rejoin` hilft, indem es das Ergebnis als neuen Startpunkt zurück merged. Das ist ein weiterer Merge *j* bei jedem Push, mit einem weiteren gesquashten Commit *r* auf *q*:
 
@@ -39,9 +39,9 @@ Und es geht kaputt, sobald Pull Requests per Squash gemerged werden, was verbrei
 
 ![Die Commits a, s und p des Monorepos in einer Reihe, und q als zweiter Elternteil von s](../git-splice/test/comparisons/git-subtree-squash-merged.drawio.svg)
 
-Mit einer Bibliothek ist der Graph noch lesbar. Mit drei bringt jede Bibliothek ihre eigenen gesquashten Commits und ihre eigenen Merges mit, und ihre Pfeile kreuzen sich:
+Mit einem Sub-Repository ist der Graph noch lesbar. Mit drei bringt jedes Sub-Repository seine eigenen gesquashten Commits und seine eigenen Merges mit, und ihre Pfeile kreuzen sich:
 
-![Die Historie des Monorepos mit Merges für drei Bibliotheken. Die gesquashten Commits jeder Bibliothek bilden eine eigene Reihe, und die Pfeile von Bibliothek B und C zu ihren Merges kreuzen die Reihen der anderen Bibliotheken](git-subtree-rejoin-three-libraries.drawio.svg)
+![Die Historie des Monorepos mit Merges für drei Sub-Repositorys. Die gesquashten Commits jedes Sub-Repositorys bilden eine eigene Reihe, und die Pfeile von Repository B und C zu ihren Merges kreuzen die Reihen der anderen Repositorys](git-subtree-rejoin-three-repositories.drawio.svg)
 
 Keiner dieser Merges sagt etwas über die App. Sie sind nur da, damit `split` schnell ist.
 
@@ -51,4 +51,4 @@ Wer ein Repository endgültig in ein Monorepo umzieht und das alte stilllegt, is
 
 ## Was ich mitgenommen habe
 
-Ich wollte die Dateien der Bibliothek im Monorepo haben, ohne ihre Historie, ohne Merges, die nur dafür da sind, dass Pushen schnell geht, und mit einem Push, der nur ansieht, was sich seit dem letzten Abgleich geändert hat. Die nächsten Folgen zeigen, wie das zusammenpasst.
+Ich wollte die Dateien des Sub-Repositorys im Monorepo haben, ohne seine Historie, ohne Merges, die nur dafür da sind, dass Pushen schnell geht, und mit einem Push, der nur ansieht, was sich seit dem letzten Abgleich geändert hat. Die nächsten Folgen zeigen, wie das zusammenpasst.
