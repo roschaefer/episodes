@@ -23,6 +23,11 @@ in that language, and optionally `docs`, the chapter of the git-splice
 docs the episode goes with, e.g. `../git-splice/test/comparisons/git-subtree.md`.
 The post and the video end with a link to it.
 
+The title is neutral: it names the subject and doesn't judge it, e.g.
+"Git Submodules", not "What goes wrong with Git submodules". It is the
+same everywhere: the post's title, the video's on the platform, and the
+title card the video opens with. The slug follows it.
+
 Every episode then ends with `question`, a question that asks the viewer
 for technical feedback, e.g. "Have you ever used Git submodules, and what
 was your developer experience?" The post and the video add "Write it in
@@ -47,6 +52,28 @@ Images use paths relative to the file, so they render in any Markdown
 preview. Diagrams the git-splice docs already test are referenced where
 they live, e.g. `../git-splice/test/comparisons/git-subtree-rejoin.drawio.svg`,
 so the post shows what the tests check.
+
+## Branches
+
+`main` is what's published: this folder without the numbered episodes,
+until one is. `development` holds every episode, published or not, and
+is where they're written. Tooling, like `video/` or this README, changes
+on `main`, and `main` is merged into `development`.
+
+To have one or more episodes reviewed, cut a branch from `main`, bring
+only those episodes over from `development`, and open a draft pull
+request to `main`. The review bots then look at nothing else:
+
+```sh
+git switch -c review/submodules main
+git restore --source development -- episodes/01-submodule-problems
+git commit -m "docs(episodes): add Git Submodules"
+git splice push episodes   # creates the branch upstream
+gh pr create --draft --repo roschaefer/episodes --base main --head review/submodules
+```
+
+Once the pull request is squash-merged, `git splice pull episodes` on
+`main` brings it back, and `main` is merged into `development`.
 
 ## Building the blog posts
 
@@ -126,6 +153,8 @@ and so does a URL that viewers should see, e.g. as a `#` line above the
 commands it explains; the prose says what they are. In prose, a link's
 text is read out, never its URL. The docs card at the end shows the
 chapter's address on the docs site.
+Wherever the video shows a link, a QR code of it stands beside it: on
+the docs card, and beside a code block with a `#` address line.
 
 Code blocks are shown, not run. scrut checks that they behave as shown,
 in the git-splice docs they come from.
