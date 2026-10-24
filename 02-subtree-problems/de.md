@@ -55,12 +55,12 @@ Um *c* und *e* zu finden, durchsucht `git subtree split` auf einmal die gesamte 
 
 Dieses Problem soll ein weiteres Flag lösen, `--rejoin`. Damit legt `git subtree` bei jedem Push einen Sync-Punkt in der Historie ab, wieder einen gesquashten Commit und einen Merge. Ähnlich wie bei Submodulen entstehen also viele Commits, die sich völlig überflüssig anfühlen. Mit `--squash` entstehen zwei Commits beim Pullen, mit `--rejoin` zwei weitere bei jedem Push.
 
-Die Historie sieht entsprechend durcheinander aus. Hier sind es drei Sub-Repositorys, zweimal in derselben Reihenfolge gepusht:
+Die Historie sieht entsprechend durcheinander aus. Hier sind es drei Sub-Repositories, zweimal in derselben Reihenfolge gepusht:
 
-![Die Historie des Monorepos mit Merges für drei Sub-Repositorys x, y und z, zweimal in derselben Reihenfolge rejoined. Die gesquashten Commits jedes Sub-Repositorys bilden eine eigene Reihe, und die Pfeile von y und z zu ihren Merges kreuzen die Reihen darüber](../git-splice/test/comparisons/git-subtree-rejoin-three.drawio.svg)
+![Die Historie des Monorepos mit Merges für drei Sub-Repositories x, y und z, zweimal in derselben Reihenfolge rejoined. Die gesquashten Commits jedes Sub-Repositorys bilden eine eigene Reihe, und die Pfeile von y und z zu ihren Merges kreuzen die Reihen darüber](../git-splice/test/comparisons/git-subtree-rejoin-three.drawio.svg)
 
 Dieses Muster habe ich gesehen, als ich mein Tool zunächst auf `git subtree` aufgebaut hatte.
 
 Die Sync-Punkte findet `git subtree` über Hinweise in den Commit-Nachrichten, Zeilen wie `git-subtree-split: <commit>`. Fasst ein Rewrite Commits zusammen und gehen dabei die ursprünglichen Nachrichten verloren, etwa beim Squash-Merge eines Pull Requests, dann findet `git subtree` auch die Sync-Punkte nicht mehr.
 
-All das zeigt: `git subtree` ist das falsche Werkzeug, wenn man zwei Repositorys mit unterschiedlichen Historien hin und her synchronisieren möchte. Gut geeignet ist es dagegen, wenn man aus zwei Repositorys eins machen möchte. Das ist in unserem Anwendungsfall aber nicht so.
+All das zeigt: `git subtree` ist das falsche Werkzeug, wenn man zwei Repositories mit unterschiedlichen Historien hin und her synchronisieren möchte. Gut geeignet ist es dagegen, wenn man aus zwei Repositories eins machen möchte. Das ist in unserem Anwendungsfall aber nicht so.
