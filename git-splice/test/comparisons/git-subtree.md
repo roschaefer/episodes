@@ -85,11 +85,12 @@ $ git rev-list --count HEAD
 It's still a merge, so the history isn't linear. `add` makes two
 commits: *q* (`Squashed 'vendor/lib/' content from commit bafd496`),
 the library's files without parents, and the merge *s*, with *a* (`app
-commit 40`) and *q* as its parents:
+commit 40`) and *q* as its parents. *a* is drawn as a stack: it stands
+for the 40 app commits in a line, which the drawings leave out:
 
 <div align="center">
 
-![The monorepo's a and s in a line, and q, a commit without parents, as the second parent of s](git-subtree-squash-add.drawio.svg)
+![The monorepo's a, drawn as a stack of commits, and s in a line, and q, a commit without parents, as the second parent of s](git-subtree-squash-add.drawio.svg)
 
 </div>
 
@@ -151,7 +152,7 @@ $ git rev-list --count HEAD
 ```
 
 Grey are the commits `split` walks, orange the ones it finds, which
-changed `vendor/lib/`. *a* stands for all 40 app commits:
+changed `vendor/lib/`. The stack *a* is all 40 app commits:
 
 <div align="center">
 
