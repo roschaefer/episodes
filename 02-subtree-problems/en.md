@@ -31,6 +31,8 @@ $ git log --graph --format=%s -4
 | * lib commit 28
 ```
 
+But do I even want that? In a monorepo that I vendor another repository into, I don't need its commits at all. I just want to copy the repository in. Maybe I then add some code that wires it into my app. That part belongs in the monorepo's history, because it's the integration.
+
 ## `--squash`
 
 `git subtree` also comes with an option to squash the other repository's history:

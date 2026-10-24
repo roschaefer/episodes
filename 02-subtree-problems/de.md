@@ -31,6 +31,8 @@ $ git log --graph --format=%s -4
 | * lib commit 28
 ```
 
+Aber will ich das überhaupt? In einem Monorepo, in das ich ein anderes Repository vendore, brauche ich dessen Commits gar nicht. Ich will das Repository einfach nur hineinkopieren. Eventuell schreibe ich danach noch Code, der es mit meiner App verdrahtet. Dieser Teil gehört in die Historie des Monorepos, denn das ist die Integration.
+
 ## `--squash`
 
 `git subtree` bringt auch eine Option mit, die Historie des anderen Repositorys zu squashen:
