@@ -1,7 +1,7 @@
 ---
-slug: was-bei-git-subtree-schiefgeht
-title: "Was bei git subtree schiefgeht"
-description: "git subtree importiert entweder die ganze Historie der Bibliothek oder durchläuft bei jedem Push die ganze Historie des Monorepos. Und ein Remote pro Bibliothek ist einen Tippfehler davon entfernt, das Monorepo zu veröffentlichen."
+slug: git-subtree
+title: "Git Subtree"
+description: "git subtree fügt überflüssige Merge-Commits in die Git-Historie ein."
 series: why-splicing
 seriesOrder: 3
 topics: [git]
@@ -11,7 +11,7 @@ docs: ../git-splice/test/comparisons/git-subtree.md
 
 `git subtree` macht den ersten Teil richtig. Es legt die Dateien der Bibliothek in einen Ordner des Monorepos. Ein Fix in der Bibliothek und der Code, der ihn aufruft, können also ein Commit sein. `git subtree split` und `git subtree push` machen aus den Monorepo-Commits, die den Ordner geändert haben, wieder Commits der Bibliothek.
 
-git-splice hat als Wrapper um `git subtree` angefangen. Aus drei Gründen habe ich es aufgegeben.
+git-splice hat als Wrapper um `git subtree` angefangen. Aus zwei Gründen habe ich es aufgegeben.
 
 ## Grund 1: Ich will die Historie der Bibliothek nicht
 
@@ -45,16 +45,10 @@ Mit einer Bibliothek ist der Graph noch lesbar. Mit drei bringt jede Bibliothek 
 
 Keiner dieser Merges sagt etwas über die App. Sie sind nur da, damit `split` schnell ist.
 
-## Grund 3: Ein Remote pro Bibliothek ist einen Tippfehler davon entfernt, das Monorepo zu veröffentlichen
-
-`git subtree push` braucht ein Remote oder jedes Mal eine URL. Mein Wrapper hat pro Bibliothek ein Git-Remote angelegt und es wie den Ordner benannt. Das sieht aufgeräumt aus, bis man `git push vendor/lib main` tippt statt `git subtree push --prefix=vendor/lib vendor/lib main`. Dann landet das ganze Monorepo im Repository der Bibliothek, samt Ordnern, die es nie verlassen sollten.
-
-Dafür braucht es nicht einmal einen Tippfehler. Ein einfaches `git push` mit `push.autoSetupRemote`, der Sync-Knopf einer IDE oder eine Suche in der Shell-Historie können dasselbe anrichten. Den Branch danach zu löschen, macht nichts ungeschehen. Dazu gibt es eine eigene Folge.
-
 ## Wo `git subtree` das richtige Werkzeug ist
 
 Wer ein Repository endgültig in ein Monorepo umzieht und das alte stilllegt, ist mit `git subtree add` ohne `--squash` genau richtig. Die Historie kommt mit, und `git blame` funktioniert weiter.
 
 ## Was ich mitgenommen habe
 
-Ich wollte die Dateien der Bibliothek im Monorepo haben, ohne ihre Historie, ohne Merges, die nur dafür da sind, dass Pushen schnell geht, mit einem Push, der nur ansieht, was sich seit dem letzten Abgleich geändert hat, und ohne ein Git-Remote pro Bibliothek. Die nächsten Folgen zeigen, wie das zusammenpasst.
+Ich wollte die Dateien der Bibliothek im Monorepo haben, ohne ihre Historie, ohne Merges, die nur dafür da sind, dass Pushen schnell geht, und mit einem Push, der nur ansieht, was sich seit dem letzten Abgleich geändert hat. Die nächsten Folgen zeigen, wie das zusammenpasst.

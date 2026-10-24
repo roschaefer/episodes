@@ -1,7 +1,7 @@
 ---
-slug: what-goes-wrong-with-git-subtree
-title: "What goes wrong with git subtree"
-description: "git subtree either imports the library's whole history or walks the monorepo's whole history on every push. And a remote per library is one typo away from publishing the monorepo."
+slug: git-subtree
+title: "Git Subtree"
+description: "git subtree adds needless merge commits to the Git history."
 series: why-splicing
 seriesOrder: 3
 topics: [git]
@@ -11,7 +11,7 @@ docs: ../git-splice/test/comparisons/git-subtree.md
 
 `git subtree` gets the first part right. It puts the library's files into a folder of the monorepo, so a fix in the library and the code that calls it can be one commit. `git subtree split` and `git subtree push` turn the monorepo commits that touched the folder back into library commits.
 
-git-splice started as a wrapper around `git subtree`. I dropped it for three reasons.
+git-splice started as a wrapper around `git subtree`. I dropped it for two reasons.
 
 ## Reason 1: I don't want the library's history
 
@@ -45,16 +45,10 @@ With one library, the graph is still readable. With three, every library adds it
 
 None of these merges says anything about the app. They're there to make `split` fast.
 
-## Reason 3: a remote per library is one typo away from publishing the monorepo
-
-`git subtree push` needs a remote, or a URL every time. My wrapper added one Git remote per library and named it like the folder. That looks tidy, until you type `git push vendor/lib main` instead of `git subtree push --prefix=vendor/lib vendor/lib main`. Then the whole monorepo lands in the library's repository, including folders that were never meant to leave it.
-
-It doesn't take a typo. A plain `git push` with `push.autoSetupRemote`, an IDE's sync button, or a search in the shell history can do the same. Deleting the branch afterwards doesn't unpublish anything. I'll come back to this in its own episode.
-
 ## Where `git subtree` is the right tool
 
 If you move a repository into a monorepo for good and retire its old home, `git subtree add` without `--squash` is exactly right. The history comes along, and `git blame` keeps working.
 
 ## What I took away
 
-I wanted the library's files in the monorepo, without the library's history, without merges that only exist to make pushing fast, with a push that only looks at what changed since the last sync, and without a Git remote for each library. The next episodes show how that fits together.
+I wanted the library's files in the monorepo, without the library's history, without merges that only exist to make pushing fast, and with a push that only looks at what changed since the last sync. The next episodes show how that fits together.
