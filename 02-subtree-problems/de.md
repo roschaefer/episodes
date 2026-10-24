@@ -28,7 +28,6 @@ Auch das ist ein vielversprechendes Konzept, denn dadurch leben alle Commits im 
 Wir schauen uns das an einem Beispiel an. Das Monorepo hat 40 Commits, das andere Repository 30:
 
 ```console
-# roschaefer.github.io/git-splice/test/comparisons/git-subtree
 git subtree add --prefix=vendor/lib \
   https://git.example.com/lib.git main
 ```
