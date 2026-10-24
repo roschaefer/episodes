@@ -41,9 +41,9 @@ Und es geht kaputt, sobald Pull Requests per Squash gemerged werden, was verbrei
 
 ![Die Commits a, s und p des Monorepos in einer Reihe, und q als zweiter Elternteil von s](../git-splice/test/comparisons/git-subtree-squash-merged.drawio.svg)
 
-Mit einem Sub-Repository ist der Graph noch lesbar. Mit drei bringt jedes Sub-Repository seine eigenen gesquashten Commits und seine eigenen Merges mit, und ihre Pfeile kreuzen sich:
+Mit einem Sub-Repository ist der Graph noch lesbar. Mit drei bringt jedes Sub-Repository seine eigenen gesquashten Commits und seine eigenen Merges mit. Rejoine ich sie immer in derselben Reihenfolge, entsteht bei jedem Rejoin dasselbe Muster, eine Treppe aus Pfeilen, die sich kreuzen:
 
-![Die Historie des Monorepos mit Merges für drei Sub-Repositorys. Die gesquashten Commits jedes Sub-Repositorys bilden eine eigene Reihe, und die Pfeile von Repository B und C zu ihren Merges kreuzen die Reihen der anderen Repositorys](git-subtree-rejoin-three-repositories.drawio.svg)
+![Die Historie des Monorepos mit Merges für drei Sub-Repositorys x, y und z, zweimal in derselben Reihenfolge rejoined. Die gesquashten Commits jedes Sub-Repositorys bilden eine eigene Reihe, und die Pfeile von y und z zu ihren Merges kreuzen die Reihen darüber](../git-splice/test/comparisons/git-subtree-rejoin-three.drawio.svg)
 
 Keiner dieser Merges sagt etwas über die App. Sie sind nur da, damit `split` schnell ist.
 

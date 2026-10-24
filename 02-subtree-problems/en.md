@@ -41,9 +41,9 @@ And it breaks as soon as pull requests are squash-merged, which is common. The s
 
 ![The monorepo's a, s and p in a line, and q as the second parent of s](../git-splice/test/comparisons/git-subtree-squash-merged.drawio.svg)
 
-With one sub-repository, the graph is still readable. With three, every sub-repository adds its own squashed commits and its own merges, and their arrows cross:
+With one sub-repository, the graph is still readable. With three, every sub-repository adds its own squashed commits and its own merges. Rejoined in the same order every time, they make the same pattern on every rejoin, a staircase of arrows that cross:
 
-![The monorepo's history with merges for three sub-repositories. Each sub-repository's squashed commits form their own line, and the arrows from repositories B and C to their merges cross the lines of the other repositories](git-subtree-rejoin-three-repositories.drawio.svg)
+![The monorepo's history with merges for three sub-repositories x, y and z, rejoined twice in the same order. Each sub-repository's squashed commits form their own line, and the arrows from y and z to their merges cross the rows above them](../git-splice/test/comparisons/git-subtree-rejoin-three.drawio.svg)
 
 None of these merges says anything about the app. They're there to make `split` fast.
 
