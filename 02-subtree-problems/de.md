@@ -45,17 +45,34 @@ Allerdings versteht `git subtree` unter `--squash` etwas Eigenartiges. Statt ein
 
 ![Die Commits a und s des Monorepos in einer Reihe, und q, ein Commit ohne Eltern, als zweiter Elternteil von s](../git-splice/test/comparisons/git-subtree-squash-add.drawio.svg)
 
-Weil dann die Historie fehlt, muss `git subtree` bei jedem Push neu berechnen, welche Commits das andere Repository noch nicht kennt. Sagen wir, *c* und *e* fixen das Sub-Repository, *b* und *d* ändern die App. Um *c* und *e* zu finden, in Orange, durchsucht `git subtree split` auf einmal die gesamte Historie des Monorepos, in Grau. Hier sind das 46 Commits, denn *a* steht für 40 App-Commits, und nur zwei davon zählen:
+Weil dann die Historie fehlt, muss `git subtree` bei jedem Push neu berechnen, welche Commits das andere Repository noch nicht kennt. Wo es anfangen kann, liest `git subtree split` aus den Commit-Nachrichten. `add`, `pull` und `split --rejoin` schreiben Zeilen wie `git-subtree-split: <commit>` hinein. Erst eine Zeile `git-subtree-mainline:` sagt `split`, bis zu welchem Commit es die Historie des Monorepos schon kennt. Ohne `--squash` hat der Merge von `add` diese Zeile, *q* hat sie nicht:
 
-![Die Commits a, s, b, c, d und e des Monorepos in einer Reihe, und q als zweiter Elternteil von s. Alle sind grau, weil split sie durchläuft, und c und e sind orange, weil es sie findet](../git-splice/test/comparisons/git-subtree-split-walks.drawio.svg)
+```console
+$ git log -1 --format=%B HEAD~4^2 | grep '^git-subtree-'
+git-subtree-dir: vendor/lib
+git-subtree-split: bafd496b1f4512a95b69464604f3da428aa9e33b
+```
+
+Sagen wir, *c* und *e* fixen das Sub-Repository, *b* und *d* ändern die App. Um *c* und *e* zu finden, orange umrandet, durchsucht `git subtree split` auf einmal die gesamte Historie des Monorepos, grau gefüllt. Hier sind das 46 Commits, denn *a* steht für 40 App-Commits, und nur zwei davon zählen:
+
+![Die Commits a, s, b, c, d und e des Monorepos in einer Reihe, und q als zweiter Elternteil von s. Alle sind grau, weil split sie durchläuft, und c und e sind orange umrandet, weil es sie findet](../git-splice/test/comparisons/git-subtree-split-walks.drawio.svg)
 
 Nur mit `--squash` skaliert das nicht.
 
 ## `--rejoin`
 
-Dieses Problem soll ein weiteres Flag lösen, `--rejoin`. Damit legt `git subtree` bei jedem Push einen Sync-Punkt in der Historie ab, wieder einen gesquashten Commit *r* und einen Merge *j*. Danach durchläuft `split` nur noch die Commits ab dem Sync-Punkt. Nach zwei weiteren Commits *g* und *h* sind das fünf:
+Dieses Problem soll ein weiteres Flag lösen, `--rejoin`. Damit legt `git subtree` bei jedem Push einen Sync-Punkt in der Historie ab, wieder einen gesquashten Commit *r* und einen Merge *j*. Die Nachricht von *j* hat, was *q* fehlt, die Zeile `git-subtree-mainline:`:
 
-![Die Commits a, s, b, c, d, e, j, g und h des Monorepos in einer Reihe. Darunter q als zweiter Elternteil von s, und r, auf q aufbauend, als zweiter Elternteil von j. e, r, j und g sind grau, weil split sie durchläuft, und h ist orange, weil es ihn findet](../git-splice/test/comparisons/git-subtree-rejoin-walks.drawio.svg)
+```console
+$ git log -1 --format=%B | grep '^git-subtree-'
+git-subtree-dir: vendor/lib
+git-subtree-mainline: 9d3cc6061455cb38432ce9846218e1227e4771be
+git-subtree-split: 48108daa0f798109c3e672ed47a7de6204cf4e02
+```
+
+Danach durchläuft `split` nur noch die Commits ab dem Sync-Punkt. Nach zwei weiteren Commits *g* und *h* sind das fünf:
+
+![Die Commits a, s, b, c, d, e, j, g und h des Monorepos in einer Reihe. Darunter q als zweiter Elternteil von s, und r, auf q aufbauend, als zweiter Elternteil von j. e, r, j, g und h sind grau, weil split sie durchläuft, und h ist orange umrandet, weil es ihn findet](../git-splice/test/comparisons/git-subtree-rejoin-walks.drawio.svg)
 
 Der Preis dafür: Ähnlich wie bei Submodulen entstehen viele Commits, die sich völlig überflüssig anfühlen. Mit `--squash` entstehen zwei Commits beim Pullen, mit `--rejoin` zwei weitere bei jedem Push.
 
@@ -65,6 +82,6 @@ Die Historie sieht entsprechend durcheinander aus. Hier sind es drei Sub-Reposit
 
 Dieses Muster habe ich gesehen, als ich mein Tool zunächst auf `git subtree` aufgebaut hatte.
 
-Die Sync-Punkte findet `git subtree` über Hinweise in den Commit-Nachrichten, Zeilen wie `git-subtree-split: <commit>`. Fasst ein Rewrite Commits zusammen und gehen dabei die ursprünglichen Nachrichten verloren, etwa beim Squash-Merge eines Pull Requests, dann findet `git subtree` auch die Sync-Punkte nicht mehr.
+Weil die Sync-Punkte nur in den Commit-Nachrichten stehen, gehen sie verloren, sobald ein Rewrite Commits zusammenfasst, etwa beim Squash-Merge eines Pull Requests. Dann durchsucht `split` wieder die gesamte Historie.
 
 All das zeigt: `git subtree` ist das falsche Werkzeug, wenn man zwei Repositories mit unterschiedlichen Historien hin und her synchronisieren möchte. Gut geeignet ist es dagegen, wenn man aus zwei Repositories eins machen möchte. Das ist in unserem Anwendungsfall aber nicht so.
