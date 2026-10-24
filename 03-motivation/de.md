@@ -31,7 +31,7 @@ $ git -c protocol.file.allow=always submodule add -q "$LIBRARY_FORK" vendor/libr
 > git commit -qm "application: add library as a submodule"
 ```
 
-Der Patch entsteht innerhalb dieses verschachtelten Repositorys. Er wird dort committed und direkt in den Fork des Teams gepusht:
+Der Patch entsteht innerhalb dieses verschachtelten Repos. Er wird dort committed und direkt in den Fork des Teams gepusht:
 
 ```scrut
 $ git -C vendor/library switch -qc feature/custom-patch && \

@@ -9,7 +9,7 @@ question: "Habt ihr schon mal Git-Subtrees benutzt, um ein anderes Repository zu
 docs: ../git-splice/test/comparisons/git-subtree.md
 ---
 
-Seit 2012 gibt es das Skript `git subtree`, das meist zusammen mit Git installiert wird. Damit importiert man die Commit-Historie eines anderen Repositorys in ein Monorepo.
+Seit 2012 gibt es das Skript `git subtree`, das meist zusammen mit Git installiert wird. Damit importiert man die Commit-Historie eines anderen Repos in ein Monorepo.
 
 Auch das ist ein vielversprechendes Konzept, denn dadurch leben alle Commits im selben Monorepo. Die Standardbefehle wie `git status` und `git log` funktionieren also so, wie man es gewohnt ist.
 
@@ -20,7 +20,7 @@ Wir schauen uns das an einem Beispiel an. Das Monorepo hat 40 Commits, das ander
 git subtree add --prefix=vendor/lib https://git.example.com/lib.git main
 ```
 
-Allerdings zieht `git subtree` dabei die gesamte Historie des anderen Repositorys mit ins Monorepo. Danach hat das Monorepo 71 Commits:
+Allerdings zieht `git subtree` dabei die gesamte Historie des anderen Repos mit ins Monorepo. Danach hat das Monorepo 71 Commits:
 
 ```console
 $ git log --graph --format=%s -4
@@ -35,7 +35,7 @@ Aber will ich das überhaupt? In einem Monorepo, in das ich ein anderes Reposito
 
 ## `--squash`
 
-`git subtree` bringt auch eine Option mit, die Historie des anderen Repositorys zu squashen:
+`git subtree` bringt auch eine Option mit, die Historie des anderen Repos zu squashen:
 
 ```console
 git subtree add --squash --prefix=vendor/lib https://git.example.com/lib.git main
@@ -57,7 +57,7 @@ Dieses Problem soll ein weiteres Flag lösen, `--rejoin`. Damit legt `git subtre
 
 Die Historie sieht entsprechend durcheinander aus. Hier sind es drei Sub-Repositories, zweimal in derselben Reihenfolge gepusht:
 
-![Die Historie des Monorepos mit Merges für drei Sub-Repositories x, y und z, zweimal in derselben Reihenfolge rejoined. Die gesquashten Commits jedes Sub-Repositorys bilden eine eigene Reihe, und die Pfeile von y und z zu ihren Merges kreuzen die Reihen darüber](../git-splice/test/comparisons/git-subtree-rejoin-three.drawio.svg)
+![Die Historie des Monorepos mit Merges für drei Sub-Repositories x, y und z, zweimal in derselben Reihenfolge rejoined. Die gesquashten Commits jedes Sub-Repos bilden eine eigene Reihe, und die Pfeile von y und z zu ihren Merges kreuzen die Reihen darüber](../git-splice/test/comparisons/git-subtree-rejoin-three.drawio.svg)
 
 Dieses Muster habe ich gesehen, als ich mein Tool zunächst auf `git subtree` aufgebaut hatte.
 
