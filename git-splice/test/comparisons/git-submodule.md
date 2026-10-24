@@ -31,7 +31,7 @@ That one `git submodule add` wrote to six places:
 
 <div align="center">
 
-![The monorepo's folders and files where a submodule keeps its state: 1 the commit in .git/objects, 2 .gitmodules, 3 the index, 4 .git/config, 5 the file vendor/lib/.git, which points to 6, the library's repository in .git/modules/vendor/lib, which points back](git-submodule-state.drawio.svg)
+![The monorepo's folders and files where a submodule keeps its state, from top to bottom: 1 .gitmodules, 2 the file vendor/lib/.git, which points to 6, 3 the commit in .git/objects, 4 the index, 5 .git/config, 6 the library's repository in .git/modules/vendor/lib, which points back to 2](git-submodule-state.drawio.svg)
 
 </div>
 
