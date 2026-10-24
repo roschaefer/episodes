@@ -1,8 +1,8 @@
 # Feature branches
 
 Every splice syncs with the upstream branch named like your current
-branch. This walkthrough starts a feature branch in the
-[sandbox](../../docs/sandbox.md), changes one splice on it and pushes, and cleans up
+branch. This walkthrough starts a feature branch in
+[its repositories](README.md), changes one splice on it and pushes, and cleans up
 once the feature is merged on both sides.
 
 <!-- Builds a fresh sandbox; see `just docs-check`.
@@ -130,7 +130,7 @@ ok   vendor/pkg-b: nothing to pull
 
 ```scrut
 $ git for-each-ref --format='%(refname)' refs/splices/pkg-b/
-refs/splices/pkg-b/main
+refs/splices/pkg-b/heads/main
 ```
 
 ```scrut

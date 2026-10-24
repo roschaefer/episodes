@@ -1,5 +1,5 @@
 [splice]
 	id = ed95bd1ffa586ab6
-	commit = cadf751380e0f4e4254e00807895f459cb358b0b
+	commit = 6a16d0ef1fb239e395938af6cea4e1d74e04d3e0
 [upstream "origin"]
 	url = git@github.com:roschaefer/git-splice.git

@@ -2,7 +2,24 @@
 
 Every command once, in order, with the output it prints. Each command
 has a page of its own with the details. To try them yourself, run
-`just walkthrough`: it opens a shell in a throwaway [sandbox](../../docs/sandbox.md).
+`just sandbox`: it opens a shell in a throwaway
+[sandbox](../../docs/sandbox.md) of this page, and `just sandbox
+walkthrough/<command>` one of a command's page.
+
+Each page starts from the same repositories, in `$WALKTHROUGH`:
+
+- `monorepo`: the monorepo, on `main`. You start here.
+- `upstream/pkg-a.git`, `pkg-b.git` and `lib-c.git`: bare repositories
+  that stand in for the splices' upstreams. The monorepo reaches them
+  as `https://git.example.com/<name>.git`.
+- `vendor/pkg-a/`: a splice whose upstream has one commit the monorepo
+  doesn't have yet. It's already fetched.
+- `pkg-b.git`: a repository that isn't spliced in yet.
+- `libs/c/`: a folder of the monorepo, to be published to the empty
+  `lib-c.git`.
+
+To push a commit to an upstream as if someone else had, clone it next to
+the monorepo, commit there and push, as in [fetch](#fetch).
 
 ## Commands
 
@@ -10,7 +27,7 @@ has a page of its own with the details. To try them yourself, run
 | --- | --- |
 | [`status`](status.md) | Shows each splice's sync state, with how many commits `push` would publish and `pull` would bring in. |
 | [`clone`](clone.md) | Splices an existing repository into a new folder, as one commit. |
-| [`fetch`](fetch.md) | Fetches every branch of each upstream into `refs/splices/<key>/`. |
+| [`fetch`](fetch.md) | Fetches every branch of each upstream into `refs/splices/<key>/heads/`. |
 | [`log`](log.md) | Shows the commits `push` would publish and `pull` would bring in. |
 | [`merge`](merge.md) | Splices already-fetched upstream changes in, as one ordinary commit per splice. |
 | [`pull`](pull.md) | `fetch` + `merge`. |
@@ -211,6 +228,7 @@ pkg-a
 The [sync model](../concepts/sync-model/README.md) explains what these
 commands compute. The workflows combine them for everyday work:
 [feature branches](feature-branches.md),
-[diverged history](diverged.md) and
-[bumping the sync point](bump.md). The [scenarios](../scenarios/README.md)
+[diverged history](diverged.md),
+[bumping the sync point](bump.md) and
+[contributing through a fork](fork.md). The [scenarios](../scenarios/README.md)
 show them in many more situations.
