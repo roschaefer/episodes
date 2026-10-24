@@ -9,48 +9,56 @@ question: "Have you ever used Git subtrees in order to vendor another repository
 docs: ../git-splice/test/comparisons/git-subtree.md
 ---
 
-`git subtree` gets the first part right. It puts another repository's files into a folder of the monorepo, so a fix in the sub-repository and the code that calls it can be one commit. `git subtree split` and `git subtree push` turn the monorepo commits that touched the folder back into commits of the sub-repository.
+Since 2012, there has been a script called `git subtree`, which is usually installed along with Git. It imports the commit history of another repository into a monorepo.
 
-git-splice started as a wrapper around `git subtree`. I dropped it because it doesn't give you a linear history. There are three ways to use it, and none of them gets you there.
+That's a promising concept too, because all commits then live in the same monorepo. So the standard commands like `git status` and `git log` work just the way you're used to.
 
-## Without `--squash`: the sub-repository's whole history
+Let's look at an example. The monorepo has 40 commits, the other repository 30:
 
-Without `--squash`, `git subtree add` merges all of the sub-repository's commits into the monorepo. In my test setup, a monorepo with 40 commits has 71 after adding a sub-repository with 30 commits.
+```console
+# roschaefer.github.io/git-splice/test/comparisons/git-subtree
+git subtree add --prefix=vendor/lib https://git.example.com/lib.git main
+```
 
-The monorepo uses the sub-repository. It doesn't develop its past. The changes the monorepo cares about, the ones that fit the sub-repository into the app, are monorepo commits anyway.
+However, `git subtree` pulls the other repository's whole history into the monorepo. Afterwards, the monorepo has 71 commits:
 
-## Only `--squash`: it doesn't scale
+```console
+$ git log --graph --format=%s -4
+*   Add 'vendor/lib/' from commit 'bafd496b1f4512a95b69464604f3da428aa9e33b'
+|\
+| * lib commit 30
+| * lib commit 29
+| * lib commit 28
+```
 
-`--squash` keeps the sub-repository's history out. `add` creates a commit *q* with the sub-repository's files and no parents, and merges it as *s*:
+## `--squash`
 
-![The monorepo's a and s in a line, and q, a commit without parents, as the second parent of s](../git-splice/test/comparisons/git-subtree-squash-add.drawio.svg)
+`git subtree` also comes with an option to squash the other repository's history:
 
-Then I work. *c* and *e* fix the sub-repository, *b* and *d* change the app:
+```console
+git subtree add --squash --prefix=vendor/lib https://git.example.com/lib.git main
+```
 
-![The monorepo's a, s, b, c, d and e in a line, and q as the second parent of s](../git-splice/test/comparisons/git-subtree-squashed.drawio.svg)
+However, `git subtree` has a peculiar idea of what `--squash` means. Instead of a single commit, it squashes only the other repository into a commit *q*, and a merge commit *s* of the monorepo joins it in. So you always get two commits instead of one:
 
-To push the two fixes, `split` has to find out which commits touched the sub-repository. With `--squash`, the monorepo contains no commit of the sub-repository it could start from. So `split` walks the whole monorepo history, on every push. In my setup that's 46 commits, although only two of them matter. In a monorepo with years of history, that gets slow.
+![The monorepo's commits a and s in a line, and q, a commit without parents, as the second parent of s](../git-splice/test/comparisons/git-subtree-squash-add.drawio.svg)
 
-## `--squash` and `--rejoin`: an ugly history
+Because the history is missing then, `git subtree` has to work out again on every push which commits the other repository doesn't know yet. Say *c* and *e* fix the sub-repository, and *b* and *d* change the app:
 
-The best you can do: `split --rejoin` merges the result back as a new starting point. That's one more merge *j* for every push, with another squashed commit *r* on top of *q*:
+![The monorepo's commits a, s, b, c, d and e in a line, and q as the second parent of s](../git-splice/test/comparisons/git-subtree-squashed.drawio.svg)
 
-![The monorepo's a, s, b, c, d, e and j in a line. Below it, q as the second parent of s, and r, on top of q, as the second parent of j](../git-splice/test/comparisons/git-subtree-rejoin.drawio.svg)
+To find *c* and *e*, `git subtree split` suddenly searches the monorepo's whole history, 46 commits here, although only two of them matter. With only `--squash`, that doesn't scale.
 
-And it breaks as soon as pull requests are squash-merged, which is common. The squash merge keeps the fixes but drops *j* and *r*, so the next `split` walks everything again:
+## `--rejoin`
 
-![The monorepo's a, s and p in a line, and q as the second parent of s](../git-splice/test/comparisons/git-subtree-squash-merged.drawio.svg)
+Another flag is meant to solve this problem: `--rejoin`. With it, `git subtree` leaves a sync point in the history on every push, again a squashed commit and a merge. Much like with submodules, you get lots of commits that feel completely unnecessary. With `--squash`, pulling makes two commits, and with `--rejoin`, every push makes two more.
 
-With one sub-repository, the graph is still readable. With three, every sub-repository adds its own squashed commits and its own merges. Rejoined in the same order every time, they make the same pattern on every rejoin, a staircase of arrows that cross:
+The history looks just as messy. Here with three sub-repositories, pushed twice in the same order:
 
 ![The monorepo's history with merges for three sub-repositories x, y and z, rejoined twice in the same order. Each sub-repository's squashed commits form their own line, and the arrows from y and z to their merges cross the rows above them](../git-splice/test/comparisons/git-subtree-rejoin-three.drawio.svg)
 
-None of these merges says anything about the app. They're there to make `split` fast.
+I saw this pattern when I first built my tool on top of `git subtree`.
 
-## Where `git subtree` is the right tool
+`git subtree` finds the sync points through hints in the commit messages, lines like `git-subtree-split: <commit>`. If a rewrite combines commits and the original messages get lost, for example when a pull request is squash-merged, `git subtree` can't find the sync points anymore.
 
-If you move a repository into a monorepo for good and retire its old home, `git subtree add` without `--squash` is exactly right. The history comes along, and `git blame` keeps working.
-
-## What I took away
-
-I wanted the sub-repository's files in the monorepo, with a linear history: without the sub-repository's history, without merges that only exist to make pushing fast, and with a push that only looks at what changed since the last sync. The next episodes show how that fits together.
+All of this shows: `git subtree` is the wrong tool if you want to synchronize two repositories with different histories back and forth. It's a good fit, though, if you want to turn two repositories into one. But that's not our use case.
