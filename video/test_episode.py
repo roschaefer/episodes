@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 
 import pytest
-from episode import Block, append_new_take, shown_link, default_stroke_width, find_episode, parse, spoken
+from episode import FRAME_WIDTH, Block, append_new_take, drawing, framed, shown_link, default_stroke_width, find_episode, parse, spoken
 
 POST = """---
 slug: example
@@ -168,3 +168,20 @@ def test_blocks_without_an_address_for_viewers_have_no_link():
     assert shown_link(Block("code", "git clone https://git.example.com/lib.git")) is None
     assert shown_link(Block("code", "$ git status --short\n# M app/main.txt")) is None
     assert shown_link(Block("heading", "A heading")) is None
+
+
+@pytest.mark.parametrize("line", ["$ git status", "$ git log --oneline -- vendor/lib/src/parse.txt"])
+def test_a_code_block_keeps_its_font_size_short_or_long(line):
+    block = Block("code", line)
+    assert framed(block).width == pytest.approx(drawing(block).width)
+
+
+def test_a_code_block_too_wide_for_the_frame_shrinks_to_fit(capsys):
+    assert framed(Block("code", "x" * 200)).width <= FRAME_WIDTH
+    assert "shorten its lines" in capsys.readouterr().err
+
+
+def test_a_qr_code_goes_below_a_code_block_too_wide_for_it_beside():
+    block = Block("code", "# roschaefer.github.io/git-splice/test/comparisons/git-subtree\ngit subtree add --squash --prefix=vendor/lib https://git.example.com/lib.git main")
+    code, qr = framed(block)
+    assert qr.get_top()[1] < code.get_bottom()[1]

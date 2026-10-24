@@ -13,6 +13,7 @@ import json
 import os
 import re
 import subprocess
+import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -34,6 +35,11 @@ BLOCK_PAUSE = 1.2
 COMMENT_PROMPT = {"en": "Write it in the comments below.", "de": "Schreibt es mir in die Kommentare."}
 DOCS_LABEL = {"en": "More in the git-splice docs", "de": "Mehr in der Dokumentation von git-splice"}
 PIPER_VOICE = {"en": "en_US-lessac-medium", "de": "de_DE-thorsten-medium"}
+# One font size for every code block, whatever its length; the room a block
+# may take of the 14.2 by 8 frame before it has to shrink.
+CODE_FONT_SIZE = 22
+FRAME_WIDTH = 13
+FRAME_HEIGHT = 7
 
 config.background_color = WHITE
 
@@ -241,7 +247,10 @@ def qr_code(link: str) -> Mobject:
 
 def with_qr_code(block: Block, mobject: Mobject) -> Mobject:
     link = shown_link(block)
-    return VGroup(mobject, qr_code(link)).arrange(RIGHT, buff=0.6) if link else mobject
+    if not link:
+        return mobject
+    beside = VGroup(mobject, qr_code(link)).arrange(RIGHT, buff=0.6)
+    return beside if beside.width <= FRAME_WIDTH else VGroup(mobject, qr_code(link)).arrange(DOWN, buff=0.4)
 
 
 def visual(block: Block) -> Mobject:
@@ -273,19 +282,24 @@ def drawing(block: Block) -> Mobject:
     return Code(
         code_string=block.content,
         language="console",
-        background="window",
+        formatter_style="default",
+        background="rectangle",
+        background_config={"fill_color": "#F3F5F8", "fill_opacity": 1, "stroke_color": "#C9D1DB", "stroke_width": 1.5, "buff": 0.3},
         add_line_numbers=False,
-        paragraph_config={"font_size": 32},
+        paragraph_config={"font_size": CODE_FONT_SIZE},
     )
 
 
 def framed(block: Block) -> Mobject:
-    """The block's visual, sized to fit the frame."""
+    """The block's visual, sized to fit the frame. Code keeps its font size,
+    so every block reads the same, unless it doesn't fit."""
     mobject = visual(block)
-    if block.kind in ("image", "code") or mobject.width > 12:
+    if block.kind == "image":
         mobject.scale_to_fit_width(12)
-    if mobject.height > 6.5:
-        mobject.scale_to_fit_height(6.5)
+    if mobject.width > FRAME_WIDTH or mobject.height > FRAME_HEIGHT:
+        if block.kind == "code":
+            print(f"A code block doesn't fit the frame and shrinks; shorten its lines:\n{block.content}", file=sys.stderr)
+        mobject.scale(min(FRAME_WIDTH / mobject.width, FRAME_HEIGHT / mobject.height))
     return mobject
 
 
@@ -316,13 +330,19 @@ class Episode(VoiceoverScene):
         shown: Mobject | None = None
         for block in parse(episode / f"{lang}.md"):
             mobject = framed(block)
-            transition = [FadeIn(mobject)] + ([FadeOut(shown)] if shown else [])
+            if shown:
+                transition = [FadeIn(mobject), FadeOut(shown)]
+            else:
+                # The title is there from the first frame on, so the thumbnail shows it.
+                self.add(mobject)
+                transition = []
             if not block.narration:
-                self.play(*transition)
+                if transition:
+                    self.play(*transition)
                 self.wait(3 if block.kind == "docs" else 1)
             for index, paragraph in enumerate(block.narration):
                 with self.voiceover(text=paragraph) as tracker:
-                    if index == 0:
+                    if index == 0 and transition:
                         self.play(*transition, run_time=min(1, tracker.duration))
                 self.wait(BLOCK_PAUSE if index == len(block.narration) - 1 else PARAGRAPH_PAUSE)
             shown = mobject
