@@ -150,13 +150,14 @@ reads best isn't always what I'd say. A numbered list reads better than
 So the post says "1." and "in der CI", and the recording says "Erstens"
 and "auf CI". The subtitles show the text, not the recording.
 
-Commands and URLs are shown, not said. A command goes in a code block,
-and so does a URL that viewers should see, e.g. as a `#` line above the
-commands it explains; the prose says what they are. In prose, a link's
-text is read out, never its URL. The docs card at the end shows the
-chapter's address on the docs site.
-Wherever the video shows a link, a QR code of it stands beside it: on
-the docs card, and beside a code block with a `#` address line.
+Commands and URLs are shown, not said. A command goes in a code block;
+the prose says what it is. In prose, a link's text is read out, never
+its URL. The closing slide shows the docs chapter's address, with its QR
+code. A code block's `#` line above the commands adds another address
+for the video, where its prose links can't be clicked: only for a page
+the closing slide doesn't link, e.g. episode 01's sandbox. The video
+shows it small, by its QR code, not as code; the post leaves it out, as
+its prose links there anyway.
 
 Code blocks are shown, not run. scrut checks that they behave as shown,
 in the git-splice docs they come from.
