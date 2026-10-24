@@ -45,15 +45,19 @@ Allerdings versteht `git subtree` unter `--squash` etwas Eigenartiges. Statt ein
 
 ![Die Commits a und s des Monorepos in einer Reihe, und q, ein Commit ohne Eltern, als zweiter Elternteil von s](../git-splice/test/comparisons/git-subtree-squash-add.drawio.svg)
 
-Weil dann die Historie fehlt, muss `git subtree` bei jedem Push neu berechnen, welche Commits das andere Repository noch nicht kennt. Sagen wir, *c* und *e* fixen das Sub-Repository, *b* und *d* ändern die App:
+Weil dann die Historie fehlt, muss `git subtree` bei jedem Push neu berechnen, welche Commits das andere Repository noch nicht kennt. Sagen wir, *c* und *e* fixen das Sub-Repository, *b* und *d* ändern die App. Um *c* und *e* zu finden, in Orange, durchsucht `git subtree split` auf einmal die gesamte Historie des Monorepos, in Grau. Hier sind das 46 Commits, denn *a* steht für 40 App-Commits, und nur zwei davon zählen:
 
-![Die Commits a, s, b, c, d und e des Monorepos in einer Reihe, und q als zweiter Elternteil von s](../git-splice/test/comparisons/git-subtree-squashed.drawio.svg)
+![Die Commits a, s, b, c, d und e des Monorepos in einer Reihe, und q als zweiter Elternteil von s. Alle sind grau, weil split sie durchläuft, und c und e sind orange, weil es sie findet](../git-splice/test/comparisons/git-subtree-split-walks.drawio.svg)
 
-Um *c* und *e* zu finden, durchsucht `git subtree split` auf einmal die gesamte Historie des Monorepos, hier 46 Commits, obwohl nur zwei davon zählen. Nur mit `--squash` skaliert das nicht.
+Nur mit `--squash` skaliert das nicht.
 
 ## `--rejoin`
 
-Dieses Problem soll ein weiteres Flag lösen, `--rejoin`. Damit legt `git subtree` bei jedem Push einen Sync-Punkt in der Historie ab, wieder einen gesquashten Commit und einen Merge. Ähnlich wie bei Submodulen entstehen also viele Commits, die sich völlig überflüssig anfühlen. Mit `--squash` entstehen zwei Commits beim Pullen, mit `--rejoin` zwei weitere bei jedem Push.
+Dieses Problem soll ein weiteres Flag lösen, `--rejoin`. Damit legt `git subtree` bei jedem Push einen Sync-Punkt in der Historie ab, wieder einen gesquashten Commit *r* und einen Merge *j*. Danach durchläuft `split` nur noch die Commits ab dem Sync-Punkt. Nach zwei weiteren Commits *g* und *h* sind das fünf:
+
+![Die Commits a, s, b, c, d, e, j, g und h des Monorepos in einer Reihe. Darunter q als zweiter Elternteil von s, und r, auf q aufbauend, als zweiter Elternteil von j. e, r, j und g sind grau, weil split sie durchläuft, und h ist orange, weil es ihn findet](../git-splice/test/comparisons/git-subtree-rejoin-walks.drawio.svg)
+
+Der Preis dafür: Ähnlich wie bei Submodulen entstehen viele Commits, die sich völlig überflüssig anfühlen. Mit `--squash` entstehen zwei Commits beim Pullen, mit `--rejoin` zwei weitere bei jedem Push.
 
 Die Historie sieht entsprechend durcheinander aus. Hier sind es drei Sub-Repositories, zweimal in derselben Reihenfolge gepusht:
 
