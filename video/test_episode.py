@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 
 import pytest
-from episode import Block, append_new_take, default_stroke_width, find_episode, parse, spoken
+from episode import Block, append_new_take, shown_link, default_stroke_width, find_episode, parse, spoken
 
 POST = """---
 slug: example
@@ -158,3 +158,14 @@ def test_a_take_is_listed_in_the_cache_once_however_often_the_video_renders(tmp_
     append_new_take(cache, take)
     append_new_take(cache, take)
     assert [entry["original_audio"] for entry in json.loads(cache.read_text())] == ["hi.mp3"]
+
+
+def test_the_docs_card_and_a_code_blocks_address_line_link_to_what_they_show():
+    assert shown_link(Block("docs", "More\nChapter\nroschaefer.github.io/git-splice/x")) == "https://roschaefer.github.io/git-splice/x"
+    assert shown_link(Block("code", "# example.org/docs\ngit clone x")) == "https://example.org/docs"
+
+
+def test_blocks_without_an_address_for_viewers_have_no_link():
+    assert shown_link(Block("code", "git clone https://git.example.com/lib.git")) is None
+    assert shown_link(Block("code", "$ git status --short\n# M app/main.txt")) is None
+    assert shown_link(Block("heading", "A heading")) is None

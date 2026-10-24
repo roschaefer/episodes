@@ -16,10 +16,12 @@ import subprocess
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from manim import DOWN, WHITE, Code, FadeIn, FadeOut, Mobject, SVGMobject, Text, VGroup, config
+from manim import BLACK, DOWN, RIGHT, WHITE, Code, FadeIn, FadeOut, Mobject, SVGMobject, Text, VGroup, config
 from manim_voiceover import VoiceoverScene
 import manim_voiceover.services.base as voiceover_base
 from manim_voiceover.services.base import SpeechService
+import qrcode
+import qrcode.image.svg
 from pydub import AudioSegment
 
 EPISODES = Path(__file__).resolve().parent.parent
@@ -217,7 +219,36 @@ def plain_svg(path: Path) -> Path:
     return out
 
 
+def shown_link(block: Block) -> str | None:
+    """The address a block shows viewers: the docs card's, or a code block's # line."""
+    if block.kind == "docs":
+        address = block.content.split("\n")[2]
+    elif block.kind == "code" and (line := re.search(r"^# (\S+\.\S+)$", block.content, re.MULTILINE)):
+        address = line.group(1)
+    else:
+        return None
+    return address if "://" in address else f"https://{address}"
+
+
+def qr_code(link: str) -> Mobject:
+    """The link as a QR code, so a viewer can open what they see."""
+    out = EPISODES / "media" / "qr" / f"{hashlib.sha256(link.encode()).hexdigest()[:8]}.svg"
+    if not out.exists():
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_bytes(qrcode.make(link, image_factory=qrcode.image.svg.SvgPathImage, border=1).to_string())
+    return SVGMobject(out).set_fill(BLACK, 1).set_stroke(width=0).scale_to_fit_height(2.5)
+
+
+def with_qr_code(block: Block, mobject: Mobject) -> Mobject:
+    link = shown_link(block)
+    return VGroup(mobject, qr_code(link)).arrange(RIGHT, buff=0.6) if link else mobject
+
+
 def visual(block: Block) -> Mobject:
+    return with_qr_code(block, drawing(block))
+
+
+def drawing(block: Block) -> Mobject:
     if block.kind == "title":
         return Text(block.content, color="#081421", font_size=56)
     if block.kind == "heading":
