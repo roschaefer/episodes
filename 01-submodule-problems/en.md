@@ -1,7 +1,7 @@
 ---
 slug: git-submodules
 id: submodule-problems
-title: "git submodules"
+title: "Git Submodules"
 description: "One git submodule add writes to six places. The commit records a pointer, not the change, and the rest is state that clones and worktrees share in different ways."
 series: why-splicing
 seriesOrder: 2
