@@ -11,6 +11,15 @@ docs: ../git-splice/test/comparisons/git-submodule.md
 
 Git hat eine eigene Implementierung von verschachtelten Repositories: Submodule.
 
+```console
+$ man git-submodule
+NAME
+     git-submodule - Initialize, update or inspect submodules
+
+DESCRIPTION
+     Inspects, updates and manages submodules.
+```
+
 „Submodul“ – das klingt nach dem richtigen Konzept. Aber leider ist die Anwendung ziemlich fehleranfällig. Wir schauen uns mal an, woran das liegt. Also bauen wir uns mal ein Beispiel:
 
 ```console

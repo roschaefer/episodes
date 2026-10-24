@@ -11,6 +11,18 @@ docs: ../git-splice/test/comparisons/git-subtree.md
 
 Seit 2012 gibt es das Skript `git subtree`, das meist zusammen mit Git installiert wird. Damit importiert man die Commit-Historie eines anderen Repos in ein Monorepo.
 
+```console
+$ man git-subtree
+NAME
+     git-subtree - Merge subtrees together and split repository
+     into subtrees
+
+DESCRIPTION
+     Subtrees allow subprojects to be included within a
+     subdirectory of the main project, optionally including the
+     subproject’s entire history.
+```
+
 Auch das ist ein vielversprechendes Konzept, denn dadurch leben alle Commits im selben Monorepo. Die Standardbefehle wie `git status` und `git log` funktionieren also so, wie man es gewohnt ist.
 
 Wir schauen uns das an einem Beispiel an. Das Monorepo hat 40 Commits, das andere Repository 30:

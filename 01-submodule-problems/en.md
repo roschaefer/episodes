@@ -11,6 +11,15 @@ docs: ../git-splice/test/comparisons/git-submodule.md
 
 Git has its own implementation of nested repositories: submodules.
 
+```console
+$ man git-submodule
+NAME
+     git-submodule - Initialize, update or inspect submodules
+
+DESCRIPTION
+     Inspects, updates and manages submodules.
+```
+
 "Submodule" – that sounds like the right concept. But unfortunately, using them is quite error-prone. Let's have a look at why. So let's build an example:
 
 ```console
