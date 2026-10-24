@@ -150,6 +150,23 @@ $ git rev-list --count HEAD
 46
 ```
 
+Grey are the commits `split` walks, orange the ones it finds, which
+changed `vendor/lib/`. *a* stands for all 40 app commits:
+
+<div align="center">
+
+![The monorepo's a, s, b, c, d and e in a line, and q as the second parent of s; all of them are grey, as split walks them, and c and e are orange, as it finds them](git-subtree-split-walks.drawio.svg)
+
+</div>
+
+<!--
+```scrut
+$ check_drawing "$TESTDIR/git-subtree-split-walks.drawio.svg" --alias HEAD=H \
+>   a=before-lib s=HEAD~4 b=HEAD~3 c=HEAD~2 d=HEAD~1 e=HEAD q=HEAD~4^2
+ok   git-subtree-split-walks.drawio.svg: 7 commits, 7 arrows, 1 boxes
+```
+-->
+
 ### With `--rejoin`, a merge for every push, which a squash merge drops
 
 `split --rejoin` merges the split result back into the monorepo, as a
@@ -191,6 +208,42 @@ $ subtree_split_walks vendor/lib
 3
 ```
 
+After two more commits, *g* (`app commit 43`) and *h* (`lib fix 3`),
+it walks only these, from *e*, the merge's first parent, on:
+
+```scrut
+$ git switch -q -c rejoined &&
+>   echo "app commit 43" >>app/main.txt && git commit -q -a -m "app commit 43" &&
+>   echo "lib fix 3" >>vendor/lib/src/parse.txt && git commit -q -a -m "lib fix 3" &&
+>   subtree_split_walked vendor/lib
+lib fix 2
+Squashed 'vendor/lib/' changes from bafd496..48108da
+Split 'vendor/lib/' into commit '48108daa0f798109c3e672ed47a7de6204cf4e02'
+app commit 43
+lib fix 3
+```
+
+<div align="center">
+
+![The monorepo's a, s, b, c, d, e, j, g and h in a line; below it, q as the second parent of s, and r, on top of q, as the second parent of j; e, r, j and g are grey, as split walks them, and h is orange, as it finds it](git-subtree-rejoin-walks.drawio.svg)
+
+</div>
+
+<!--
+```scrut
+$ check_drawing "$TESTDIR/git-subtree-rejoin-walks.drawio.svg" --alias HEAD=H \
+>   a=before-lib s=HEAD~7 b=HEAD~6 c=HEAD~5 d=HEAD~4 e=HEAD~3 j=HEAD~2 \
+>   g=HEAD~1 h=HEAD q=HEAD~7^2 r=HEAD~2^2
+ok   git-subtree-rejoin-walks.drawio.svg: 11 commits, 12 arrows, 1 boxes
+```
+-->
+
+<!-- Back to the branch the squash merge below is made from:
+```scrut
+$ git switch -q squashed
+```
+-->
+
 That's one more merge commit for every push. And where a pull request is
 squash-merged, *j* never reaches the branch it's merged into.
 Squash-merged on top of *s*, that branch gets one commit *p* (`lib fixes
@@ -204,7 +257,7 @@ $ git switch -q -c squash-merged "HEAD^~4" &&
 
 <div align="center">
 
-![The monorepo's a, s and p in a line; below it, q as the second parent of s](git-subtree-squash-merged.drawio.svg)
+![The monorepo's a, s and p in a line; below it, q as the second parent of s; all of them are grey, as the next split walks them, and p is orange, as it finds it](git-subtree-squash-merged.drawio.svg)
 
 </div>
 
@@ -217,7 +270,7 @@ ok   git-subtree-squash-merged.drawio.svg: 4 commits, 4 arrows, 1 boxes
 -->
 
 So the next `split` from there walks all of the monorepo's history
-again:
+again, to find *p*:
 
 ```scrut
 $ subtree_split_walks vendor/lib
