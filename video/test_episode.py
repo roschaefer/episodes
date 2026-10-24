@@ -144,6 +144,27 @@ def test_an_episode_with_a_docs_chapter_ends_on_a_link_to_it(tmp_path, monkeypat
     )
 
 
+def test_an_episode_with_a_docs_chapter_and_a_question_ends_on_one_slide_with_both(tmp_path, monkeypatch):
+    chapter = tmp_path / "git-splice" / "test" / "chapter.md"
+    chapter.parent.mkdir(parents=True)
+    chapter.write_text("# `git subtree` compared\n")
+    monkeypatch.setattr("episode.GIT_SPLICE", tmp_path / "git-splice")
+    post = tmp_path / "episodes" / "02-example" / "en.md"
+    post.parent.mkdir(parents=True)
+    post.write_text(POST.replace("title:", 'docs: ../../git-splice/test/chapter.md\nquestion: "Have you?"\ntitle:'))
+
+    blocks = parse(post)
+    assert blocks[-2].kind != "docs"
+    assert blocks[-1] == Block(
+        "closing",
+        "Have you?\nWrite it in the comments below.\nMore in the git-splice docs\ngit subtree compared\nroschaefer.github.io/git-splice/test/chapter",
+        ["Have you? Write it in the comments below."],
+    )
+    assert shown_link(blocks[-1]) == "https://roschaefer.github.io/git-splice/test/chapter"
+    slide, corner = framed(blocks[-1])
+    assert corner.get_top()[1] < slide.get_bottom()[1]
+
+
 def test_a_diagrams_1px_lines_stay_visible():
     svg = '<rect x="1" stroke="#000000"/><rect stroke="#000000" stroke-width="2"/><rect stroke="none"/><path d="M 0 0" fill="#000"/>'
     assert default_stroke_width(svg) == (

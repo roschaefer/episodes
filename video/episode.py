@@ -112,7 +112,11 @@ def parse(path: Path) -> list[Block]:
         blocks.append(Block("docs", f"{DOCS_LABEL[lang]}\n{chapter_title}\n{url}"))
     if question:
         prompt = COMMENT_PROMPT[lang]
-        blocks.append(Block("question", f"{question.group(1)}\n{prompt}", [f"{question.group(1)} {prompt}"]))
+        ask = Block("question", f"{question.group(1)}\n{prompt}", [f"{question.group(1)} {prompt}"])
+        if blocks[-1].kind == "docs":
+            # One closing slide: the question, and the docs to read on.
+            ask = Block("closing", f"{ask.content}\n{blocks.pop().content}", ask.narration)
+        blocks.append(ask)
     return blocks
 
 
@@ -230,8 +234,8 @@ ADDRESS_LINE = re.compile(r"^# (\S+\.\S+)$\n?", re.MULTILINE)
 
 def shown_address(block: Block) -> str | None:
     """The address a block shows viewers, as written: the docs card's, or a code block's # line."""
-    if block.kind == "docs":
-        return block.content.split("\n")[2]
+    if block.kind in ("docs", "closing"):
+        return block.content.split("\n")[-1]
     if block.kind == "code" and (line := ADDRESS_LINE.search(block.content)):
         return line.group(1)
     return None
@@ -299,6 +303,15 @@ def drawing(block: Block) -> Mobject:
             VGroup(*(Text(sentence, color="#081421", font_size=44) for sentence in sentences)).arrange(DOWN, buff=0.2),
             Text(prompt, color="#5d7189", font_size=32),
         ).arrange(DOWN, buff=0.6)
+    if block.kind == "closing":
+        question, prompt, label, chapter_title, _ = block.content.split("\n")
+        return VGroup(
+            drawing(Block("question", f"{question}\n{prompt}")),
+            VGroup(
+                Text(label, color="#5d7189", font_size=28),
+                Text(chapter_title, color="#081421", font_size=36),
+            ).arrange(DOWN, buff=0.25),
+        ).arrange(DOWN, buff=0.9)
     if block.kind == "image":
         return SVGMobject(plain_svg(Path(block.content)))
     return Code(
@@ -367,6 +380,9 @@ class Episode(VoiceoverScene):
                     if index == 0 and transition:
                         self.play(*transition, run_time=min(1, tracker.duration))
                 self.wait(BLOCK_PAUSE if index == len(block.narration) - 1 else PARAGRAPH_PAUSE)
+            if block.kind == "closing":
+                # Time to scan the QR code.
+                self.wait(3)
             shown = mobject
         self.play(FadeOut(shown))
 
