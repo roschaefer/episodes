@@ -248,6 +248,16 @@ def visual(block: Block) -> Mobject:
     )
 
 
+def framed(block: Block) -> Mobject:
+    """The block's visual, sized to fit the frame."""
+    mobject = visual(block)
+    if block.kind in ("image", "code") or mobject.width > 12:
+        mobject.scale_to_fit_width(12)
+    if mobject.height > 6.5:
+        mobject.scale_to_fit_height(6.5)
+    return mobject
+
+
 if "EPISODE" in os.environ:
     # Only my own voice makes the video; a preview says which voice it has.
     voice = os.environ.get("VOICE", "piper")
@@ -274,11 +284,7 @@ class Episode(VoiceoverScene):
 
         shown: Mobject | None = None
         for block in parse(episode / f"{lang}.md"):
-            mobject = visual(block)
-            if block.kind in ("image", "code") or mobject.width > 12:
-                mobject.scale_to_fit_width(12)
-            if mobject.height > 6.5:
-                mobject.scale_to_fit_height(6.5)
+            mobject = framed(block)
             transition = [FadeIn(mobject)] + ([FadeOut(shown)] if shown else [])
             if not block.narration:
                 self.play(*transition)

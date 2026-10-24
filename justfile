@@ -19,6 +19,10 @@ video id lang="en" quality="l" voice="piper":
 record id lang="en":
     {{shell}} 'EPISODE={{id}} EPISODE_LANG={{lang}} VOICE=recorder uv run manim -qh video/episode.py Episode'
 
+# Render an episode's slides in a language (en, de) as a PDF, one page per block of the video: quality l(ow), m(edium), h(igh) or k (4K)
+slides id lang="en" quality="h":
+    {{shell}} 'uv run python video/slides.py {{id}} {{lang}} {{quality}}'
+
 # List an episode's paragraphs in a language, numbered, and which of them I've recorded
 voiceovers id lang="en":
     {{shell}} 'uv run python video/voiceovers.py status {{id}} {{lang}}'

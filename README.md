@@ -84,6 +84,7 @@ just video <id> de           # the German preview
 just video <id> de h         # the same in full HD
 just video <id> en l silence # silence as long as reading the text takes
 just record <id> de          # record each German paragraph not recorded yet, then render
+just slides <id> de          # the German slides, a PDF with one page per block
 just video-test              # test how an episode becomes blocks
 ```
 
@@ -92,6 +93,10 @@ belong in Git. Change a paragraph and only that one needs recording again.
 The video and its subtitles (`.srt`) are written to
 `media/videos/episode/<quality>/` as `<nn>-<id>-<lang>.mp4`; a preview adds
 `-piper` or `-silence`.
+
+The slides for a talk are the video's blocks as stills, as the video shows
+them: `just slides <id> <lang>` writes `media/slides/<nn>-<id>-<lang>.pdf`,
+at 13.33 by 7.5 inches, the size of a widescreen slide.
 
 To record, `just record <id> <lang>` shows
 each paragraph not recorded yet: press Enter, wait a second, speak, and
