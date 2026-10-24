@@ -17,7 +17,8 @@ Wir schauen uns das an einem Beispiel an. Das Monorepo hat 40 Commits, das ander
 
 ```console
 # roschaefer.github.io/git-splice/test/comparisons/git-subtree
-git subtree add --prefix=vendor/lib https://git.example.com/lib.git main
+git subtree add --prefix=vendor/lib \
+  https://git.example.com/lib.git main
 ```
 
 Allerdings zieht `git subtree` dabei die gesamte Historie des anderen Repos mit ins Monorepo. Danach hat das Monorepo 71 Commits:
@@ -38,7 +39,8 @@ Aber will ich das überhaupt? In einem Monorepo, in das ich ein anderes Reposito
 `git subtree` bringt auch eine Option mit, die Historie des anderen Repos zu squashen:
 
 ```console
-git subtree add --squash --prefix=vendor/lib https://git.example.com/lib.git main
+git subtree add --squash --prefix=vendor/lib \
+  https://git.example.com/lib.git main
 ```
 
 Allerdings versteht `git subtree` unter `--squash` etwas Eigenartiges. Statt eines einzigen Commits squasht es nur das andere Repository zu einem Commit *q*, und ein Merge-Commit *s* des Monorepos joint ihn ein. Es entstehen also immer zwei Commits statt einem:
@@ -61,7 +63,7 @@ Nur mit `--squash` skaliert das nicht.
 
 ## `--rejoin`
 
-Dieses Problem soll ein weiteres Flag lösen, `--rejoin`. Damit legt `git subtree` bei jedem Push einen Sync-Punkt in der Historie ab, wieder einen gesquashten Commit *r* und einen Merge *j*. Die Nachricht von *j* hat, was *q* fehlt, die Zeile `git-subtree-mainline:`:
+Dieses Problem soll ein weiteres Flag lösen, `--rejoin`. Damit legt `git subtree` bei jedem Push einen Synchronisationspunkt in der Historie ab, wieder einen gesquashten Commit *r* und einen Merge *j*. Die Nachricht von *j* hat, was *q* fehlt, die Zeile `git-subtree-mainline:`:
 
 ```console
 $ git log -1 --format=%B | grep '^git-subtree-'
@@ -70,7 +72,7 @@ git-subtree-mainline: 9d3cc6061455cb38432ce9846218e1227e4771be
 git-subtree-split: 48108daa0f798109c3e672ed47a7de6204cf4e02
 ```
 
-Danach durchläuft `split` nur noch die Commits ab dem Sync-Punkt. Nach zwei weiteren Commits *g* und *h* sind das fünf:
+Danach durchläuft `split` nur noch die Commits ab dem Synchronisationspunkt. Nach zwei weiteren Commits *g* und *h* sind das fünf:
 
 ![Die Commits a, s, b, c, d, e, j, g und h des Monorepos in einer Reihe. Darunter q als zweiter Elternteil von s, und r, auf q aufbauend, als zweiter Elternteil von j. e, r, j, g und h sind grau, weil split sie durchläuft, und h ist orange umrandet, weil es ihn findet](../git-splice/test/comparisons/git-subtree-rejoin-walks.drawio.svg)
 
@@ -82,6 +84,6 @@ Die Historie sieht entsprechend durcheinander aus. Hier sind es drei Sub-Reposit
 
 Dieses Muster habe ich gesehen, als ich mein Tool zunächst auf `git subtree` aufgebaut hatte.
 
-Weil die Sync-Punkte nur in den Commit-Nachrichten stehen, gehen sie verloren, sobald ein Rewrite Commits zusammenfasst, etwa beim Squash-Merge eines Pull Requests. Dann durchsucht `split` wieder die gesamte Historie.
+Weil die Synchronisationspunkte nur in den Commit-Nachrichten stehen, gehen sie verloren, sobald ein Rewrite Commits zusammenfasst, etwa beim Squash-Merge eines Pull Requests. Dann durchsucht `split` wieder die gesamte Historie.
 
 All das zeigt: `git subtree` ist das falsche Werkzeug, wenn man zwei Repositories mit unterschiedlichen Historien hin und her synchronisieren möchte. Gut geeignet ist es dagegen, wenn man aus zwei Repositories eins machen möchte. Das ist in unserem Anwendungsfall aber nicht so.

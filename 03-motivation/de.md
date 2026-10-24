@@ -28,7 +28,7 @@ In derselben Datei können wir auch die Konfiguration ablegen, die wir aus `.git
 	url = git@github.com:x/a.git
 ```
 
-Die Datei liegt im Ordner des Sub-Repos. So zieht sie immer mit dem Ordner mit. Und weil sie im Worktree eingecheckt ist, hat jeder Worktree seine eigene: Veränderliche Zustände sind voneinander getrennt, statt wie bei Submodulen geteilt in der `.git/config`. Sie kann auch nicht durch Rewrites der Commits verloren gehen, anders als die Sync-Punkte von `git subtree` in den Commit-Nachrichten.
+Die Datei liegt im Ordner des Sub-Repos. So zieht sie immer mit dem Ordner mit. Und weil sie im Worktree eingecheckt ist, hat jeder Worktree seine eigene: Veränderliche Zustände sind voneinander getrennt, statt wie bei Submodulen geteilt in der `.git/config`. Sie kann auch nicht durch Rewrites der Commits verloren gehen, anders als die Synchronisationspunkte von `git subtree` in den Commit-Nachrichten.
 
 ## Ein Three-Way-Merge
 

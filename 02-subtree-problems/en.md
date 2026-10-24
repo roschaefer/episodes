@@ -17,7 +17,8 @@ Let's look at an example. The monorepo has 40 commits, the other repository 30:
 
 ```console
 # roschaefer.github.io/git-splice/test/comparisons/git-subtree
-git subtree add --prefix=vendor/lib https://git.example.com/lib.git main
+git subtree add --prefix=vendor/lib \
+  https://git.example.com/lib.git main
 ```
 
 However, `git subtree` pulls the other repository's whole history into the monorepo. Afterwards, the monorepo has 71 commits:
@@ -38,7 +39,8 @@ But do I even want that? In a monorepo that I vendor another repository into, I 
 `git subtree` also comes with an option to squash the other repository's history:
 
 ```console
-git subtree add --squash --prefix=vendor/lib https://git.example.com/lib.git main
+git subtree add --squash --prefix=vendor/lib \
+  https://git.example.com/lib.git main
 ```
 
 However, `git subtree` has a peculiar idea of what `--squash` means. Instead of a single commit, it squashes only the other repository into a commit *q*, and a merge commit *s* of the monorepo joins it in. So you always get two commits instead of one:
