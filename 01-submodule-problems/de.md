@@ -39,16 +39,16 @@ git commit -m "add lib as a submodule"
 
 ```text
 monorepo/
-├── .gitmodules      2  Name, Pfad und URL
+├── .gitmodules      Name, Pfad und URL
 ├── app/
 │   └── main.txt
 └── vendor/
-    └── lib          1  Gitlink: 160000 commit bafd496
+    └── lib          Gitlink: 160000 commit bafd496
 ```
 
-1. Im Commit des Monorepos steht am Ordnerpfad des Submoduls nur ein sogenannter Gitlink mit der ID des ausgecheckten Commits des Submoduls. Den Commit selbst speichert das Monorepo nicht.
+- Im Commit des Monorepos steht am Ordnerpfad des Submoduls nur ein sogenannter Gitlink mit der ID des ausgecheckten Commits des Submoduls. Den Commit selbst speichert das Monorepo nicht.
 
-2. Im Wurzelverzeichnis befindet sich eine weitere Datei, die `.gitmodules`. Sie gibt dem Submodul einen Namen, speichert den Ordnerpfad zum Submodul sowie die Upstream-URL, ähnlich wie bei einem `git remote`.
+- Im Wurzelverzeichnis befindet sich eine weitere Datei, die `.gitmodules`. Sie gibt dem Submodul einen Namen, speichert den Ordnerpfad zum Submodul sowie die Upstream-URL, ähnlich wie bei einem `git remote`.
 
 Außerdem gibt es noch [vier weitere Stellen](https://roschaefer.github.io/git-splice/test/comparisons/git-submodule/#where-a-submodule-keeps-its-state), an denen Git ein Submodul ablegt. Aber nur die beiden oben genannten landen im Commit.
 
@@ -90,11 +90,11 @@ Und warum steht der Pfad des Submoduls noch einmal in `.gitmodules`? Der Gitlink
 
 ```text
 monorepo/
-├── .gitmodules      2  Pfad: vendor/lib
+├── .gitmodules      Pfad: vendor/lib
 ├── app/
 │   └── main.txt
 └── vendor/
-    └── lib          1  Hier ist der Pfad implizit
+    └── lib          Hier ist der Pfad implizit
 ```
 
 ## Fehler 2: „Geteilter, veränderlicher Zustand ist die Wurzel allen Übels“

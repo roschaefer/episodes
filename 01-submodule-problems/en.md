@@ -41,16 +41,16 @@ git commit -m "add lib as a submodule"
 
 ```text
 monorepo/
-├── .gitmodules      2  name, path and URL
+├── .gitmodules      name, path and URL
 ├── app/
 │   └── main.txt
 └── vendor/
-    └── lib          1  gitlink: 160000 commit bafd496
+    └── lib          gitlink: 160000 commit bafd496
 ```
 
-1. At the submodule's folder path, the monorepo's commit holds only a so-called gitlink, with the ID of the submodule's checked-out commit. The commit itself isn't stored in the monorepo.
+- At the submodule's folder path, the monorepo's commit holds only a so-called gitlink, with the ID of the submodule's checked-out commit. The commit itself isn't stored in the monorepo.
 
-2. The root folder has one more file, `.gitmodules`. It gives the submodule a name and stores the folder path to the submodule and its upstream URL, much like a `git remote`.
+- The root folder has one more file, `.gitmodules`. It gives the submodule a name and stores the folder path to the submodule and its upstream URL, much like a `git remote`.
 
 There are also [four more places](https://roschaefer.github.io/git-splice/test/comparisons/git-submodule/#where-a-submodule-keeps-its-state) where Git keeps a submodule. But only the two above end up in the commit.
 
@@ -92,11 +92,11 @@ And why is the submodule's path in `.gitmodules` again? The gitlink already sits
 
 ```text
 monorepo/
-├── .gitmodules      2  path: vendor/lib
+├── .gitmodules      path: vendor/lib
 ├── app/
 │   └── main.txt
 └── vendor/
-    └── lib          1  here the path is implicit
+    └── lib          here the path is implicit
 ```
 
 ## Mistake 2: "Shared mutable state is the root of all evil"
