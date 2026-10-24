@@ -1,6 +1,5 @@
 ---
 slug: warum-es-git-splice-heisst
-id: naming
 title: "Warum es git-splice heißt"
 description: "Warum „Splice“, und warum ist git-splice die Referenzimplementierung und nicht der eigentliche Kern?"
 series: git-splice

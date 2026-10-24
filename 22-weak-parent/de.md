@@ -1,6 +1,5 @@
 ---
 slug: der-schwache-elternteil
-id: weak-parent
 title: "Der schwache Elternteil"
 description: "Was ist ein schwacher Elternteil, und warum braucht Splicing eine Beziehung, die schwächer ist als Git-Abstammung?"
 series: splicing-concepts

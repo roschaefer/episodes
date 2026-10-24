@@ -1,6 +1,5 @@
 ---
 slug: synchronisationszustand-gehoert-in-den-working-tree
-id: sync-state
 title: "Synchronisationszustand gehört in den Working Tree"
 description: "Historie kann einen Synchronisationspunkt markieren, doch gewöhnliches Umschreiben kann ihn löschen. Eine kleine eingecheckte Zustandsdatei überlebt und ermöglicht inkrementelle Arbeit."
 series: splicing-concepts

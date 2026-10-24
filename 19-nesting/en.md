@@ -1,6 +1,5 @@
 ---
 slug: nesting-splices
-id: nesting
 title: "Nesting splices"
 description: "What happens when a spliced repository contains a splice itself?"
 series: splicing-concepts

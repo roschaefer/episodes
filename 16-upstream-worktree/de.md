@@ -1,6 +1,5 @@
 ---
 slug: einen-upstream-commit-im-worktree-auschecken
-id: upstream-worktree
 title: "Einen Upstream-Commit im Worktree auschecken"
 description: "Wie kann ein Repository zwei unabhängige Historien enthalten und beide nebeneinander auschecken?"
 series: git-splice

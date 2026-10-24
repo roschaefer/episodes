@@ -1,6 +1,5 @@
 ---
 slug: why-i-started-writing-my-own-tool
-id: own-tool
 title: "Why I started writing my own tool"
 description: "When did working around submodules and subtrees stop being worth it, and what did git-subtrees teach me?"
 series: why-splicing

@@ -1,6 +1,5 @@
 ---
 slug: sync-state-makes-the-log-trivial
-id: sync-log
 title: "Once the sync state exists, the log becomes trivial"
 description: "A committed boundary turns 'what will push?' and 'what will pull?' from bespoke subtree analysis into ordinary Git set operations."
 series: splicing-concepts

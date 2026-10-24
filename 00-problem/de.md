@@ -1,6 +1,5 @@
 ---
 slug: ein-ordner-zwei-repositories
-id: problem
 title: "Ein Ordner, zwei Repositories"
 description: "Manchmal muss ein Ordner in einem Monorepo zugleich ein eigenes Repository sein: ein öffentliches Projekt in einem privaten Monorepo, eine vendorte Bibliothek, Teams mit eigener CI."
 series: why-splicing

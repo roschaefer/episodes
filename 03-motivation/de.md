@@ -1,6 +1,5 @@
 ---
 slug: teile-eines-monorepos-unabhaengig-veroeffentlichen
-id: motivation
 title: "Teile eines Monorepos unabhängig veröffentlichen"
 description: "Ein Ordner soll im Monorepo entwickelt und zugleich als eigenständiges Repository veröffentlicht werden. Git bietet dafür Submodule und Subtrees – mit sehr unterschiedlichen Nachteilen."
 series: why-splicing

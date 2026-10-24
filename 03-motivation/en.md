@@ -1,6 +1,5 @@
 ---
 slug: publishing-parts-of-a-monorepo-independently
-id: motivation
 title: "Publishing parts of a monorepo independently"
 description: "A directory should be developed inside a monorepo while being published as a standalone repository. Git offers submodules and subtrees for this—with very different drawbacks."
 series: why-splicing

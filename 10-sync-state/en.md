@@ -1,6 +1,5 @@
 ---
 slug: sync-state-belongs-in-the-worktree
-id: sync-state
 title: "Synchronization state belongs in the worktree"
 description: "History can record a synchronization point, but ordinary history rewriting can erase it. A small committed state file survives and makes incremental work possible."
 series: splicing-concepts

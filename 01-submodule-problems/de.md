@@ -1,6 +1,5 @@
 ---
 slug: git-submodules
-id: submodule-problems
 title: "Git Submodules"
 description: "Ein git submodule add schreibt an sechs Stellen. Der Commit speichert einen Zeiger, nicht die Änderung, und der Rest ist Zustand, den Klone und Worktrees auf unterschiedliche Weise teilen."
 series: why-splicing

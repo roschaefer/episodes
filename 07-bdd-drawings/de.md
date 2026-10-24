@@ -1,6 +1,5 @@
 ---
 slug: die-zeichnungen-testen
-id: bdd-drawings
 title: "Die Zeichnungen testen"
 description: "Wie prüfe ich, dass die Diagramme noch zu dem passen, was das Werkzeug tatsächlich tut?"
 series: building-git-splice

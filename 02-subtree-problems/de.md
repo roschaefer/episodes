@@ -1,6 +1,5 @@
 ---
 slug: was-bei-git-subtree-schiefgeht
-id: subtree-problems
 title: "Was bei git subtree schiefgeht"
 description: "git subtree importiert entweder die ganze Historie der Bibliothek oder durchläuft bei jedem Push die ganze Historie des Monorepos. Und ein Remote pro Bibliothek ist einen Tippfehler davon entfernt, das Monorepo zu veröffentlichen."
 series: why-splicing

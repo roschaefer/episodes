@@ -1,6 +1,5 @@
 ---
 slug: naming-it-git-splice
-id: naming
 title: "Naming it git-splice"
 description: "Why “splice”, and why is git-splice the reference implementation rather than the point?"
 series: git-splice

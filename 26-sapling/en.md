@@ -1,6 +1,5 @@
 ---
 slug: sapling
-id: sapling
 title: "Sapling"
 description: "What does Sapling do differently, and does it make splicing unnecessary?"
 series: other-tools

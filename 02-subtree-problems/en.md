@@ -1,6 +1,5 @@
 ---
 slug: what-goes-wrong-with-git-subtree
-id: subtree-problems
 title: "What goes wrong with git subtree"
 description: "git subtree either imports the library's whole history or walks the monorepo's whole history on every push. And a remote per library is one typo away from publishing the monorepo."
 series: why-splicing

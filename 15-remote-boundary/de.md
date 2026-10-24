@@ -1,6 +1,5 @@
 ---
 slug: remotes-sind-die-falsche-grenze
-id: remote-boundary
 title: "Git-Remotes sind die falsche Grenze für einen Ordner"
 description: "Ein Remote repräsentiert immer ein Repository. Es nach einem Monorepo-Ordner zu benennen ließ einen katastrophalen Push normal aussehen – und offenbarte einen Designfehler in git-subtrees."
 series: splicing-concepts

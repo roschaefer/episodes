@@ -1,6 +1,5 @@
 ---
 slug: warum-ich-ein-eigenes-werkzeug-schreibe
-id: own-tool
 title: "Warum ich angefangen habe, ein eigenes Werkzeug zu schreiben"
 description: "Wann hat sich das Umgehen von Submodulen und Subtrees nicht mehr gelohnt, und was hat mir git-subtrees beigebracht?"
 series: why-splicing

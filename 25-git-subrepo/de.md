@@ -1,6 +1,5 @@
 ---
 slug: git-subrepo
-id: git-subrepo
 title: "git-subrepo"
 description: "Wie geht git-subrepo dasselbe Problem an, und wo unterscheidet es sich vom Splicing?"
 series: other-tools

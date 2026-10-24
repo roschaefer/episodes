@@ -1,6 +1,5 @@
 ---
 slug: splicing-in-scrut
-id: splicing-scrut
 title: "Splicing in Scrut"
 description: "What does it look like to splice a real third-party project into a monorepo?"
 series: splicing-in-practice

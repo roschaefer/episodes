@@ -1,6 +1,5 @@
 ---
 slug: der-nachgebaute-commit-r
-id: rebuilt-commit
 title: "Der nachgebaute Commit R"
 description: "Wie macht git-splice aus Monorepo-Commits Upstream-Commits?"
 series: git-splice

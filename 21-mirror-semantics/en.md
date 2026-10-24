@@ -1,6 +1,5 @@
 ---
 slug: mirror-semantics
-id: mirror-semantics
 title: "Mirror semantics"
 description: "In which sense is the folder a mirror of the upstream, and where does the analogy end?"
 series: splicing-concepts

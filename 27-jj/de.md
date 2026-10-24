@@ -1,6 +1,5 @@
 ---
 slug: jujutsu
-id: jj
 title: "Jujutsu (jj)"
 description: "Wie sähe Splicing in jj aus, und was kann Git davon lernen?"
 series: other-tools
