@@ -117,7 +117,7 @@ def parse(path: Path) -> list[Block]:
 
 
 def find_episode(name: str, episodes: Path = EPISODES) -> Path:
-    """The episode folder, by its full name (01-submodule-problems), id, or number."""
+    """The episode folder, by its full name (01-git-submodules), id, or number."""
     folders = sorted(path.parent for path in episodes.glob("[0-9]*-*/en.md"))
     for folder in folders:
         number, id = folder.name.split("-", 1)

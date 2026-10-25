@@ -71,7 +71,7 @@ request to `main`. The review bots then look at nothing else:
 
 ```sh
 git switch -c review/submodules main
-git restore --source development -- episodes/01-submodule-problems
+git restore --source development -- episodes/01-git-submodules
 git commit -m "docs(episodes): add Git Submodules"
 git splice push episodes   # creates the branch upstream
 gh pr create --draft --repo roschaefer/episodes --base main --head review/submodules
