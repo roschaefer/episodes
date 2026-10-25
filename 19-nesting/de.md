@@ -1,5 +1,4 @@
 ---
-slug: splices-verschachteln
 title: "Splices verschachteln"
 description: "Was passiert, wenn ein gesplictes Repository selbst einen Splice enthält?"
 series: splicing-concepts

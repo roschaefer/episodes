@@ -1,5 +1,4 @@
 ---
-slug: naming-it-git-splice
 title: "Naming it git-splice"
 description: "What a splice is, and the rule for git-splice's words: Git's words do what they do in Git, new words don't collide with them."
 series: git-splice

@@ -1,5 +1,4 @@
 ---
-slug: spiegel-semantik
 title: "Spiegel-Semantik"
 description: "In welchem Sinn ist der Ordner ein Spiegel des Upstreams, und wo endet die Analogie?"
 series: splicing-concepts

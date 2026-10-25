@@ -1,5 +1,4 @@
 ---
-slug: git-subtree
 title: "Git Subtree"
 description: "git subtree adds needless merge commits to the Git history. It doesn't give you a linear history."
 series: why-splicing

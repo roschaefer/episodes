@@ -1,5 +1,4 @@
 ---
-slug: sapling
 title: "Sapling"
 description: "Was macht Sapling anders, und macht es Splicing überflüssig?"
 series: other-tools

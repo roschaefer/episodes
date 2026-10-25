@@ -1,5 +1,4 @@
 ---
-slug: pulling-commits-into-a-splice
 title: "Pulling commits into a splice"
 description: "How do upstream commits arrive as one monorepo commit, and which base does the merge use?"
 series: splicing-concepts

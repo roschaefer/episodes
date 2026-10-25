@@ -1,5 +1,4 @@
 ---
-slug: der-nachgebaute-commit-r
 title: "Der nachgebaute Commit R"
 description: "Wie macht git-splice aus Monorepo-Commits Upstream-Commits?"
 series: git-splice

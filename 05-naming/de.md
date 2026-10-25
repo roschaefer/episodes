@@ -1,5 +1,4 @@
 ---
-slug: warum-es-git-splice-heisst
 title: "Warum es git-splice heißt"
 description: "Was ein Splice ist, und die Regel für die Begriffe von git-splice: Begriffe aus Git tun, was sie in Git tun, neue Begriffe kollidieren nicht mit ihnen."
 series: git-splice

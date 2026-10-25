@@ -1,5 +1,4 @@
 ---
-slug: specification-by-example-mit-scrut
 title: "Specification by Example mit Scrut"
 description: "Die Dokumentation von git-splice ist ihre Testsuite: Scrut führt die Befehle im Markdown aus und vergleicht ihre Ausgabe."
 series: building-git-splice

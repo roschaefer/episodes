@@ -1,5 +1,4 @@
 ---
-slug: synchronisationszustand-macht-den-log-trivial
 title: "Mit Synchronisationszustand wird der Log trivial"
 description: "Eine eingecheckte Grenze macht aus den Fragen ‚Was wird gepusht?‘ und ‚Was wird gepullt?‘ gewöhnliche Mengenoperationen auf Git-Historien."
 series: splicing-concepts

@@ -1,5 +1,4 @@
 ---
-slug: what-is-an-upstream
 title: "What is an upstream?"
 description: "What does “upstream” mean for a folder that is also a repository?"
 series: splicing-concepts

@@ -1,5 +1,4 @@
 ---
-slug: was-ist-ein-drei-wege-merge
 title: "Was ist ein Drei-Wege-Merge genau?"
 description: "Was sind BASE, OURS und THEIRS, und warum ist ein Merge nur so gut wie seine Basis?"
 series: splicing-concepts
