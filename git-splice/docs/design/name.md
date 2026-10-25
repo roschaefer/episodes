@@ -37,6 +37,18 @@ As a verb, you splice something in or out:
 The [vocabulary](README.md#vocabulary) defines these and the
 other terms.
 
+## Words from Git, and new words
+
+The names in `git-splice` follow one rule:
+
+- A word Git already uses, like `status`, `pull`, `upstream` or `rebase`,
+  does in `git-splice` what it does in Git.
+- A new word must not collide with one Git already uses.
+
+"Splice" is a new word: Git doesn't use it, so it doesn't collide, but it
+has to be coined. An everyday word that Git doesn't use yet would do as
+well.
+
 ## RNA splicing
 
 In [RNA splicing](https://en.wikipedia.org/wiki/RNA_splicing), a cell cuts
