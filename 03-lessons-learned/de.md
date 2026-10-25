@@ -1,7 +1,7 @@
 ---
 slug: getrennte-historien-gemeinsame-dateien
 title: "Getrennte Historien, gemeinsame Dateien"
-description: "Getrennte Historien wie bei Submodulen, die Dateien im Monorepo wie bei git subtree, und dazwischen ein eingecheckter Synchronisationspunkt."
+description: "Die Dateien des anderen Repos in einen Ordner kopieren, den zuletzt synchronisierten Commit merken, und dieser Commit ist die Basis eines Three-Way-Merges."
 series: why-splicing
 seriesOrder: 4
 topics: [git]
@@ -13,13 +13,24 @@ Weder Git-Submodule noch `git subtree` sind eine gute Lösung, um zwei Repositor
 
 Um das Beste aus beiden Welten zu kombinieren, brauchen wir getrennte Historien, wie bei Submodulen. Gleichzeitig soll das Monorepo die Dateien des Sub-Repos enthalten, wie bei `git subtree`. Dadurch funktionieren die Standardbefehle wie `git status` und `git log` weiterhin so, wie man es gewohnt ist.
 
-So kommt alles zusammen, was zusammengehört, anders als bei Submodulen: Ein Fix im Sub-Repo und der Code, der ihn aufruft, sind ein Commit.
+## Nur die Dateien
+
+Das ist einfacher, als es klingt. Wir kopieren die Dateien des anderen Repos in einen Ordner des Monorepos, und fertig:
+
+```text
+monorepo/
+├── app/
+│   └── main.js
+└── vendor/a/       die Dateien von a.git
+    └── src/
+        └── parse.js
+```
+
+Es werden keine Commits ausgetauscht. Das Monorepo bekommt nicht die Historie des anderen Repos, und das andere Repo nicht die des Monorepos. Ein Fix in `vendor/a/` und der Code in `app/`, der ihn aufruft, sind ein ganz normaler Commit.
 
 ## Ein Synchronisationspunkt
 
-Damit das Neuberechnen der Commits skaliert, brauchen wir einen Synchronisationspunkt. Er ähnelt einem Gitlink, verspricht aber nicht, dass es sich um den ausgecheckten Commit handelt. Es reicht, wenn es der zuletzt *synchronisierte* Commit ist.
-
-In derselben Datei können wir auch die Konfiguration ablegen, die wir aus `.gitmodules` kennen, etwa die URL:
+Wir merken uns nur eines: welchen Commit des anderen Repos wir zuletzt kopiert haben. Er ähnelt einem Gitlink, verspricht aber nicht, dass es sich um den ausgecheckten Commit handelt. Es reicht, wenn es der zuletzt *synchronisierte* Commit ist. Eine kleine Datei im Ordner hält ihn fest, zusammen mit der URL, die wir aus `.gitmodules` kennen:
 
 ```text
 [splice]
@@ -28,10 +39,18 @@ In derselben Datei können wir auch die Konfiguration ablegen, die wir aus `.git
 	url = git@github.com:x/a.git
 ```
 
-Die Datei liegt im Ordner des Sub-Repos. So zieht sie immer mit dem Ordner mit. Und weil sie im Worktree eingecheckt ist, hat jeder Worktree seine eigene: Veränderliche Zustände sind voneinander getrennt, statt wie bei Submodulen geteilt in der `.git/config`. Sie kann auch nicht durch Rewrites der Commits verloren gehen, anders als die Synchronisationspunkte von `git subtree` in den Commit-Nachrichten.
+Die Datei ist eingecheckt. So zieht sie immer mit dem Ordner mit, und Rewrites der Commits können sie nicht verlieren.
 
 ## Ein Three-Way-Merge
 
-Um die geänderten Dateien abzugleichen, reicht ein ganz normaler Three-Way-Merge. Wir müssen nicht zwei Historien in Einklang bringen wie bei `git subtree`, es geht nur um Dateiänderungen.
+In der Zwischenzeit entwickeln sich beide Seiten weiter. Um sie zusammenzubringen, reicht ein ganz normaler Three-Way-Merge:
 
-Synchronisieren verschiedene Branches zu verschiedenen Zeiten, kann es in dieser Datei zu Konflikten kommen. Das ist aber gewünscht, und wir lösen sie so, wie wir es von Git gewohnt sind.
+```text
+BASE     vendor/a/, wie wir ihn zuletzt kopiert haben, bei 3f1c…
+OURS     vendor/a/ im Monorepo, wie er jetzt ist
+THEIRS   a.git, wie es jetzt ist
+```
+
+Der Synchronisationspunkt ist die Basis. Git vergleicht unsere und ihre Dateien mit ihr und übernimmt die Änderungen beider Seiten. Wir müssen nicht zwei Historien in Einklang bringen wie bei `git subtree`, es geht nur um Dateiänderungen.
+
+Synchronisieren verschiedene Branches zu verschiedenen Zeiten, kann es am Synchronisationspunkt zu Konflikten kommen. Das ist aber gewünscht, und wir lösen sie so, wie wir es von Git gewohnt sind.
