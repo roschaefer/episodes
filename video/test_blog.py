@@ -162,12 +162,13 @@ def test_two_images_with_one_name_are_refused(tmp_path, site):
         built(tmp_path, site)
 
 
-def test_stale_images_and_renamed_posts_are_removed_but_other_posts_stay(tmp_path, site):
+def test_stale_images_and_posts_of_renamed_or_removed_episodes_go_but_posts_outside_the_series_stay(tmp_path, site):
     episode(tmp_path, "02-example")
     (site / "images").mkdir(parents=True)
     (site / "images" / "gone.svg").write_text("<svg/>")
     (site / "posts" / "en").mkdir(parents=True)
-    (site / "posts" / "en" / "old-slug.svx").write_text("---\nid: example\n---\n")
-    (site / "posts" / "en" / "by-hand.svx").write_text("---\nid: by-hand\n---\n")
+    (site / "posts" / "en" / "old-title.svx").write_text("---\nid: example\nseries: example-series\n---\n")
+    (site / "posts" / "en" / "removed.svx").write_text("---\nid: removed\nseries: example-series\n---\n")
+    (site / "posts" / "en" / "by-hand.svx").write_text("---\nid: by-hand\nseries: other\n---\n")
     _, stray = built(tmp_path, site)
-    assert sorted(path.name for path in stray) == ["gone.svg", "old-slug.svx"]
+    assert sorted(path.name for path in stray) == ["gone.svg", "old-title.svx", "removed.svx"]

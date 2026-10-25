@@ -55,16 +55,16 @@ def build(episodes: Path, posts: Path, images: Path, images_url: str, series_fil
         outputs[images / name] = file.read_bytes()
     outputs[series_file] = (json.dumps({series["id"]: series}, ensure_ascii=False, indent="\t") + "\n").encode()
 
-    # The images folder belongs to the episodes; posts outside them stay untouched.
+    # The images folder belongs to the episodes, and so does every post in
+    # their series: one no episode writes any more was renamed or removed.
+    # Posts outside the series stay untouched.
     stray = [path for path in sorted(images.iterdir()) if path not in outputs] if images.exists() else []
-    # A post of an episode whose slug changed: the episode now writes it under its new name.
-    ids = {episode_id(folder) for folder in folders}
     for lang in LANGS:
         if (posts / lang).exists():
             stray += [
                 path
                 for path in sorted((posts / lang).glob("*.svx"))
-                if path not in outputs and frontmatter_id(path) in ids
+                if path not in outputs and frontmatter_series(path) == series["id"]
             ]
     return outputs, stray
 
@@ -90,9 +90,8 @@ def slugify(title: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", text).strip("-")
 
 
-def frontmatter_id(path: Path) -> str | None:
-    match = re.search(r"^id: *(\S+)$", path.read_text(), re.MULTILINE)
-    return match.group(1) if match else None
+def frontmatter_series(path: Path) -> str | None:
+    return frontmatter_field(path.read_text(), "series")
 
 
 def post(source: Path, series: str, order: int, images_url: str, image_sources: dict[str, Path]) -> str:

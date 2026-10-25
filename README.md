@@ -96,8 +96,10 @@ just episodes-check  # fails if those are out of date
 ```
 
 Edit the episode here, not the generated `.svx`: the next build overwrites
-it. `static/blog/episodes/` belongs to the build, which removes images no
-episode references any more.
+it. `static/blog/episodes/` belongs to the build, and so does every post
+in the episodes' series: the build removes images no episode references
+and posts no episode writes any more, e.g. after renaming or removing
+an episode. Posts outside the series stay untouched.
 
 ## Building the video
 
