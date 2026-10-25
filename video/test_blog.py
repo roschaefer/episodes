@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 
 import pytest
@@ -12,8 +13,22 @@ The intro.
 """
 
 
+SERIES = """id = "example-series"
+
+[title]
+en = "Examples"
+de = "Beispiele"
+
+[description]
+en = "All of them."
+de = "Alle."
+"""
+
+
 @pytest.fixture
 def site(tmp_path):
+    (tmp_path / "episodes").mkdir()
+    (tmp_path / "episodes" / "series.toml").write_text(SERIES)
     return tmp_path / "site"
 
 
@@ -25,14 +40,35 @@ def episode(tmp_path: Path, name: str, text: str = POST, lang: str = "en") -> Pa
 
 
 def built(tmp_path: Path, site: Path):
-    outputs, stray = build(tmp_path / "episodes", site / "posts", site / "images", "/blog/episodes", site / "plan.ts")
+    outputs, stray = build(tmp_path / "episodes", site / "posts", site / "images", "/blog/episodes", site / "series.json")
     return {path.relative_to(site).as_posix(): content for path, content in outputs.items()}, stray
 
 
-def test_a_post_is_named_by_its_slug_and_takes_its_id_from_the_folder(tmp_path, site):
+def test_a_post_takes_its_id_from_the_folder_and_its_place_in_the_series_from_the_folders_order(tmp_path, site):
+    episode(tmp_path, "00-first", POST.replace("Example", "First"))
     episode(tmp_path, "02-example")
     outputs, _ = built(tmp_path, site)
-    assert outputs["posts/en/example.svx"].decode() == '---\nid: example\ntitle: "Example"\n---\n\nThe intro.\n'
+    assert outputs["posts/en/example.svx"].decode() == (
+        '---\nid: example\nseries: example-series\nseriesOrder: 2\ntitle: "Example"\n---\n\nThe intro.\n'
+    )
+
+
+def test_the_series_is_written_for_the_website(tmp_path, site):
+    outputs, _ = built(tmp_path, site)
+    assert json.loads(outputs["series.json"]) == {
+        "example-series": {
+            "id": "example-series",
+            "title": {"en": "Examples", "de": "Beispiele"},
+            "description": {"en": "All of them.", "de": "Alle."},
+        }
+    }
+
+
+@pytest.mark.parametrize("field", ["series: other", "seriesOrder: 3"])
+def test_a_series_in_the_frontmatter_is_refused(tmp_path, site, field):
+    episode(tmp_path, "02-example", POST.replace("title:", f"{field}\ntitle:"))
+    with pytest.raises(EpisodeError, match="drop the series"):
+        built(tmp_path, site)
 
 
 @pytest.mark.parametrize(
@@ -124,13 +160,6 @@ def test_two_images_with_one_name_are_refused(tmp_path, site):
         (source.parent / "diagram.svg").write_text(name)
     with pytest.raises(EpisodeError, match="share the name diagram.svg"):
         built(tmp_path, site)
-
-
-def test_the_episodes_numbers_are_the_publication_plan(tmp_path, site):
-    episode(tmp_path, "10-later", POST.replace("Example", "Later"))
-    episode(tmp_path, "02-sooner", POST.replace("Example", "Sooner"))
-    outputs, _ = built(tmp_path, site)
-    assert outputs["plan.ts"].decode().startswith('export const publicationPlan: string[] = [\n\t"sooner",\n\t"later",\n];\n')
 
 
 def test_stale_images_and_renamed_posts_are_removed_but_other_posts_stay(tmp_path, site):

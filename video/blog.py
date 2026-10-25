@@ -1,15 +1,18 @@
 """Writes each episode's <lang>.md as a blog post into a website, and copies
-the images it references, rewriting their paths. The episodes' numbers
-become the publication plan. With --check, writes nothing and fails if the
-website differs from what it would write. See ../README.md.
+the images it references, rewriting their paths. The episodes make one
+series, ../series.toml, in their folders' order. With --check, writes
+nothing and fails if the website differs from what it would write. See
+../README.md.
 
-    blog.py --posts <dir> --images <dir> --images-url <path> --plan <file> [--check]
+    blog.py --posts <dir> --images <dir> --images-url <path> --series <file> [--check]
 """
 
 import argparse
+import json
 import os
 import re
 import sys
+import tomllib
 from pathlib import Path
 
 from post import ADDRESS, COMMENT_PROMPT, DOCS_SITE, EPISODES, EpisodeError, docs_chapter, episode_folders, episode_id
@@ -33,30 +36,24 @@ def docs_paragraph(source: Path, path: str, lang: str) -> str:
     return DOCS_LINK[lang](f"[{chapter.title}]({url})", chapter.tested)
 
 
-def build(episodes: Path, posts: Path, images: Path, images_url: str, plan: Path) -> tuple[dict[Path, bytes], list[Path]]:
+def build(episodes: Path, posts: Path, images: Path, images_url: str, series_file: Path) -> tuple[dict[Path, bytes], list[Path]]:
     """What to write where, and which stale files to remove."""
     outputs: dict[Path, bytes] = {}
     image_sources: dict[str, Path] = {}
     folders = episode_folders(episodes)
+    series = tomllib.loads((episodes / "series.toml").read_text())
 
-    for folder in folders:
+    for order, folder in enumerate(folders, 1):
         for source in sorted(folder.glob("[a-z][a-z].md")):
             where = source.relative_to(episodes)
             try:
-                outputs[posts / source.stem / f"{slug(source)}.svx"] = post(source, images_url, image_sources).encode()
+                text = post(source, series["id"], order, images_url, image_sources)
+                outputs[posts / source.stem / f"{slug(source)}.svx"] = text.encode()
             except EpisodeError as error:
                 raise EpisodeError(f"{where}: {error}") from None
     for name, file in image_sources.items():
         outputs[images / name] = file.read_bytes()
-
-    plan_ids = "".join(f'\t"{episode_id(folder)}",\n' for folder in folders)
-    outputs[plan] = f"""export const publicationPlan: string[] = [{f"\n{plan_ids}" if plan_ids else ""}];
-
-export const plannedPosition = (id: string) => {{
-\tconst position = publicationPlan.indexOf(id);
-\treturn position === -1 ? publicationPlan.length : position;
-}};
-""".encode()
+    outputs[series_file] = (json.dumps({series["id"]: series}, ensure_ascii=False, indent="\t") + "\n").encode()
 
     # The images folder belongs to the episodes; posts outside them stay untouched.
     stray = [path for path in sorted(images.iterdir()) if path not in outputs] if images.exists() else []
@@ -98,12 +95,15 @@ def frontmatter_id(path: Path) -> str | None:
     return match.group(1) if match else None
 
 
-def post(source: Path, images_url: str, image_sources: dict[str, Path]) -> str:
+def post(source: Path, series: str, order: int, images_url: str, image_sources: dict[str, Path]) -> str:
     """The episode as a blog post: the frontmatter the website reads, and the ending the video has too."""
     text = source.read_text()
     end = text.find("\n---\n", 4)
-    if re.search(r"^id:", text[:end] if end != -1 else text[:-1], re.MULTILINE):
+    frontmatter = text[:end] if end != -1 else text[:-1]
+    if re.search(r"^id:", frontmatter, re.MULTILINE):
         raise EpisodeError("drop the id, the build takes it from the folder name")
+    if re.search(r"^(series|seriesOrder):", frontmatter, re.MULTILINE):
+        raise EpisodeError("drop the series, the build takes it from series.toml and the folder's number")
     docs = frontmatter_field(text, "docs")
     question = frontmatter_field(text, "question", r'"?(.*?)"?')
     if not question and re.search(r"^publishedAt:", text, re.MULTILINE):
@@ -123,7 +123,7 @@ def post(source: Path, images_url: str, image_sources: dict[str, Path]) -> str:
         image_sources[file.name] = file
         return f"![{alt}]({images_url}/{file.name})"
 
-    text = re.sub(r"^---\n", f"---\nid: {episode_id(source.parent)}\n", text, count=1)
+    text = re.sub(r"^---\n", f"---\nid: {episode_id(source.parent)}\nseries: {series}\nseriesOrder: {order}\n", text, count=1)
     for field in (r"slug: *\S+", r"docs: *\S+", r"question: .*"):
         text = re.sub(rf"^{field}\n", "", text, count=1, flags=re.MULTILINE)
     # A code block's # address line is for the video, which shows it by a QR
@@ -142,12 +142,12 @@ def main() -> None:
     parser.add_argument("--posts", type=Path, required=True, help="where <lang>/<slug>.svx go")
     parser.add_argument("--images", type=Path, required=True, help="where the posts' images go")
     parser.add_argument("--images-url", required=True, help="the path the website serves the images at")
-    parser.add_argument("--plan", type=Path, required=True, help="the publication plan, a TypeScript module")
+    parser.add_argument("--series", type=Path, required=True, help="where the series goes, as JSON")
     parser.add_argument("--check", action="store_true", help="write nothing, fail if out of date")
     args = parser.parse_args()
-    posts, images, plan = (path.resolve() for path in (args.posts, args.images, args.plan))
+    posts, images, series = (path.resolve() for path in (args.posts, args.images, args.series))
     try:
-        outputs, stray = build(EPISODES, posts, images, args.images_url, plan)
+        outputs, stray = build(EPISODES, posts, images, args.images_url, series)
     except EpisodeError as error:
         sys.exit(f"blog: {error}")
     if args.check:

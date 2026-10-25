@@ -10,17 +10,18 @@ Each language has its own post and its own video, which I speak myself.
 episodes/<nn>-<id>/en.md   the English post, and the script for the English video
 episodes/<nn>-<id>/de.md   the German post, and the script for the German video
 episodes/<nn>-<id>/*.svg   diagrams that belong to this episode only
+episodes/series.toml       the series the episodes make: its title and description
 episodes/git-splice/       git-splice, spliced in: the docs and diagrams the episodes cite
 ```
 
-`<nn>` is the episode's place in the publication plan: the build writes
-the plan (`roschaefer.de/src/lib/blog/plan.ts`) in the folders' order. To
-reorder, rename the folders. `<id>` is the post's `id`, the same in both
-languages.
+`<nn>` is the episode's place in the series, as in the playlist: the
+build writes it into the post as `seriesOrder`. To reorder, rename the
+folders. `<id>` is the post's `id`, the same in both languages.
 
 The frontmatter is the blog's (see
-`roschaefer.de/src/lib/blog/posts.ts`), without `id`, which the build
-adds from the folder name, plus optionally `docs`, the chapter of the git-splice
+`roschaefer.de/src/lib/blog/posts.ts`), without `id`, `series` and
+`seriesOrder`, which the build adds from the folder name and
+`series.toml`, plus optionally `docs`, the chapter of the git-splice
 docs the episode goes with, e.g. `../git-splice/test/comparisons/git-subtree.md`.
 The post and the video end with a link to it.
 
@@ -83,14 +84,14 @@ Once the pull request is squash-merged, `git splice pull episodes` on
 
 Each `<lang>.md` becomes a post: `video/blog.py` writes it, with the
 frontmatter the website reads and the same ending as the video, into a
-website's folders, copies the images it shows, and writes the
-publication plan from the episodes' numbers. Which folders those are is
+website's folders, copies the images it shows, and writes the series
+as JSON. Which folders those are is
 the website's business: my monorepo has this folder and roschaefer.de
 spliced in side by side and passes roschaefer.de's, which is deployed
 from its own repository:
 
 ```sh
-just episodes        # in the monorepo: writes src/content/blog/<lang>/<slug>.svx and static/blog/episodes/
+just episodes        # in the monorepo: writes src/content/blog/<lang>/<slug>.svx, static/blog/episodes/ and src/lib/blog/series.json
 just episodes-check  # fails if those are out of date
 ```
 
