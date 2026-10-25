@@ -150,7 +150,9 @@ just retake <id> <lang> <paragraph>...   # discard bad takes; just record asks a
 just voiceovers-prune <id>               # discard takes of text the scripts no longer have
 ```
 
-`just check` fails while an episode has takes of text it no longer has.
+`just check` fails while an episode has takes of text it no longer has,
+or a block nothing is said over: a code block, say, whose next paragraph
+already introduces the block after it.
 
 The text is written for readers, and I speak it in my own words: what
 reads best isn't always what I'd say. A numbered list reads better than

@@ -107,3 +107,10 @@ def test_check_reports_the_language_of_a_stale_take(episode, capsys):
     with pytest.raises(SystemExit):
         check(episode.parent)
     assert "de: Ein Absatz, den ich umgeschrieben habe." in capsys.readouterr().out
+
+
+def test_check_fails_on_a_block_nothing_is_said_over(episode, capsys):
+    (episode / "en.md").write_text((episode / "en.md").read_text() + "\n```console\n$ git status\n```\n\nIntroduces the next one:\n\n```console\n$ git log\n```\n")
+    with pytest.raises(SystemExit):
+        check(episode.parent)
+    assert "nothing is said over code '$ git status'" in capsys.readouterr().out

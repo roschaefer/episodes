@@ -3,7 +3,8 @@
     voiceovers.py status <episode> <lang>               which paragraphs are recorded
     voiceovers.py retake <episode> <lang> <paragraph>…  discard takes, to record them again
     voiceovers.py prune <episode>                       discard takes of text the script no longer has
-    voiceovers.py check                                 fail if any episode has such takes
+    voiceovers.py check                                 fail if any episode has such takes,
+                                                        or a block nothing is said over
 
 A take is a recording in <episode>/voiceovers/<lang>/, listed in its
 cache.json under the text it speaks. See ../README.md.
@@ -13,7 +14,7 @@ import json
 import sys
 from pathlib import Path
 
-from episode import EPISODES, find_episode, parse
+from episode import EPISODES, find_episode, parse, silent
 
 CACHE = "cache.json"
 
@@ -75,6 +76,15 @@ def stale_takes(episode: Path) -> list[str]:
     return found
 
 
+def silent_blocks(episode: Path) -> list[str]:
+    """What check reports besides stale takes: blocks with nothing said over them."""
+    return [
+        f"{lang}: nothing is said over {block.kind} {block.content.splitlines()[0][:50]!r}, give it a paragraph of its own"
+        for lang in languages(episode)
+        for block in silent(parse(episode / f"{lang}.md"))
+    ]
+
+
 def status(episode: Path, lang: str) -> None:
     recorded = {spoken_text(take) for take in takes(episode / "voiceovers" / lang)}
     script = paragraphs(episode, lang)
@@ -107,13 +117,14 @@ def prune(episode: Path) -> None:
 
 
 def check(episodes: Path = EPISODES) -> None:
-    problems = {
-        episode.name: found
-        for episode in sorted(path.parent for path in episodes.glob("[0-9]*-*/en.md"))
-        if (found := stale_takes(episode))
-    }
+    problems = {}
+    for episode in sorted(path.parent for path in episodes.glob("[0-9]*-*/en.md")):
+        if old := stale_takes(episode):
+            old.append(f"run 'just voiceovers-prune {episode.name[:2]}' to discard these takes")
+        if found := old + silent_blocks(episode):
+            problems[episode.name] = found
     for name, found in problems.items():
-        print(f"{name}, run 'just voiceovers-prune {name[:2]}':", *found, sep="\n  ")
+        print(f"{name}:", *found, sep="\n  ")
     if problems:
         raise SystemExit(1)
 

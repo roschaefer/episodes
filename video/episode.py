@@ -2,8 +2,9 @@
 
 A block starts at each heading, diagram, or code block, and its narration is
 the prose up to the next one. A paragraph ending in a colon introduces the
-next block, so it plays over that one. The prose before the first block plays
-over a title card. Each language's <lang>.md makes its own video. See ../README.md.
+next block, so it plays over that one. A heading with nothing said over it
+heads the diagram or code block after it instead. The prose before the first
+block plays over a title card. Every block has something said over it. Each language's <lang>.md makes its own video. See ../README.md.
 
     EPISODE=<id> [EPISODE_LANG=en|de] [VOICE=piper|silence|recorder] manim video/episode.py Episode
 """
@@ -52,6 +53,8 @@ class Block:
     kind: str  # "title", "heading", "image", "code", "docs" or "question"
     content: str
     narration: list[str] = field(default_factory=list)
+    # The heading shown above a diagram or code block, see with_headings.
+    heading: str | None = None
 
 
 def spoken(markdown: str) -> str:
@@ -110,7 +113,8 @@ def parse(path: Path) -> list[Block]:
         chapter = docs_chapter(path, docs.group(1))
         # The page as I'd type it: no scheme.
         url = f"{DOCS_SITE}/{chapter.page}".rstrip("/")
-        blocks.append(Block("docs", f"{DOCS_LABEL[lang]}\n{spoken(chapter.title)}\n{url}"))
+        title = spoken(chapter.title)
+        blocks.append(Block("docs", f"{DOCS_LABEL[lang]}\n{title}\n{url}", [f"{DOCS_LABEL[lang]}: {title}."]))
     if question:
         prompt = COMMENT_PROMPT[lang]
         ask = Block("question", f"{question.group(1)}\n{prompt}", [f"{question.group(1)} {prompt}"])
@@ -118,7 +122,24 @@ def parse(path: Path) -> list[Block]:
             # One closing slide: the question, and the docs to read on.
             ask = Block("closing", f"{ask.content}\n{blocks.pop().content}", ask.narration)
         blocks.append(ask)
-    return blocks
+    return with_headings(blocks)
+
+
+def with_headings(blocks: list[Block]) -> list[Block]:
+    """A heading with nothing said over it, because the paragraph after it
+    introduces a diagram or code block, heads that block: no silent slide."""
+    headed: list[Block] = []
+    for block in blocks:
+        previous = headed[-1] if headed else None
+        if previous and previous.kind == "heading" and not previous.narration and block.kind in ("code", "image"):
+            block.heading = headed.pop().content
+        headed.append(block)
+    return headed
+
+
+def silent(blocks: list[Block]) -> list[Block]:
+    """The blocks nothing is said over, which the text has to fix."""
+    return [block for block in blocks if not block.narration]
 
 
 def find_episode(name: str, episodes: Path = EPISODES) -> Path:
@@ -337,6 +358,8 @@ def framed(block: Block) -> Mobject:
     mobject = drawing(block)
     if block.kind == "image":
         mobject.scale_to_fit_width(12)
+    if block.heading:
+        mobject = VGroup(drawing(Block("heading", block.heading)).scale(0.8), mobject).arrange(DOWN, buff=0.5)
     if mobject.width > FRAME_WIDTH or mobject.height > FRAME_HEIGHT:
         if block.kind == "code":
             print(f"A code block doesn't fit the frame and shrinks; shorten its lines:\n{block.content}", file=sys.stderr)
@@ -368,8 +391,11 @@ class Episode(VoiceoverScene):
             else:
                 self.set_speech_service(Silence(cache_dir=voiceovers / voice))
 
+        blocks = parse(episode / f"{lang}.md")
+        if quiet := silent(blocks):
+            raise SystemExit(f"Nothing is said over these blocks, give each a paragraph of its own: {[block.content.splitlines()[0] for block in quiet]}")
         shown: Mobject | None = None
-        for block in parse(episode / f"{lang}.md"):
+        for block in blocks:
             mobject = framed(block)
             start = self.renderer.time
             if shown:
@@ -378,9 +404,6 @@ class Episode(VoiceoverScene):
                 # The title is there from the first frame on, so the thumbnail shows it.
                 self.add(mobject)
                 transition = []
-            if not block.narration:
-                if transition:
-                    self.play(*transition)
             for index, paragraph in enumerate(block.narration):
                 with self.voiceover(text=paragraph) as tracker:
                     if index == 0 and transition:

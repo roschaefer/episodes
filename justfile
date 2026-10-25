@@ -35,7 +35,7 @@ retake id lang +paragraphs:
 voiceovers-prune id:
     {{shell}} 'uv run python video/voiceovers.py prune {{id}}'
 
-# Fail if an episode has takes of text it no longer has
+# Fail if an episode has takes of text it no longer has, or a block nothing is said over
 voiceovers-check:
     {{shell}} 'uv run python video/voiceovers.py check'
 

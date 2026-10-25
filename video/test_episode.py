@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 
 import pytest
-from episode import FRAME_WIDTH, MIN_BLOCK_SECONDS, Block, append_new_take, drawing, framed, shown_code, shown_link, default_stroke_width, find_episode, parse, spoken, still_to_show
+from episode import FRAME_WIDTH, MIN_BLOCK_SECONDS, Block, append_new_take, drawing, framed, shown_code, shown_link, default_stroke_width, find_episode, parse, silent, spoken, still_to_show
 
 POST = """---
 slug: example
@@ -80,9 +80,9 @@ def test_a_block_introduced_by_a_colon_keeps_it_when_the_next_block_follows_dire
     post.parent.mkdir()
     post.write_text(POST.replace("Read over the heading.", "The output:").replace(
         "First paragraph about the output.\nStill the first paragraph.\n\nSecond paragraph.\n", ""))
-    heading, code, image = parse(post)[1:]
-    assert heading.narration == []
+    code, image = parse(post)[1:]
     assert code.narration == ["The output:"]
+    assert code.heading == "A heading"
     assert image.narration == ["Read over the diagram."]
 
 
@@ -141,6 +141,7 @@ def test_an_episode_with_a_docs_chapter_ends_on_a_link_to_it(tmp_path, monkeypat
     assert parse(post)[-1] == Block(
         "docs",
         "More in the git-splice docs\ngit subtree compared\nroschaefer.github.io/git-splice/test/chapter",
+        ["More in the git-splice docs: git subtree compared."],
     )
 
 
@@ -217,3 +218,26 @@ def test_a_block_with_nothing_said_over_it_stays_on_screen_for_the_minimum():
 
 def test_a_block_shown_long_enough_already_moves_on_at_once():
     assert still_to_show(MIN_BLOCK_SECONDS + 5) == 0
+
+
+def test_a_heading_with_nothing_said_over_it_heads_the_block_its_next_paragraph_introduces(tmp_path):
+    post = tmp_path / "example" / "en.md"
+    post.parent.mkdir()
+    post.write_text('---\ntitle: "T"\n---\n\nIntro.\n\n## Just the files\n\nWe copy them:\n\n```text\nmonorepo/\n```\n\nAfter it.\n')
+    *_, code = parse(post)
+    assert code == Block("code", "monorepo/", ["We copy them:", "After it."], heading="Just the files")
+    heading, drawn = framed(code)
+    assert heading.get_bottom()[1] > drawn.get_top()[1]
+
+
+def test_a_heading_with_something_said_over_it_keeps_its_own_slide(tmp_path):
+    title, heading, code, *_ = blocks(tmp_path)
+    assert (heading.kind, code.kind, code.heading) == ("heading", "code", None)
+
+
+def test_no_block_of_an_episode_is_silent_but_a_code_block_whose_next_paragraph_introduces_another_is(tmp_path):
+    assert silent(blocks(tmp_path)) == []
+    post = tmp_path / "silent" / "en.md"
+    post.parent.mkdir()
+    post.write_text('---\ntitle: "T"\n---\n\nIntro.\n\n```console\n$ one\n```\n\nNext:\n\n```console\n$ two\n```\n\nDone.\n')
+    assert [block.content for block in silent(parse(post))] == ["$ one"]
