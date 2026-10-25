@@ -1,5 +1,5 @@
 ---
-title: "Getrennte Historien, gemeinsame Dateien"
+title: "Lessons Learned"
 description: "Die Dateien des anderen Repos in einen Ordner kopieren, den zuletzt synchronisierten Commit merken, und dieser Commit ist die Basis eines Three-Way-Merges."
 series: why-splicing
 seriesOrder: 4

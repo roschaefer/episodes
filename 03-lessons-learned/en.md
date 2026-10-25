@@ -1,5 +1,5 @@
 ---
-title: "Separate histories, shared files"
+title: "Lessons learned"
 description: "Copy the other repository's files into a folder, remember the last synced commit, and that commit is the base of a three-way merge."
 series: why-splicing
 seriesOrder: 4

@@ -1,5 +1,5 @@
 ---
-title: "Ein Ordner, zwei Repositories"
+title: "Motivation"
 description: "Manchmal muss ein Ordner in einem Monorepo zugleich ein eigenes Repository sein: ein öffentliches Projekt in einem privaten Monorepo, eine vendorte Bibliothek, Teams mit eigener CI."
 series: why-splicing
 seriesOrder: 1
