@@ -6,7 +6,9 @@ question: "Wer schreibt und wer prüft bei euch im Team die Akzeptanztests?"
 docs: ../git-splice/README.md
 ---
 
-Die Dokumentation von git-splice ist gleichzeitig seine Testsuite. Dafür nutze ich Scrut, ein Werkzeug von Meta. In einer Markdown-Datei steht in einem Codeblock, der mit `scrut` markiert ist, ein Befehl nach dem `$`, und darunter die Ausgabe, die ich erwarte:
+Die Dokumentation von git-splice ist gleichzeitig seine Testsuite. Dafür nutze ich Scrut, ein Werkzeug von Meta.
+
+In einer Markdown-Datei steht in einem Codeblock, der mit `scrut` markiert ist, ein Befehl nach dem `$`, und darunter die Ausgabe, die ich erwarte:
 
 ```console
 $ git splice status

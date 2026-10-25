@@ -6,7 +6,9 @@ question: "Who writes and who checks the acceptance tests in your team?"
 docs: ../git-splice/README.md
 ---
 
-The documentation of git-splice is also its test suite. I use Scrut for that, a tool from Meta. In a Markdown file, a code block marked `scrut` holds a command after the `$`, and below it the output I expect:
+The documentation of git-splice is also its test suite. I use Scrut for that, a tool from Meta.
+
+In a Markdown file, a code block marked `scrut` holds a command after the `$`, and below it the output I expect:
 
 ```console
 $ git splice status
