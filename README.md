@@ -79,10 +79,13 @@ Once the pull request is squash-merged, `git splice pull episodes` on
 
 ## Building the blog posts
 
-The Markdown is the interface to the website. This repository doesn't
-build the posts: my monorepo has this folder and roschaefer.de spliced in
-side by side, and its `scripts/build-blog.mjs` writes each `<lang>.md`
-into roschaefer.de, which is deployed from its own repository:
+Each `<lang>.md` becomes a post: `video/blog.py` writes it, with the
+frontmatter the website reads and the same ending as the video, into a
+website's folders, copies the images it shows, and writes the
+publication plan from the episodes' numbers. Which folders those are is
+the website's business: my monorepo has this folder and roschaefer.de
+spliced in side by side and passes roschaefer.de's, which is deployed
+from its own repository:
 
 ```sh
 just episodes        # in the monorepo: writes src/content/blog/<lang>/<slug>.svx and static/blog/episodes/
@@ -114,7 +117,7 @@ just video <id> de h         # the same in full HD
 just video <id> en l silence # silence as long as reading the text takes
 just record <id> de          # record each German paragraph not recorded yet, then render
 just slides <id> de          # the German slides, a PDF with one page per block
-just video-test              # test how an episode becomes blocks
+just video-test              # test how an episode becomes blocks and a post
 ```
 
 Recordings land in `<nn>-<id>/voiceovers/<lang>/`, named by their text, and

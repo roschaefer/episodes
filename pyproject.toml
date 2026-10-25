@@ -1,7 +1,7 @@
 [project]
 name = "episodes"
 version = "0"
-description = "Renders the episodes' videos with Manim"
+description = "Renders the episodes as videos with Manim, and as blog posts"
 requires-python = ">=3.12,<3.13"
 dependencies = [
     "manim",

@@ -25,14 +25,12 @@ import qrcode
 import qrcode.image.svg
 from pydub import AudioSegment
 
-EPISODES = Path(__file__).resolve().parent.parent
-GIT_SPLICE = EPISODES / "git-splice"
-DOCS_SITE = "roschaefer.github.io/git-splice"
+from post import ADDRESS, COMMENT_PROMPT, DOCS_SITE, EPISODES, docs_chapter
+
 WORDS_PER_MINUTE = 150
 # Seconds of quiet after a paragraph, and after the last one a block shows.
 PARAGRAPH_PAUSE = 0.6
 BLOCK_PAUSE = 1.2
-COMMENT_PROMPT = {"en": "Write it in the comments below.", "de": "Schreibt es mir in die Kommentare."}
 DOCS_LABEL = {"en": "More in the git-splice docs", "de": "Mehr in der Dokumentation von git-splice"}
 PIPER_VOICE = {"en": "en_US-lessac-medium", "de": "de_DE-thorsten-medium"}
 # One font size for every code block, whatever its length; the room a block
@@ -104,12 +102,10 @@ def parse(path: Path) -> list[Block]:
     end_paragraph()
     blocks[-1].narration.extend(lead_in)
     if docs:
-        chapter = (path.parent / docs.group(1)).resolve()
-        chapter_title = spoken(re.search(r"^# +(.+)$", chapter.read_text(), re.MULTILINE).group(1))
-        # Its page on the docs site, as I'd type it: no scheme, a README is its folder.
-        page = re.sub(r"(^|/)README\.md$|\.md$", "", str(chapter.relative_to(GIT_SPLICE.resolve())))
-        url = f"{DOCS_SITE}/{page}".rstrip("/")
-        blocks.append(Block("docs", f"{DOCS_LABEL[lang]}\n{chapter_title}\n{url}"))
+        chapter = docs_chapter(path, docs.group(1))
+        # The page as I'd type it: no scheme.
+        url = f"{DOCS_SITE}/{chapter.page}".rstrip("/")
+        blocks.append(Block("docs", f"{DOCS_LABEL[lang]}\n{spoken(chapter.title)}\n{url}"))
     if question:
         prompt = COMMENT_PROMPT[lang]
         ask = Block("question", f"{question.group(1)}\n{prompt}", [f"{question.group(1)} {prompt}"])
@@ -229,7 +225,7 @@ def plain_svg(path: Path) -> Path:
     return out
 
 
-ADDRESS_LINE = re.compile(r"^# (\S+\.\S+)$\n?", re.MULTILINE)
+ADDRESS_LINE = re.compile(rf"^{ADDRESS}$\n?", re.MULTILINE)
 
 
 def shown_address(block: Block) -> str | None:

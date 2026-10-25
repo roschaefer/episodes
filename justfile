@@ -39,6 +39,10 @@ voiceovers-prune id:
 voiceovers-check:
     {{shell}} 'uv run python video/voiceovers.py check'
 
-# Test the glue that turns an episode into video blocks
+# Write each episode as a blog post into a website: <posts>/<lang>/<slug>.svx, the images to <images>, served at <images_url>, and the publication plan to <plan>; with --check, fail if they are out of date
+blog posts images images_url plan *check:
+    {{shell}} 'uv run python video/blog.py --posts {{posts}} --images {{images}} --images-url {{images_url}} --plan {{plan}} {{check}}'
+
+# Test the glue that turns an episode into video blocks and a blog post
 video-test:
     {{shell}} 'uv run pytest -q video'

@@ -133,7 +133,7 @@ def test_an_episode_with_a_docs_chapter_ends_on_a_link_to_it(tmp_path, monkeypat
     chapter = tmp_path / "git-splice" / "test" / "chapter.md"
     chapter.parent.mkdir(parents=True)
     chapter.write_text("# `git subtree` compared\n")
-    monkeypatch.setattr("episode.GIT_SPLICE", tmp_path / "git-splice")
+    monkeypatch.setattr("post.GIT_SPLICE", tmp_path / "git-splice")
     post = tmp_path / "episodes" / "02-example" / "en.md"
     post.parent.mkdir(parents=True)
     post.write_text(POST.replace("title:", "docs: ../../git-splice/test/chapter.md\ntitle:"))
@@ -148,7 +148,7 @@ def test_an_episode_with_a_docs_chapter_and_a_question_ends_on_one_slide_with_bo
     chapter = tmp_path / "git-splice" / "test" / "chapter.md"
     chapter.parent.mkdir(parents=True)
     chapter.write_text("# `git subtree` compared\n")
-    monkeypatch.setattr("episode.GIT_SPLICE", tmp_path / "git-splice")
+    monkeypatch.setattr("post.GIT_SPLICE", tmp_path / "git-splice")
     post = tmp_path / "episodes" / "02-example" / "en.md"
     post.parent.mkdir(parents=True)
     post.write_text(POST.replace("title:", 'docs: ../../git-splice/test/chapter.md\nquestion: "Have you?"\ntitle:'))
