@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 
 import pytest
-from episode import FRAME_WIDTH, Block, append_new_take, drawing, framed, shown_code, shown_link, default_stroke_width, find_episode, parse, spoken
+from episode import FRAME_WIDTH, MIN_BLOCK_SECONDS, Block, append_new_take, drawing, framed, shown_code, shown_link, default_stroke_width, find_episode, parse, spoken, still_to_show
 
 POST = """---
 slug: example
@@ -208,3 +208,12 @@ def test_a_code_blocks_address_line_is_no_code_but_goes_below_it_by_the_qr_code(
     code, corner = framed(block)
     assert corner.get_top()[1] < code.get_bottom()[1]
     assert corner.get_right()[0] > code.get_right()[0]
+
+
+def test_a_block_with_nothing_said_over_it_stays_on_screen_for_the_minimum():
+    assert still_to_show(1) == MIN_BLOCK_SECONDS - 1
+    assert MIN_BLOCK_SECONDS >= 3
+
+
+def test_a_block_shown_long_enough_already_moves_on_at_once():
+    assert still_to_show(MIN_BLOCK_SECONDS + 5) == 0

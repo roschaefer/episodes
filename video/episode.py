@@ -31,6 +31,9 @@ WORDS_PER_MINUTE = 150
 # Seconds of quiet after a paragraph, and after the last one a block shows.
 PARAGRAPH_PAUSE = 0.6
 BLOCK_PAUSE = 1.2
+# Seconds each block is on screen at least, so a viewer can take it in,
+# even one with nothing to say over it.
+MIN_BLOCK_SECONDS = 3
 DOCS_LABEL = {"en": "More in the git-splice docs", "de": "Mehr in der Dokumentation von git-splice"}
 PIPER_VOICE = {"en": "en_US-lessac-medium", "de": "de_DE-thorsten-medium"}
 # One font size for every code block, whatever its length; the room a block
@@ -321,6 +324,11 @@ def drawing(block: Block) -> Mobject:
     )
 
 
+def still_to_show(shown_for: float) -> float:
+    """How much longer a block that has been on screen for shown_for seconds stays."""
+    return max(0, MIN_BLOCK_SECONDS - shown_for)
+
+
 def framed(block: Block) -> Mobject:
     """The block's visual, sized to fit the frame. Code keeps its font size,
     so every block reads the same, unless it doesn't fit."""
@@ -361,6 +369,7 @@ class Episode(VoiceoverScene):
         shown: Mobject | None = None
         for block in parse(episode / f"{lang}.md"):
             mobject = framed(block)
+            start = self.renderer.time
             if shown:
                 transition = [FadeIn(mobject), FadeOut(shown)]
             else:
@@ -370,7 +379,6 @@ class Episode(VoiceoverScene):
             if not block.narration:
                 if transition:
                     self.play(*transition)
-                self.wait(3 if block.kind == "docs" else 1)
             for index, paragraph in enumerate(block.narration):
                 with self.voiceover(text=paragraph) as tracker:
                     if index == 0 and transition:
@@ -379,6 +387,8 @@ class Episode(VoiceoverScene):
             if block.kind == "closing":
                 # Time to scan the QR code.
                 self.wait(3)
+            if wait := still_to_show(self.renderer.time - start):
+                self.wait(wait)
             shown = mobject
         self.play(FadeOut(shown))
 
