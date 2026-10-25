@@ -1,8 +1,6 @@
 ---
 title: "Warum es git-splice heißt"
 description: "Was ein Splice ist, und die Regel für die Begriffe von git-splice: Begriffe aus Git tun, was sie in Git tun, neue Begriffe kollidieren nicht mit ihnen."
-series: git-splice
-seriesOrder: 1
 topics: [git]
 question: "Fällt euch ein besserer Name ein? Am liebsten ein alltägliches Wort, das in Git noch nicht belegt ist."
 docs: ../git-splice/docs/design/name.md

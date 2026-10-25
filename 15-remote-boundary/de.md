@@ -1,8 +1,6 @@
 ---
 title: "Git-Remotes sind die falsche Grenze für einen Ordner"
 description: "Ein Remote repräsentiert immer ein Repository. Es nach einem Monorepo-Ordner zu benennen ließ einen katastrophalen Push normal aussehen – und offenbarte einen Designfehler in git-subtrees."
-series: splicing-concepts
-seriesOrder: 7
 topics: [git]
 docs: ../git-splice/docs/design/accidental-monorepo-push.md
 ---

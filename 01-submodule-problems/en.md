@@ -1,8 +1,6 @@
 ---
 title: "Git Submodules"
 description: "One git submodule add writes to six places. The commit records a pointer, not the change, and the rest is state that clones and worktrees share in different ways."
-series: why-splicing
-seriesOrder: 2
 topics: [git]
 question: "Have you ever used Git submodules, and what was your developer experience?"
 docs: ../git-splice/test/comparisons/git-submodule.md

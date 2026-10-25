@@ -1,8 +1,6 @@
 ---
 title: "Lessons learned"
 description: "Copy the other repository's files into a folder, remember the last synced commit, and that commit is the base of a three-way merge."
-series: why-splicing
-seriesOrder: 4
 topics: [git]
 question: "What else would you need to keep two repositories in sync for good?"
 docs: ../git-splice/test/concepts/splice-file/README.md

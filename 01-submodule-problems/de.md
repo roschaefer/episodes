@@ -1,8 +1,6 @@
 ---
 title: "Git Submodules"
 description: "Ein git submodule add schreibt an sechs Stellen. Der Commit speichert einen Zeiger, nicht die Änderung, und der Rest ist Zustand, den Klone und Worktrees auf unterschiedliche Weise teilen."
-series: why-splicing
-seriesOrder: 2
 topics: [git]
 question: "Habt ihr schon mal Git-Submodule benutzt, und wie war eure Erfahrung damit?"
 docs: ../git-splice/test/comparisons/git-submodule.md

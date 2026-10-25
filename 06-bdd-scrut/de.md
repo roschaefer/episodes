@@ -1,8 +1,6 @@
 ---
 title: "Specification by Example mit Scrut"
 description: "Die Dokumentation von git-splice ist ihre Testsuite: Scrut führt die Befehle im Markdown aus und vergleicht ihre Ausgabe."
-series: building-git-splice
-seriesOrder: 1
 topics: [git, testing]
 question: "Wer schreibt und wer prüft bei euch im Team die Akzeptanztests?"
 docs: ../git-splice/README.md

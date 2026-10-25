@@ -1,8 +1,6 @@
 ---
 title: "What is a three-way merge, exactly?"
 description: "What are BASE, OURS and THEIRS, and why is a merge only as good as its base?"
-series: splicing-concepts
-seriesOrder: 1
 topics: [git]
 ---
 

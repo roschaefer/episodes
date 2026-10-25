@@ -1,8 +1,6 @@
 ---
 title: "Naming it git-splice"
 description: "What a splice is, and the rule for git-splice's words: Git's words do what they do in Git, new words don't collide with them."
-series: git-splice
-seriesOrder: 1
 topics: [git]
 question: "Can you think of a better name? Ideally an everyday word that Git doesn't use yet."
 docs: ../git-splice/docs/design/name.md

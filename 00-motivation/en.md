@@ -1,8 +1,6 @@
 ---
 title: "Motivation"
 description: "Sometimes a folder in a monorepo has to be a repository of its own as well: a public project in a private monorepo, a vendored library, teams with their own CI."
-series: why-splicing
-seriesOrder: 1
 topics: [git]
 question: "Have you ever been in a similar situation? Have you had to decide between a monorepo and separate repos?"
 ---

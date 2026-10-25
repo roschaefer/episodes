@@ -1,8 +1,6 @@
 ---
 title: "Lessons Learned"
 description: "Die Dateien des anderen Repos in einen Ordner kopieren, den zuletzt synchronisierten Commit merken, und dieser Commit ist die Basis eines Three-Way-Merges."
-series: why-splicing
-seriesOrder: 4
 topics: [git]
 question: "Was bräuchtet ihr noch, um zwei Repositories dauerhaft zu synchronisieren?"
 docs: ../git-splice/test/concepts/splice-file/README.md

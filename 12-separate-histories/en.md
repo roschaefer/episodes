@@ -1,8 +1,6 @@
 ---
 title: "Vendoring does not require importing history"
 description: "git subtree's squash mode hides upstream commits but still adds a side history and merge. A vendored tree needs a reference to upstream—not upstream ancestry."
-series: splicing-concepts
-seriesOrder: 4
 topics: [git]
 ---
 

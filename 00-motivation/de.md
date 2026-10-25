@@ -1,8 +1,6 @@
 ---
 title: "Motivation"
 description: "Manchmal muss ein Ordner in einem Monorepo zugleich ein eigenes Repository sein: ein öffentliches Projekt in einem privaten Monorepo, eine vendorte Bibliothek, Teams mit eigener CI."
-series: why-splicing
-seriesOrder: 1
 topics: [git]
 question: "Hattet ihr schon mal eine ähnliche Situation? Musstet ihr euch zwischen einem Monorepo und getrennten Repositories entscheiden?"
 ---

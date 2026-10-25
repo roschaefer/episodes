@@ -1,8 +1,6 @@
 ---
 title: "Git Subtree"
 description: "git subtree fügt überflüssige Merge-Commits in die Git-Historie ein. Eine lineare Historie bekommt man damit nicht."
-series: why-splicing
-seriesOrder: 3
 topics: [git]
 question: "Habt ihr schon mal Git-Subtrees benutzt, um ein anderes Repository zu vendoren?"
 docs: ../git-splice/test/comparisons/git-subtree.md

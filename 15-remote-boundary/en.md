@@ -1,8 +1,6 @@
 ---
 title: "Git remotes are the wrong boundary for one directory"
 description: "A remote always represents a repository. Naming one after a monorepo directory made a catastrophic push look ordinary—and revealed a flaw in git-subtrees' model."
-series: splicing-concepts
-seriesOrder: 7
 topics: [git]
 docs: ../git-splice/docs/design/accidental-monorepo-push.md
 ---

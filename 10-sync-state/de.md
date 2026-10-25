@@ -1,8 +1,6 @@
 ---
 title: "Synchronisationszustand gehört in den Working Tree"
 description: "Historie kann einen Synchronisationspunkt markieren, doch gewöhnliches Umschreiben kann ihn löschen. Eine kleine eingecheckte Zustandsdatei überlebt und ermöglicht inkrementelle Arbeit."
-series: splicing-concepts
-seriesOrder: 2
 topics: [git]
 ---
 
