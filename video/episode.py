@@ -39,6 +39,8 @@ PIPER_VOICE = {"en": "en_US-lessac-medium", "de": "de_DE-thorsten-medium"}
 # One font size for every code block, whatever its length; the room a block
 # may take of the 14.2 by 8 frame before it has to shrink.
 CODE_FONT_SIZE = 22
+# Pango's default leaves code lines cramped; this is the gap Manim adds.
+CODE_LINE_SPACING = 0.8
 FRAME_WIDTH = 13
 FRAME_HEIGHT = 7
 
@@ -320,7 +322,7 @@ def drawing(block: Block) -> Mobject:
         background="rectangle",
         background_config={"fill_color": "#F3F5F8", "fill_opacity": 1, "stroke_color": "#C9D1DB", "stroke_width": 1.5, "buff": 0.3},
         add_line_numbers=False,
-        paragraph_config={"font_size": CODE_FONT_SIZE},
+        paragraph_config={"font_size": CODE_FONT_SIZE, "line_spacing": CODE_LINE_SPACING},
     )
 
 
