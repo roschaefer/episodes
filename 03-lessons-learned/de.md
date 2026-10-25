@@ -12,7 +12,7 @@ Um das Beste aus beiden Welten zu kombinieren, brauchen wir getrennte Historien,
 
 ## Nur die Dateien
 
-Das ist einfacher, als es klingt. Wir kopieren die Dateien des anderen Repos in einen Ordner des Monorepos, und fertig:
+Das ist doch nicht so schwierig: Wir kopieren die Dateien des anderen Repos in einen Ordner des Monorepos, und fertig:
 
 ```text
 monorepo/

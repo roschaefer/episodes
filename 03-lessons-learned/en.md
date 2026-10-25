@@ -12,7 +12,7 @@ To combine the best of both worlds, we need separate histories, as with submodul
 
 ## Just the files
 
-That's simpler than it sounds. We copy the other repository's files into a folder of the monorepo, and that's it:
+It's not that hard, really: we copy the other repository's files into a folder of the monorepo, and that's it:
 
 ```text
 monorepo/
