@@ -20,15 +20,17 @@ languages.
 
 The frontmatter is the blog's (see
 `roschaefer.de/src/lib/blog/posts.ts`), without `id`, which the build
-adds from the folder name, plus `slug`, the post's file name in that
-language, and optionally `docs`, the chapter of the git-splice
+adds from the folder name, plus optionally `docs`, the chapter of the git-splice
 docs the episode goes with, e.g. `../git-splice/test/comparisons/git-subtree.md`.
 The post and the video end with a link to it.
 
 The title is neutral: it names the subject and doesn't judge it, e.g.
 "Git Submodules", not "What goes wrong with Git submodules". It is the
 same everywhere: the post's title, the video's on the platform, and the
-title card the video opens with. The slug follows it.
+title card the video opens with. The post's slug, its file name and
+URL, is the title written for a URL ("Warum es git-splice heißt" becomes
+`warum-es-git-splice-heisst`). A published episode pins it with `slug`,
+so that retitling it keeps its URL; the build refuses one without.
 
 Every episode then ends with `question`, a question that asks the viewer
 for technical feedback, e.g. "Have you ever used Git submodules, and what

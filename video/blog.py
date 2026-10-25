@@ -73,10 +73,24 @@ export const plannedPosition = (id: string) => {{
 
 
 def slug(source: Path) -> str:
-    found = frontmatter_field(source.read_text(), "slug")
-    if not found:
-        raise EpisodeError("frontmatter needs a slug, the post's file name")
-    return found
+    """The post's file name: its title, written for a URL, unless the frontmatter pins it."""
+    text = source.read_text()
+    if pinned := frontmatter_field(text, "slug"):
+        return pinned
+    if re.search(r"^publishedAt:", text, re.MULTILINE):
+        raise EpisodeError("a published episode pins its slug, so retitling it keeps its URL")
+    title = frontmatter_field(text, "title", r'"?(.*?)"?')
+    if not title:
+        raise EpisodeError("frontmatter needs a title")
+    return slugify(title)
+
+
+def slugify(title: str) -> str:
+    """Sync state belongs in the worktree -> sync-state-belongs-in-the-worktree; ä -> ae, ß -> ss."""
+    text = title.lower()
+    for letter, spelled in {"ä": "ae", "ö": "oe", "ü": "ue", "ß": "ss"}.items():
+        text = text.replace(letter, spelled)
+    return re.sub(r"[^a-z0-9]+", "-", text).strip("-")
 
 
 def frontmatter_id(path: Path) -> str | None:

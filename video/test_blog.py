@@ -5,8 +5,7 @@ from blog import build
 from post import EpisodeError
 
 POST = """---
-slug: example
-title: "What goes wrong"
+title: "Example"
 ---
 
 The intro.
@@ -33,29 +32,50 @@ def built(tmp_path: Path, site: Path):
 def test_a_post_is_named_by_its_slug_and_takes_its_id_from_the_folder(tmp_path, site):
     episode(tmp_path, "02-example")
     outputs, _ = built(tmp_path, site)
-    assert outputs["posts/en/example.svx"].decode() == '---\nid: example\ntitle: "What goes wrong"\n---\n\nThe intro.\n'
+    assert outputs["posts/en/example.svx"].decode() == '---\nid: example\ntitle: "Example"\n---\n\nThe intro.\n'
+
+
+@pytest.mark.parametrize(
+    ("title", "slug"),
+    [
+        ("Separate histories, shared files", "separate-histories-shared-files"),
+        ("Warum es git-splice heißt", "warum-es-git-splice-heisst"),
+        ("Die Identität eines Splices", "die-identitaet-eines-splices"),
+        ("Jujutsu (jj)", "jujutsu-jj"),
+    ],
+)
+def test_the_slug_is_the_title_written_for_a_url(tmp_path, site, title, slug):
+    episode(tmp_path, "02-example", POST.replace('"Example"', f'"{title}"'))
+    outputs, _ = built(tmp_path, site)
+    assert f"posts/en/{slug}.svx" in outputs
+
+
+def test_a_pinned_slug_wins_over_the_title(tmp_path, site):
+    episode(tmp_path, "02-example", POST.replace("title:", "slug: pinned\ntitle:"))
+    outputs, _ = built(tmp_path, site)
+    assert "slug" not in outputs["posts/en/pinned.svx"].decode()
 
 
 def test_an_id_in_the_frontmatter_is_refused(tmp_path, site):
-    episode(tmp_path, "02-example", POST.replace("slug:", "id: example\nslug:"))
+    episode(tmp_path, "02-example", POST.replace("title:", "id: example\ntitle:"))
     with pytest.raises(EpisodeError, match="02-example/en.md: drop the id"):
         built(tmp_path, site)
 
 
-def test_a_post_without_a_slug_is_refused(tmp_path, site):
-    episode(tmp_path, "02-example", POST.replace("slug: example\n", ""))
-    with pytest.raises(EpisodeError, match="needs a slug"):
+def test_a_published_episode_without_a_pinned_slug_is_refused(tmp_path, site):
+    episode(tmp_path, "02-example", POST.replace("title:", 'publishedAt: 2026-10-01\nquestion: "Have you?"\ntitle:'))
+    with pytest.raises(EpisodeError, match="pins its slug"):
         built(tmp_path, site)
 
 
 def test_a_published_episode_without_a_question_is_refused(tmp_path, site):
-    episode(tmp_path, "02-example", POST.replace("slug:", "publishedAt: 2026-10-01\nslug:"))
+    episode(tmp_path, "02-example", POST.replace("title:", "publishedAt: 2026-10-01\nslug: example\ntitle:"))
     with pytest.raises(EpisodeError, match="ends with a question"):
         built(tmp_path, site)
 
 
 def test_the_post_ends_asking_the_reader_its_question(tmp_path, site):
-    episode(tmp_path, "02-example", POST.replace("slug:", 'question: "Have you?"\nslug:'), lang="de")
+    episode(tmp_path, "02-example", POST.replace("title:", 'question: "Have you?"\ntitle:'), lang="de")
     outputs, _ = built(tmp_path, site)
     assert outputs["posts/de/example.svx"].decode().endswith("The intro.\n\n**Have you?** Schreibt es mir in die Kommentare.\n")
 
@@ -66,8 +86,8 @@ def test_the_post_links_to_its_docs_chapter_and_says_whether_its_commands_are_te
     (chapters / "README.md").write_text("# Tests\n\n```scrut\n$ true\n```\n")
     (chapters / "plain.md").write_text("# Plain\n")
     monkeypatch.setattr("post.GIT_SPLICE", tmp_path / "episodes" / "git-splice")
-    episode(tmp_path, "02-tested", POST.replace("slug: example", "docs: ../git-splice/test/README.md\nslug: tested"))
-    episode(tmp_path, "03-plain", POST.replace("slug: example", "docs: ../git-splice/test/plain.md\nslug: plain"))
+    episode(tmp_path, "02-tested", POST.replace("Example", "Tested").replace("title:", "docs: ../git-splice/test/README.md\ntitle:"))
+    episode(tmp_path, "03-plain", POST.replace("Example", "Plain").replace("title:", "docs: ../git-splice/test/plain.md\ntitle:"))
     outputs, _ = built(tmp_path, site)
     assert outputs["posts/en/tested.svx"].decode().endswith(
         "\nMore in the git-splice docs, where every command is tested: [Tests](https://roschaefer.github.io/git-splice/test/).\n"
@@ -78,7 +98,7 @@ def test_the_post_links_to_its_docs_chapter_and_says_whether_its_commands_are_te
 
 
 def test_docs_outside_git_splice_are_refused(tmp_path, site):
-    episode(tmp_path, "02-example", POST.replace("slug:", "docs: ../README.md\nslug:"))
+    episode(tmp_path, "02-example", POST.replace("title:", "docs: ../README.md\ntitle:"))
     (tmp_path / "episodes" / "README.md").write_text("# Episodes\n")
     with pytest.raises(EpisodeError, match="docs must be a chapter in git-splice/"):
         built(tmp_path, site)
@@ -100,15 +120,15 @@ def test_images_are_copied_and_their_paths_point_at_the_copies(tmp_path, site):
 
 def test_two_images_with_one_name_are_refused(tmp_path, site):
     for name in ("02-one", "03-two"):
-        source = episode(tmp_path, name, POST.replace("slug: example", f"slug: {name}") + "\n![A diagram](diagram.svg)\n")
+        source = episode(tmp_path, name, POST.replace("Example", name) + "\n![A diagram](diagram.svg)\n")
         (source.parent / "diagram.svg").write_text(name)
     with pytest.raises(EpisodeError, match="share the name diagram.svg"):
         built(tmp_path, site)
 
 
 def test_the_episodes_numbers_are_the_publication_plan(tmp_path, site):
-    episode(tmp_path, "10-later", POST.replace("slug: example", "slug: later"))
-    episode(tmp_path, "02-sooner", POST.replace("slug: example", "slug: sooner"))
+    episode(tmp_path, "10-later", POST.replace("Example", "Later"))
+    episode(tmp_path, "02-sooner", POST.replace("Example", "Sooner"))
     outputs, _ = built(tmp_path, site)
     assert outputs["plan.ts"].decode().startswith('export const publicationPlan: string[] = [\n\t"sooner",\n\t"later",\n];\n')
 
