@@ -15,12 +15,14 @@ To combine the best of both worlds, we need separate histories, as with submodul
 It's not that hard, really: we copy the other repository's files into a folder of the monorepo, and that's it:
 
 ```text
-monorepo/
-├── app/
-│   └── main.js
-└── vendor/a/       the files of a.git
-    └── src/
-        └── parse.js
+a.git                         monorepo/
+                              ├── app/
+                              │   └── main.js
+                              └── vendor/
+.  ──────── copy ──────────►      └── a/
+├── src/                              ├── src/
+│   └── parse.js                      │   └── parse.js
+└── README.md                         └── README.md
 ```
 
 No commits are exchanged. The monorepo doesn't get the other repository's history, and the other repository doesn't get the monorepo's. A fix in `vendor/a/` and the code in `app/` that calls it are one ordinary commit.

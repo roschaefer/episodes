@@ -15,12 +15,14 @@ Um das Beste aus beiden Welten zu kombinieren, brauchen wir getrennte Historien,
 Das ist doch nicht so schwierig: Wir kopieren die Dateien des anderen Repos in einen Ordner des Monorepos, und fertig:
 
 ```text
-monorepo/
-├── app/
-│   └── main.js
-└── vendor/a/       die Dateien von a.git
-    └── src/
-        └── parse.js
+a.git                         monorepo/
+                              ├── app/
+                              │   └── main.js
+                              └── vendor/
+.  ──────── copy ──────────►      └── a/
+├── src/                              ├── src/
+│   └── parse.js                      │   └── parse.js
+└── README.md                         └── README.md
 ```
 
 Es werden keine Commits ausgetauscht. Das Monorepo bekommt nicht die Historie des anderen Repos, und das andere Repo nicht die des Monorepos. Ein Fix in `vendor/a/` und der Code in `app/`, der ihn aufruft, sind ein ganz normaler Commit.
