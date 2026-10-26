@@ -33,7 +33,7 @@ Wir merken uns nur eines: welchen Commit des anderen Repos wir zuletzt kopiert h
 
 ```text
 [splice]
-	commit = 3f1c…
+	commit = bafd496b1f4512a95b69464604f3da428aa9e33b
 [upstream "origin"]
 	url = git@github.com:x/a.git
 ```
@@ -47,7 +47,7 @@ Sie bleibt aber im Monorepo und wandert nie ins andere Repository. Das andere Re
 In der Zwischenzeit entwickeln sich beide Seiten weiter. Um sie zusammenzubringen, reicht ein ganz normaler Three-Way-Merge:
 
 ```text
-BASE     vendor/a/, wie wir ihn zuletzt kopiert haben, bei 3f1c…
+BASE     vendor/a/, wie wir ihn zuletzt kopiert haben
 OURS     vendor/a/ im Monorepo, wie er jetzt ist
 THEIRS   a.git, wie es jetzt ist
 ```

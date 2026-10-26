@@ -33,7 +33,7 @@ We only remember one thing: which commit of the other repository we last copied.
 
 ```text
 [splice]
-	commit = 3f1c…
+	commit = bafd496b1f4512a95b69464604f3da428aa9e33b
 [upstream "origin"]
 	url = git@github.com:x/a.git
 ```
@@ -47,7 +47,7 @@ But it stays in the monorepo and never goes to the other repository. The other r
 In the meantime, both sides move on. To bring them together, a plain three-way merge is enough:
 
 ```text
-BASE     vendor/a/ as we last copied it, at 3f1c…
+BASE     vendor/a/ as we last copied it
 OURS     vendor/a/ in the monorepo, as it is now
 THEIRS   a.git, as it is now
 ```
