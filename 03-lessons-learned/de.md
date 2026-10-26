@@ -40,6 +40,8 @@ Wir merken uns nur eines: welchen Commit des anderen Repos wir zuletzt kopiert h
 
 Die Datei ist eingecheckt. So zieht sie immer mit dem Ordner mit, und Rewrites der Commits können sie nicht verlieren.
 
+Sie bleibt aber im Monorepo und wandert nie ins andere Repository. Das andere Repository muss nicht wissen, dass es irgendwo gevendort wird. Nur so kann ich jedes beliebige Repository vendoren, auch eines, auf das ich keinen Schreibzugriff habe.
+
 ## Ein Three-Way-Merge
 
 In der Zwischenzeit entwickeln sich beide Seiten weiter. Um sie zusammenzubringen, reicht ein ganz normaler Three-Way-Merge:

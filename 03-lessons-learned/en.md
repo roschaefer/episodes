@@ -40,6 +40,8 @@ We only remember one thing: which commit of the other repository we last copied.
 
 The file is committed, so it moves along with the folder, and rewriting commits can't lose it.
 
+But it stays in the monorepo and never goes to the other repository. The other repository doesn't need to know that it's vendored anywhere. That's how I can vendor any repository, even one I can't write to.
+
 ## A three-way merge
 
 In the meantime, both sides move on. To bring them together, a plain three-way merge is enough:
