@@ -1,6 +1,6 @@
 ---
 title: "Git Submodules"
-description: "One git submodule add writes to six places. The commit records a pointer, not the change, and the rest is state that clones and worktrees share in different ways."
+description: "Adding a submodule and committing it writes to six places. The commit records a pointer, not the change, and the rest is state that clones and worktrees share in different ways."
 topics: [git]
 question: "Have you ever used Git submodules, and what was your developer experience?"
 docs: ../git-splice/test/comparisons/git-submodule.md
@@ -30,15 +30,10 @@ By the way: you can run the example yourself. These commands open a sandbox with
 
 The example builds a monorepo and another repository with 30 commits.
 
-Then we add the other repository to the monorepo as a submodule. That one command, `git submodule add`, writes to six places in total:
+Then we add the other repository to the monorepo as a submodule, and commit it. These two commands write to six places in total:
 
 ```console
 git submodule add https://git.example.com/lib.git vendor/lib
-```
-
-Now we commit the submodule in the monorepo:
-
-```console
 git commit -m "add lib as a submodule"
 ```
 

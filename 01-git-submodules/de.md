@@ -1,6 +1,6 @@
 ---
 title: "Git Submodules"
-description: "Ein git submodule add schreibt an sechs Stellen. Der Commit speichert einen Zeiger, nicht die Änderung, und der Rest ist Zustand, den Klone und Worktrees auf unterschiedliche Weise teilen."
+description: "Ein Submodul hinzuzufügen und zu committen schreibt an sechs Stellen. Der Commit speichert einen Zeiger, nicht die Änderung, und der Rest ist Zustand, den Klone und Worktrees auf unterschiedliche Weise teilen."
 topics: [git]
 question: "Habt ihr schon mal Git-Submodule benutzt, und wie war eure Erfahrung damit?"
 docs: ../git-splice/test/comparisons/git-submodule.md
@@ -28,15 +28,10 @@ nix develop -c just sandbox comparisons/git-submodule
 
 Übrigens: Ihr könnt das Beispiel selbst ausführen. Diese Befehle öffnen eine Sandbox mit dem Submodul und dem Monorepo, und jeder Befehl gibt aus, was ihr hier seht. Wie das geht, steht in der [Dokumentation von git-splice](https://roschaefer.github.io/git-splice/docs/sandbox/#any-page-in-a-sandbox).
 
-Das Beispiel baut ein Monorepo und ein weiteres Repository mit 30 Commits. Danach fügen wir das andere Repository als Submodul zum Monorepo hinzu. Dieser eine Befehl, `git submodule add`, schreibt an insgesamt sechs Stellen:
+Das Beispiel baut ein Monorepo und ein weiteres Repository mit 30 Commits. Danach fügen wir das andere Repository als Submodul zum Monorepo hinzu und committen es. Diese zwei Befehle schreiben an insgesamt sechs Stellen:
 
 ```console
 git submodule add https://git.example.com/lib.git vendor/lib
-```
-
-Jetzt committen wir das Submodul im Monorepo:
-
-```console
 git commit -m "add lib as a submodule"
 ```
 
