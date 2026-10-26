@@ -17,7 +17,7 @@ changes only go in through a PR from another branch.
 
 Upstream has no `feature` branch, so there's no T. The splice didn't
 change on `feature`, but `feature` has *b*, which upstream's `main` lacks:
-R's copy *b'* is dashed, no upstream branch has it yet. That's what counts, as for a PR: `push` creates
+no upstream branch has R's copy *b'* yet. That's what counts, as for a PR: `push` creates
 `feature` upstream with it, ready for one (#150).
 
 ## Output

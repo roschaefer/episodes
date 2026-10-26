@@ -8,7 +8,8 @@ everywhere.
 | --- | --- | --- |
 | Anything you can type or `git-splice` prints: commands, options, paths, files, branches, refs (`HEAD` too), config keys, variables, hashes, commit subjects, status output, the tool's name | `monospace` | `git splice push`, `--force`, `.splice`, `main`, `HEAD`, `refs/splices/<key>/`, `$UPSTREAM`, `e849115`, `add vendor/a`, `ahead 1`, `git-splice` |
 | A commit: a node in a drawing, or a variable for one | *italic* | *a*, *d'*, *X* |
-| A role: our name for whichever commit plays a part, as `HEAD` names the checked-out one | plain capitals | BOUNDARY, BASE, OURS, THEIRS; H, B, T, R |
+| A role: our name for whichever commit plays a part, as `HEAD` names the checked-out one | plain capitals | H, B, T, R |
+| Git's name for a part in a three-way merge, which the README uses for a role | *italic*, lowercase | *boundary*, *base*, *ours*, *theirs* |
 | A formula | plain, nothing inside marked up | U(H), U(X^), U(e) |
 | A splice | its folder, with a trailing slash | `vendor/a/` |
 | A repository | words, never a letter | the monorepo, the upstream of `vendor/a/` |
@@ -65,3 +66,16 @@ $ git clone -q https://git.example.com/lib.git ../lib-dev &&
   block (`<!--` … `-->`): it keeps the drawing true, but a reader
   learns nothing from it. Only a page that explains the check itself,
   like its `--alias`, shows it.
+- A drawing with a legend says what the next rebuild does with a
+  commit: an orange outline (`#E07000`) for a change it carries across,
+  on both ends, a commit R copies and its copy, and, where the number
+  of commits it walks matters, a grey fill (`#E0E0E0`) for the monorepo
+  commits on the first-parent history since B. The legend, a shape
+  styled `legend=1` below the drawing, shows a sample commit for each
+  mark the drawing's commits use, orange, grey, dashed or a `'`, with
+  what it means. Without a legend, every commit is black and white.
+  `check_drawing` checks the marks against the legend, as it checks the
+  dashes. A drawing of another tool uses them the same way, for the
+  commits that tool walks and the ones it carries over, e.g.
+  `git subtree split`, with a legend in its words; there
+  `check_drawing` can't check them.

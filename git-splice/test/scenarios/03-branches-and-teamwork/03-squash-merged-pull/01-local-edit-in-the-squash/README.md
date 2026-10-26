@@ -19,8 +19,8 @@ edit that the upstream doesn't have.
 
 `.splice` records a commit, not a branch: *s* records *f* as U(H). The
 upstream's `main`, T, is still at *k*, since nobody merged `feature` into
-it there. *f* is on the upstream's `feature`, so it's solid. R's copy *s'*
-is dashed: no upstream branch has it yet.
+it there. *f* is on the upstream's `feature`, but no upstream branch has R's
+copy *s'* yet.
 
 ## Output
 
