@@ -173,12 +173,16 @@ def test_a_diagrams_1px_lines_stay_visible():
     )
 
 
-def test_a_photo_shows_as_it_is_and_fills_the_width_like_a_diagram(tmp_path):
+@pytest.mark.parametrize("mode", ["RGB", "P", "L"])
+def test_a_photo_shows_as_it_is_and_fills_the_width_like_a_diagram(tmp_path, mode):
+    from manim import Scene
     from PIL import Image
 
     photo = tmp_path / "photo.png"
-    Image.new("RGB", (40, 20), "white").save(photo)
-    assert framed(Block("image", str(photo))).width == pytest.approx(12)
+    Image.new(mode, (40, 20)).save(photo)
+    slide = framed(Block("image", str(photo)))
+    assert slide.width == pytest.approx(12)
+    Scene().camera.capture_mobject(slide)
 
 
 def test_a_take_is_listed_in_the_cache_once_however_often_the_video_renders(tmp_path):
