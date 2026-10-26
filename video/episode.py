@@ -18,7 +18,7 @@ import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from manim import BLACK, DOWN, RIGHT, WHITE, Code, FadeIn, FadeOut, Mobject, SVGMobject, Text, VGroup, config
+from manim import BLACK, DOWN, RIGHT, WHITE, Code, FadeIn, FadeOut, Group, ImageMobject, Mobject, SVGMobject, Text, VGroup, config
 from manim_voiceover import VoiceoverScene
 import manim_voiceover.services.base as voiceover_base
 from manim_voiceover.services.base import SpeechService
@@ -302,7 +302,7 @@ def with_link(block: Block, mobject: Mobject) -> Mobject:
     if mobject.height > top - bottom:
         mobject.scale_to_fit_height(top - bottom)
     mobject.move_to([0, (top + bottom) / 2, 0])
-    return VGroup(mobject, corner)
+    return Group(mobject, corner)
 
 
 def drawing(block: Block) -> Mobject:
@@ -334,6 +334,8 @@ def drawing(block: Block) -> Mobject:
                 Text(chapter_title, color="#081421", font_size=36),
             ).arrange(DOWN, buff=0.25),
         ).arrange(DOWN, buff=0.9)
+    if block.kind == "image" and Path(block.content).suffix != ".svg":
+        return ImageMobject(block.content)
     if block.kind == "image":
         return SVGMobject(plain_svg(Path(block.content)))
     return Code(
@@ -359,7 +361,7 @@ def framed(block: Block) -> Mobject:
     if block.kind == "image":
         mobject.scale_to_fit_width(12)
     if block.heading:
-        mobject = VGroup(drawing(Block("heading", block.heading)).scale(0.8), mobject).arrange(DOWN, buff=0.5)
+        mobject = Group(drawing(Block("heading", block.heading)).scale(0.8), mobject).arrange(DOWN, buff=0.5)
     if mobject.width > FRAME_WIDTH or mobject.height > FRAME_HEIGHT:
         if block.kind == "code":
             print(f"A code block doesn't fit the frame and shrinks; shorten its lines:\n{block.content}", file=sys.stderr)
