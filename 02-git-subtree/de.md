@@ -63,7 +63,7 @@ git-subtree-dir: vendor/lib
 git-subtree-split: bafd496b1f4512a95b69464604f3da428aa9e33b
 ```
 
-Sagen wir, *c* und *e* fixen das Sub-Repository, *b* und *d* ändern die App. Um *c* und *e* zu finden, orange umrandet, durchsucht `git subtree split` auf einmal die gesamte Historie des Monorepos, grau gefüllt. Hier sind das 46 Commits, denn *a* steht für 40 App-Commits, und nur zwei davon zählen:
+Sagen wir, *c* und *e* fixen das Sub-Repository, *b* und *d* ändern die App. Um *c* und *e* zu finden, durchsucht `git subtree split` auf einmal die gesamte Historie des Monorepos. Hier sind das 46 Commits, denn *a* steht für 40 App-Commits, und nur zwei davon zählen:
 
 ![Die Commits a, s, b, c, d und e des Monorepos in einer Reihe, und q als zweiter Elternteil von s. Alle sind grau, weil split sie durchläuft, und c und e sind orange umrandet, weil es sie findet](../git-splice/test/comparisons/git-subtree-split-walks.drawio.svg)
 
