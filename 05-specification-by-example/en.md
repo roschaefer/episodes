@@ -10,9 +10,10 @@ git-splice is a tool, but the tool isn't what I care about. I care about the wor
 
 ## Scenarios
 
-For each of these situations, I write a scenario: a small example with a state before, a command, and the state after. That's specification by example: not "status shows how far the splice is ahead", but this command, in this situation, prints exactly this. Together, the scenarios are the specification:
+For each of these situations, I write a scenario: a small example with a state before, a command, and the state after. That's [specification by example](https://en.wikipedia.org/wiki/Specification_by_example): not "status shows how far the splice is ahead", but this command, in this situation, prints exactly this. Together, the scenarios are the specification:
 
 ```text
+# en.wikipedia.org/wiki/Specification_by_example
 test/scenarios/
 ├── 01-everyday-sync/
 ├── 02-starting-a-splice/

@@ -10,7 +10,7 @@ topics: [git]
 
 ## Die Rollen tauschen
 
-**Acceptance Test-Driven Development** schreibt die Beispiele vor dem Code. Sie sind die Akzeptanztests: Das Feature ist fertig, wenn sie durchlaufen.
+[**Acceptance Test-Driven Development**](https://en.wikipedia.org/wiki/Acceptance_test-driven_development) schreibt die Beispiele vor dem Code. Sie sind die Akzeptanztests: Das Feature ist fertig, wenn sie durchlaufen.
 
 Im klassischen ATDD hat der Product Owner die Akzeptanztests geprüft, und der Entwickler hat sie umgesetzt.
 

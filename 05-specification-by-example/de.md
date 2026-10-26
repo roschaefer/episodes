@@ -10,9 +10,10 @@ git-splice ist ein Werkzeug, aber um das Werkzeug geht es mir nicht. Mir geht es
 
 ## Szenarien
 
-Für jede dieser Situationen schreibe ich ein Szenario: ein kleines Beispiel mit einem Zustand vorher, einem Befehl und dem Zustand danach. Das ist Specification by Example: Nicht „status zeigt, wie weit der Spleiß voraus ist“, sondern: Dieser Befehl gibt in dieser Situation genau das aus. Zusammen sind die Szenarien die Spezifikation:
+Für jede dieser Situationen schreibe ich ein Szenario: ein kleines Beispiel mit einem Zustand vorher, einem Befehl und dem Zustand danach. Das ist [Specification by Example](https://en.wikipedia.org/wiki/Specification_by_example): Nicht „status zeigt, wie weit der Spleiß voraus ist“, sondern: Dieser Befehl gibt in dieser Situation genau das aus. Zusammen sind die Szenarien die Spezifikation:
 
 ```text
+# en.wikipedia.org/wiki/Specification_by_example
 test/scenarios/
 ├── 01-everyday-sync/
 ├── 02-starting-a-splice/

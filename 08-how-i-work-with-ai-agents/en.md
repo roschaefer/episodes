@@ -10,7 +10,7 @@ topics: [git]
 
 ## The roles swap
 
-**Acceptance test-driven development** writes the examples before the code. They are the acceptance tests: the feature is done when they pass.
+[**Acceptance test-driven development**](https://en.wikipedia.org/wiki/Acceptance_test-driven_development) writes the examples before the code. They are the acceptance tests: the feature is done when they pass.
 
 In classic ATDD, the product owner checked the acceptance tests, and the developer implemented them.
 
