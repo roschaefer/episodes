@@ -59,7 +59,9 @@ monorepo/
 
 There are also [four more places](https://roschaefer.github.io/git-splice/test/comparisons/git-submodule/#where-a-submodule-keeps-its-state) where Git keeps a submodule. But only the two above end up in the commit.
 
-## Mistake 1: what belongs together is stored apart
+## Mistake 1: low cohesion
+
+Cohesion is a term from software design. Robert C. Martin put it as the Common Closure Principle: what changes together belongs together. Submodules split one change into two commits, in two repositories.
 
 Because the monorepo stores only the submodule's commit ID, it doesn't see the submodule's files. Say I change one file inside the submodule and one outside it:
 

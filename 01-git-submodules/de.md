@@ -57,7 +57,9 @@ monorepo/
 
 Außerdem gibt es noch [vier weitere Stellen](https://roschaefer.github.io/git-splice/test/comparisons/git-submodule/#where-a-submodule-keeps-its-state), an denen Git ein Submodul ablegt. Aber nur die beiden oben genannten landen im Commit.
 
-## Fehler 1: Was zusammengehört, wird getrennt gespeichert
+## Fehler 1: Geringe Kohäsion
+
+Kohäsion ist ein Fachbegriff aus der Softwareentwicklung. Robert C. Martin fasst sie im Common Closure Principle so: Was sich gemeinsam ändert, gehört zusammen. Submodule teilen eine Änderung auf zwei Commits in zwei Repositories auf.
 
 Weil das Monorepo nur die Commit-ID des Submoduls speichert, sieht es die Dateien des Submoduls nicht. Wenn ich zum Beispiel eine Datei innerhalb und eine außerhalb des Submoduls ändere:
 
