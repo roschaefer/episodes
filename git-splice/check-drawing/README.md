@@ -36,9 +36,10 @@ Otherwise it prints each difference, with what to change, and fails:
 !!   b' is solid, but no upstream branch has it: dash it
 ```
 
-A circle's label is the commit's subject. A commit whose subject makes
-a poor label, like `add vendor/a`, gets a short one, given as
-`<label>=<rev>`, a revision of the monorepo: `a=HEAD~3`. A box's name
+A circle's label is the commit's subject, or its start up to a colon:
+*a* is `a: add vendor/a`. Another tool's commit, whose message you
+can't choose, gets a label given as `<label>=<rev>`, a revision of the
+monorepo: `a=HEAD~3`. A box's name
 given that way points at that revision, e.g. a commit another tool
 records, as `parent=<rev>`.
 
@@ -73,10 +74,12 @@ beside it, as installed; `$GIT_SPLICE_LIB` overrides both.
 ## The drawing's vocabulary
 
 - **Commit**: a circle (ellipse). Its label is the commit's subject,
-  looked up on the monorepo's first-parent history, then upstream. A
+  or the subject's start before `: `, looked up on the monorepo's first-parent history, then upstream. A
   label with a trailing `'` (*b'* for *b*) is the rebuild's copy of the
   commit without it, and a copy of a drawn commit is labelled so: the same message, author and dates, in R's history
-  or on a fetched upstream branch, where a push put it.
+  or on a fetched upstream branch, where a push put it. Where several
+  copies look alike, e.g. a pushed *b'* and R's *c'* after `git rebase`
+  copied *b* to *c*, give the copy in full: `b'=<rev>`.
 - **Parent arrow**: an arrow between two commits points from a parent to
   its child.
 - **Message arrow**: an arrow styled `message=1` points from a commit to
@@ -156,6 +159,21 @@ them too. To export a `.drawio` file:
 drawio -x -f svg -e -u --theme auto -b 10 -o x.drawio.svg x.drawio
 ```
 
+`check-drawing` reads the diagram, and readers see the picture. An edit
+of the diagram without exporting again would leave the two apart, so
+[`check-export`](check-export) exports each drawing again from its
+diagram, with draw.io, and compares the pictures:
+
+```sh
+just drawings-check          # fails on a stale picture
+just drawings-check --write  # exports the stale ones again
+```
+
+It runs in `nix develop .#drawings`, which has a headless draw.io, and
+in CI whenever a drawing changes. The documentation site serves each
+drawing without its diagram, as a plain SVG:
+[`drawings.js`](../website/src/drawings.js).
+
 ## Limits
 
 `check-drawing` is as strict as the drawings it checks need it to be.
@@ -185,4 +203,5 @@ In `git-splice`, [`test/drawing.bats`](../test/drawing.bats) and
 [`test/drawing-lanes.bats`](../test/drawing-lanes.bats) and
 [`test/drawing-upstreams.bats`](../test/drawing-upstreams.bats) run it against
 `git-splice`'s test scenarios, and each [scenario](../test/scenarios/)
-with a drawing checks it in its README.
+with a drawing checks it in its README. [`test/drawing-export.bats`](../test/drawing-export.bats)
+tests `check-export`, with draw.io.

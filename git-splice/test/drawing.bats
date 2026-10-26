@@ -65,6 +65,13 @@ edit_drawing() {
   [[ "$output" != *"c is"* ]]
 }
 
+@test "drawing: a commit the rebuild walks isn't filled in a color the legend doesn't explain" {
+  edit_drawing -u '//mxCell[@id="c"]/@style' -v 'ellipse;aspect=fixed;fillColor=#FFFF00;'
+  run check_drawing "$drawing" a=HEAD~4 e=HEAD
+  [ "$status" -eq 1 ]
+  [ "$output" = "!!   c is filled #FFFF00, a color the legend doesn't explain: leave it white" ]
+}
+
 @test "drawing: a commit the rebuild doesn't walk stays white" {
   edit_drawing -u '//mxCell[@id="a"]/@style' -v 'ellipse;aspect=fixed;fillColor=#E0E0E0;'
   run check_drawing "$drawing" a=HEAD~4 e=HEAD
@@ -368,6 +375,32 @@ git_names=(--alias HEAD=H --alias BOUNDARY=B --alias OURS=R --alias THEIRS=T --a
   [ "$status" -eq 0 ]
 }
 
+@test "drawing: c' is R's copy of c, though an upstream branch has an older copy, pushed before a 'git rebase'" {
+  load 'walkthrough/rebase-feature-branch/setup'
+  # Equal dates, as in the docs, leave git log's order to the refs given.
+  export GIT_AUTHOR_DATE=2026-01-01T00:00:00Z GIT_COMMITTER_DATE=2026-01-01T00:00:00Z
+  scenario_feature_branch_behind_default_branch "$BATS_TEST_TMPDIR/rebased" "$BATS_TEST_TMPDIR/rebased-upstream.git"
+  git -C "$BATS_TEST_TMPDIR/rebased" rebase -q main
+  cd "$BATS_TEST_TMPDIR/rebased"
+  run check_drawing "$BATS_TEST_DIRNAME/walkthrough/rebase-feature-branch/rebased-in-the-monorepo.drawio.svg" \
+    c=HEAD "b'=refs/splices/a/heads/feature"
+  [ "$status" -eq 0 ]
+}
+
+@test "drawing: without b'=<rev>, the pushed b' and R's c' after a 'git rebase' look alike, and b' is taken for c'" {
+  load 'walkthrough/rebase-feature-branch/setup'
+  export GIT_AUTHOR_DATE=2026-01-01T00:00:00Z GIT_COMMITTER_DATE=2026-01-01T00:00:00Z
+  scenario_feature_branch_behind_default_branch "$BATS_TEST_TMPDIR/rebased" "$BATS_TEST_TMPDIR/rebased-upstream.git"
+  local b
+  b="$(git -C "$BATS_TEST_TMPDIR/rebased" rev-parse HEAD)"
+  git -C "$BATS_TEST_TMPDIR/rebased" rebase -q main
+  cd "$BATS_TEST_TMPDIR/rebased"
+  run check_drawing "$BATS_TEST_DIRNAME/walkthrough/rebase-feature-branch/rebased-in-the-monorepo.drawio.svg" \
+    c=HEAD b="$b"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"!!   b' is solid, but no upstream branch has it: dash it"* ]]
+}
+
 @test "drawing: a lane names a splice whose folder Git quotes" {
   load 'scenarios/03-branches-and-teamwork/03-squash-merged-pull/setup'
   scenario_squash_merged_pull "$BATS_TEST_TMPDIR/squash" "$BATS_TEST_TMPDIR/squash-upstream.git"
@@ -503,6 +536,16 @@ XML
   git switch -q main
   pushed_copy_drawing feature
   run check_drawing "$drawing" x=feature
+  [ "$status" -eq 0 ]
+  [ "$output" = "ok   after-pull.drawio: 2 commits, 1 arrows, 1 boxes" ]
+}
+
+@test "drawing: a label also names the commit whose subject starts with it and a colon, and its rebuilt copy" {
+  git switch -q -c feature
+  commit_local "$monorepo" lib "x: a change"
+  splice push lib >/dev/null 2>&1
+  pushed_copy_drawing feature
+  run check_drawing "$drawing"
   [ "$status" -eq 0 ]
   [ "$output" = "ok   after-pull.drawio: 2 commits, 1 arrows, 1 boxes" ]
 }

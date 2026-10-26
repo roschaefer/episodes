@@ -8,14 +8,8 @@ out, the others get new commits. Either way, the commit the monorepo
 synced last is on no upstream branch any more
 ([#169](https://github.com/roschaefer/git-splice/issues/169)).
 
-- **Monorepo (`vendor/a/`)**: *a* (`add vendor/a`) cloned *q* from
-  `patches`, and follows `patches` on `main`.
-- **Upstream** (`$UPSTREAM`, reached as `https://git.example.com/a.git`):
-  *k* (`seed`) on `main`, and two patches on top of it on
-  `patches`: *p* (`patch`) and *q* (`other patch`). Then `main` takes
-  the first patch reworded, *m* (`patch, reworded upstream`), and
-  `patches` is rebased onto it: *p* drops out, and the other patch gets
-  a new commit, *n* (`other patch`), on top of *m*. Already fetched.
+Here, the upstream's *m* is *p* reworded, and *n* is *q* rebased onto
+it:
 
 <div align="center">
 
@@ -23,14 +17,12 @@ synced last is on no upstream branch any more
 
 </div>
 
-U(H) is *q*, but T is *n*, and no upstream branch has *p* or *q* any
-more, so they're dashed. Git's merge base of the two is *k*, from before
-the patches: merging from there, the first patch and its rewording would
-be changes on both sides, and conflict. Like `git pull --rebase`, a
-`pull` merges from the branch's fork point instead: where the fetched
-`patches` was before the rebase, *q*, as the ref's reflog has it. Those
-are the files the monorepo took last, so the upstream's new version
-simply replaces them.
+Git's merge base of *q* and *n* is *k*: merging from there, *p* and *m*
+would be changes on both sides, and conflict. Like `git pull --rebase`,
+`pull` merges from the branch's fork point instead: *q*, where the
+fetched `patches` was before the rebase, as its reflog has it. The
+monorepo has changed nothing since it took *q*, so the upstream's new
+version simply replaces it.
 
 Another upstream's commit, like a fork's patch the original never had,
 isn't rewritten away: the original's fetched branch never pointed at it
@@ -65,8 +57,8 @@ follow that branch, for `pull`, `push` and `status` alike:
 ```scrut
 $ cat vendor/a/.splice
 [splice]
-	commit = 05c1bab18820a907428ae83bd6ee0a2c8d817ed0
-	id = 5e134102fdb37eed
+	commit = f463f92ba0f70a0da1ffaa64c5af8e3b64f04c55
+	id = db77d5957130b5d2
 [upstream "origin"]
 	url = https://git.example.com/a.git
 	default-branch = patches
@@ -78,7 +70,7 @@ $ q="$(git config --file vendor/a/.splice splice.commit)"
 ```
 
 ```scrut
-$ check_drawing "$TESTDIR/patch-branch-rebased.drawio.svg" a=HEAD k="$q~2" p="$q~1" q="$q" m=refs/splices/a/heads/main n=refs/splices/a/heads/patches
+$ check_drawing "$TESTDIR/patch-branch-rebased.drawio.svg" q="$q" n=refs/splices/a/heads/patches
 ok   patch-branch-rebased.drawio.svg: 6 commits, 8 arrows, 4 boxes, 1 lanes
 ```
 -->
@@ -86,8 +78,8 @@ ok   patch-branch-rebased.drawio.svg: 6 commits, 8 arrows, 4 boxes, 1 lanes
 ```scrut
 $ git -C "$UPSTREAM" log --format=%s patches
 other patch
-patch, reworded upstream
-seed
+m: patch, reworded upstream
+k: seed
 ```
 
 ```scrut
@@ -100,13 +92,12 @@ On branch main
 `ahead 2` are *p* and *q*: the rebased branch lacks them, though the
 monorepo has nothing to push. That count is misleading after a rewrite upstream.
 
-The fetched branch's reflog has both *n* and *q*, where `patches` was
-before, each with the subject `other patch`:
+The fetched branch's reflog has *n*, and *q* before it:
 
 ```scrut
 $ git log -g --format='%h %s' refs/splices/a/heads/patches
-63b44f3 other patch
-05c1bab other patch
+28d3fa4 other patch
+f463f92 other patch
 ```
 
 ```scrut
@@ -116,9 +107,9 @@ the fork point is q
 ```
 
 ```scrut
-$ git splice pull vendor/a
+$ git splice pull -m "x: pull the rebased patches" vendor/a
 ok   vendor/a fetched
-ok   vendor/a: pulled 63b44f3
+ok   vendor/a: pulled 28d3fa4
 ```
 
 The folder has the upstream's version of the first patch, and the other
@@ -126,8 +117,8 @@ patch as before:
 
 ```scrut
 $ cat vendor/a/file.txt vendor/a/other.txt
-seed
-patch, reworded upstream
+k: seed
+m: patch, reworded upstream
 other patch
 ```
 
@@ -146,14 +137,7 @@ $ [ "$(git splice rebuild vendor/a)" = "$(git rev-parse refs/splices/a/heads/pat
 R is T
 ```
 
-Why one `pull` is enough: since it took *q*, the monorepo changed
-nothing in `vendor/a/`. Merging from *q*, only the upstream changed
-something, from *q* to *n*, so the merge takes all of it, without a
-conflict. From *k*, Git's merge base, the first patch would be a change
-on both sides. The pull, *x*, then records *n* in `.splice`: H and B are
-*x*, U(H) = U(B) = *n*. The rebuild starts at *n* and adds nothing, so
-R is T, and `status` has nothing ahead. *p* and *q* are in neither
-history any more:
+After the pull, *x*:
 
 <div align="center">
 
@@ -163,8 +147,7 @@ history any more:
 
 <!--
 ```scrut
-$ check_drawing "$TESTDIR/pulled.drawio.svg" a=HEAD~1 x=HEAD k="$q~2" p="$q~1" q="$q" \
->   m=refs/splices/a/heads/main n=refs/splices/a/heads/patches
+$ check_drawing "$TESTDIR/pulled.drawio.svg" p="$q~1" q="$q" n=refs/splices/a/heads/patches
 ok   pulled.drawio.svg: 7 commits, 8 arrows, 3 boxes, 1 lanes
 ```
 -->

@@ -36,12 +36,12 @@ $ git splice pull vendor/pkg-a >/dev/null
 
 ```scrut
 $ echo "a faster parser" >>vendor/pkg-a/file.txt &&
->   git commit -qam "pkg-a: a faster parser"
+>   git commit -qam "k: a faster parser"
 ```
 
 ```scrut
 $ git splice push vendor/pkg-a
-ok   vendor/pkg-a: pushed 9816d9f to main
+ok   vendor/pkg-a: pushed dd60ba4 to main
 ```
 
 A pull right after the push has nothing to bring in, and leaves `.splice`
@@ -61,19 +61,14 @@ pkg-a: a second commit, after the clone
 With `--bump`, it records the pushed commit:
 
 ```scrut
-$ git splice pull --bump vendor/pkg-a
+$ git splice pull --bump -m "a: bump pkg-a to the faster parser" vendor/pkg-a
 ok   vendor/pkg-a fetched
-ok   vendor/pkg-a: bumped the synced commit to 9816d9f
+ok   vendor/pkg-a: bumped the synced commit to dd60ba4
 ```
 
 ```scrut
 $ git log -1 --format=%s "$(git config --file vendor/pkg-a/.splice splice.commit)"
-pkg-a: a faster parser
-```
-
-```scrut
-$ git log -1 --format=%s
-splice: bump vendor/pkg-a from main at 9816d9f
+k: a faster parser
 ```
 
 [bump-after-push](../scenarios/01-everyday-sync/02-up-to-date/02-push-ahead/01-pushed-then-pulled/bump-after-push.md)
@@ -92,7 +87,7 @@ $ echo "an option" >>vendor/pkg-a/file.txt &&
 >   mkdir -p app &&
 >   echo "uses the option" >app/main.txt &&
 >   git add app &&
->   git commit -qam "pkg-a: an option, and the app uses it"
+>   git commit -qam "b: an option in pkg-a, and the app uses it"
 ```
 
 The push creates `pkg-a`'s `feature` branch, the library's pull request.
@@ -101,13 +96,13 @@ A bump then records it on the monorepo's `feature`:
 ```scrut
 $ git splice push vendor/pkg-a
 ??   vendor/pkg-a: upstream has no 'feature' branch yet -- this push creates it
-ok   vendor/pkg-a: pushed 556e8b7 to feature
+ok   vendor/pkg-a: pushed 2253c84 to feature
 ```
 
 ```scrut
-$ git splice pull --bump vendor/pkg-a
+$ git splice pull --bump -m "c: bump pkg-a to the pull request" vendor/pkg-a
 ok   vendor/pkg-a fetched
-ok   vendor/pkg-a: bumped the synced commit to 556e8b7
+ok   vendor/pkg-a: bumped the synced commit to 2253c84
 ```
 
 The library squash-merges the pull request: its `main` gets the same
@@ -123,7 +118,7 @@ $ git clone -q "$WALKTHROUGH/upstream/pkg-a.git" "$WALKTHROUGH/pkg-a" &&
 
 ```scrut
 $ git merge -q --squash origin/feature &&
->   git commit -q -m "an option (#1)" &&
+>   git commit -q -m "s: an option (#1)" &&
 >   git push -q origin main
 Squash commit -- not updating HEAD
 ```
@@ -135,15 +130,31 @@ $ cd "$WALKTHROUGH/monorepo" && git switch -q main
 ```
 
 ```scrut
-$ git splice pull vendor/pkg-a
-ok   vendor/pkg-a fetched (main moved 9816d9f..0d27eb0)
-ok   vendor/pkg-a: pulled 0d27eb0
+$ git splice pull -m "d: pull the squashed option" vendor/pkg-a
+ok   vendor/pkg-a fetched (main moved dd60ba4..7faf4fd)
+ok   vendor/pkg-a: pulled 7faf4fd
 ```
 
+*b'* is *b* as pushed:
+
+<div align="center">
+
+![The monorepo commits a and d on main, and b and c on feature, both from a; in the lane vendor/pkg-a/, s on main and b prime on feature, both on top of k; U(d) is s and U(c) is b prime](bump-conflict.drawio.svg)
+
+</div>
+
+<!--
+```scrut
+$ source "$TESTDIR/../../check-drawing/check-drawing" &&
+>   check_drawing "$TESTDIR/bump-conflict.drawio.svg" \
+>   b=feature~1 c=feature k=splices/pkg-a/heads/main~1
+ok   bump-conflict.drawio.svg: 7 commits, 9 arrows, 4 boxes, 1 lanes
+```
+-->
+
 `main` has the library's change now, but not the app's. So the monorepo's
-`feature` still needs merging, and that conflicts: `main` changed
-`.splice` to the squashed commit, and the bump on `feature` changed the
-same line to the pull request's commit. A squash merge computes its
+`feature` still needs merging, and that conflicts: *d*'s `.splice`
+records *s*, and *c*'s the same line as *b'*. A squash merge computes its
 files like any merge, so it conflicts too:
 
 ```scrut
@@ -177,7 +188,7 @@ $ cd "$WALKTHROUGH/pkg-a" &&
 
 ```scrut
 $ git log -1 --format=%s feature
-an option (#1)
+s: an option (#1)
 ```
 
 The monorepo's `feature` pulls it. The folder already has its files, so
@@ -188,10 +199,27 @@ $ cd "$WALKTHROUGH/monorepo" && git switch -q feature
 ```
 
 ```scrut
-$ git splice pull vendor/pkg-a
-ok   vendor/pkg-a fetched (feature moved 556e8b7..0d27eb0)
-ok   vendor/pkg-a: recorded 0d27eb0 as the synced commit -- the folder already has its files
+$ git splice pull -m "e: record the squashed option" vendor/pkg-a
+ok   vendor/pkg-a fetched (feature moved 2253c84..7faf4fd)
+ok   vendor/pkg-a: recorded 7faf4fd as the synced commit -- the folder already has its files
 ```
+
+*e* names *s*, as `main`'s *d* does:
+
+<div align="center">
+
+![The same graphs after the rebase: e on top of c on feature records s, which is now both main and feature of the library](bump-way-out.drawio.svg)
+
+</div>
+
+<!--
+```scrut
+$ source "$TESTDIR/../../check-drawing/check-drawing" &&
+>   check_drawing "$TESTDIR/bump-way-out.drawio.svg" \
+>   d=main b=feature~2 c=feature~1 e=feature k=splices/pkg-a/heads/main~1
+ok   bump-way-out.drawio.svg: 7 commits, 8 arrows, 3 boxes, 1 lanes
+```
+-->
 
 Now both branches name the same commit in `.splice`, and the merge only
 brings in the app:
@@ -232,7 +260,7 @@ $ git switch -q -c feature-2 &&
 ```scrut
 $ git splice push vendor/pkg-a >/dev/null && git splice pull --bump vendor/pkg-a
 ok   vendor/pkg-a fetched
-ok   vendor/pkg-a: bumped the synced commit to f7e1048
+ok   vendor/pkg-a: bumped the synced commit to 89d4457
 ```
 
 ```scrut
@@ -298,7 +326,7 @@ ok   vendor/pkg-a fetched
 $ git splice status vendor/pkg-a
 On branch main
 
-  !! unrelated history  vendor/pkg-a  see 'git splice merge vendor/pkg-a' for options
+  ?? synced commit 89d4457 isn't here  vendor/pkg-a  run 'git splice fetch vendor/pkg-a', or check that upstream has it
 ```
 
 Without the bump, `main`'s `.splice` would name a commit on the

@@ -82,9 +82,16 @@ push_one() {
       ;;
     diverged)
       if [[ -z "$force" ]]; then
-        log_err "$path: upstream has commits this branch lacks -- run 'git splice pull $option$path' first"
+        log_err "$path: upstream has commits this branch lacks"
         return 1
       fi
+      ;;
+    missing-synced)
+      if [[ -z "$force" ]]; then
+        log_warn "$path: $(missing_synced_message "$path")"
+        return 1
+      fi
+      SPLICE_REBUILT="$(REBUILD_WITHOUT_SYNCED=1 splice_rebuild "$path")" || return 1
       ;;
     unrelated-history)
       if [[ -z "$force" ]]; then

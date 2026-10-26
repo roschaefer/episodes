@@ -16,9 +16,11 @@ setup() {
     01-everyday-sync/02-up-to-date/02-push-ahead/01-pushed-then-pulled/01-pushed-then-changed \
     04-upstreams/03-shared-remote-url \
     04-upstreams/01-default-branch \
-    01-everyday-sync/02-up-to-date/02-push-ahead/02-uncommitted-changes; do
+    01-everyday-sync/02-up-to-date/02-push-ahead/02-uncommitted-changes \
+    06-rewritten-history/02-upstream-rewritten-equal-tree; do
     load "scenarios/$scenario/setup"
   done
+  load 'walkthrough/rebase-feature-branch/setup'
   monorepo="$BATS_TEST_TMPDIR/monorepo"
   upstream="$BATS_TEST_TMPDIR/upstream.git"
 }
@@ -82,7 +84,28 @@ setup() {
   cd "$monorepo"
   run cmd_push vendor/a
   [ "$status" -eq 1 ]
-  [[ "$output" == *"run 'git splice pull vendor/a' first"* ]]
+  [ "${lines[0]}" = "!!   vendor/a: upstream has commits this branch lacks" ]
+}
+
+@test "push: after 'git rebase main', states only that upstream has commits this branch lacks: whether they're copies to replace or work to pull in is the user's call" {
+  scenario_feature_branch_behind_default_branch "$monorepo" "$upstream"
+  git -C "$monorepo" rebase -q main
+  cd "$monorepo"
+  run cmd_push vendor/a
+  [ "$status" -eq 1 ]
+  [ "$output" = "!!   vendor/a: upstream has commits this branch lacks
+!!   Failed: vendor/a" ]
+}
+
+@test "push: --force has nothing to push when upstream rewrote its history to the folder's files, and doesn't undo the rewrite" {
+  scenario_upstream_rewritten_equal_tree "$monorepo" "$upstream"
+  cd "$monorepo"
+  local rewritten
+  rewritten="$(git -C "$upstream" rev-parse main)"
+  run cmd_push --force vendor/a
+  [ "$status" -eq 0 ]
+  [ "$output" = "ok   vendor/a: nothing to push" ]
+  [ "$(git -C "$upstream" rev-parse main)" = "$rewritten" ]
 }
 
 @test "push: nothing to push when upstream is ahead" {
@@ -116,7 +139,10 @@ setup() {
   fetch_splice "$monorepo" "$upstream" vendor/a
   ! git cat-file -e "$(splice_config vendor/a commit)^{commit}" 2>/dev/null
   classify_splice vendor/a main
-  [ "$SPLICE_STATE" = unrelated-history ]
+  [ "$SPLICE_STATE" = missing-synced ]
+  run cmd_push vendor/a
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"synced commit ${SPLICE_SYNCED:0:7} isn't here -- run 'git splice fetch vendor/a', or check that upstream has it"* ]]
   run cmd_push --force vendor/a
   [ "$status" -eq 0 ]
   [ "$(git -C "$upstream" log -1 --format=%s main)" = "local change" ]

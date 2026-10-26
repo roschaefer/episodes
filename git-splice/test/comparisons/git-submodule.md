@@ -27,7 +27,7 @@ $ git submodule add -q https://git.example.com/lib.git vendor/lib &&
 
 ## Where a submodule keeps its state
 
-That one `git submodule add` wrote to six places:
+`git submodule add` and the commit after it wrote to six places:
 
 <div align="center">
 
