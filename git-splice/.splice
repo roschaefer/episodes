@@ -1,6 +1,6 @@
 [splice]
 	id = ed95bd1ffa586ab6
-	commit = 4dc933e9bc94ab61769f74f55ac0d36439489003
+	commit = ca02daa2b8993a134ee6eb3b05b67bd7a0b02da6
 [upstream "origin"]
 	url = git@github.com:roschaefer/git-splice.git
 	default-branch = main
