@@ -10,16 +10,6 @@ A [splice](https://en.wikipedia.org/wiki/Splice) joins two things into
 one: ropes, film, tape, wires, optical fibres, wooden beams, genes. The
 name `git-splice` borrows from all of them.
 
-## A concept, and its reference implementation
-
-Splicing is a concept: copy another repository's files into a folder,
-keep the last synced commit, and bring both sides together with a
-three-way merge. The [scenarios](../../test/scenarios/README.md) specify
-how splicing behaves, one situation at a time. `git-splice` is its
-reference implementation, for Git: it shows that the specification can
-be built. A tool for another version control system could splice too,
-and the name belongs to the concept, not to the tool.
-
 ## Rope splicing
 
 A [long splice](https://en.wikipedia.org/wiki/Rope_splicing) unlays the
@@ -46,18 +36,6 @@ As a verb, you splice something in or out:
 
 The [vocabulary](README.md#vocabulary) defines these and the
 other terms.
-
-## Words of the version control system, and new words
-
-The names of splicing follow one rule:
-
-- A word the version control system already uses, like Git's `status`,
-  `pull`, `upstream` or `rebase`, does what it does there.
-- A new word must not collide with one it already uses.
-
-"Splice" is a new word: Git doesn't use it, so it doesn't collide, but it
-has to be coined. An everyday word would be easier to pick up, but most
-of them are taken.
 
 ## RNA splicing
 
