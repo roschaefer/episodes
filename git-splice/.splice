@@ -3,3 +3,4 @@
 	commit = 789b051bb035bb89613dd72e4f7f260440e18579
 [upstream "origin"]
 	url = git@github.com:roschaefer/git-splice.git
+  default-branch = main
