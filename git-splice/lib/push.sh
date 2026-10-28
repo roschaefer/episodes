@@ -2,49 +2,62 @@
 
 usage_push() {
   cat <<'EOF'
-usage: git splice push [--upstream <name>] [--force] (<path>... | --all)
-       git splice push [--upstream <name>] [--force] --rebuilt-commit <commit> <path>
+NAME
+    git-splice-push - Publish local splice changes upstream
 
-Publishes each splice's local changes: rebuilds the commits that changed
-it since its boundary, without its .splice file, and pushes them to its
-upstream URL. Nothing is written to the monorepo.
+SYNOPSIS
+    git splice push [--upstream <name>] [--branch <name> [--track]] [--force] (<path>... | --all)
+    git splice push [--upstream <name>] [--branch <name>] [--force] --rebuilt-commit <commit> <path>
 
-Bottom-up: a splice below another is pushed first, since the push of the
-one above publishes its .splice, and a failed push stops the splices
-above it.
+DESCRIPTION
+    Publishes each splice's local changes: rebuilds the commits that changed
+    it since its boundary, without its .splice file, and pushes them to its
+    upstream URL. Nothing is written to the monorepo.
 
-If the upstream has no branch named like the current one, push creates it
--- but only if it has commits upstream's default branch lacks, so working
-on a feature branch doesn't spawn empty branches upstream. Commits the
-feature branch got from the branch it was cut from count too: when
-upstream takes changes only through PRs, that's how they get there.
+    Bottom-up: a splice below another is pushed first, since the push of the
+    one above publishes its .splice, and a failed push stops the splices
+    above it.
 
-On the monorepo's default branch, a default-pin names a tag or a commit,
-which isn't pushed to: push refuses there.
+    If the upstream has no branch named like the current one, push creates it
+    -- but only if a PR from it to upstream's default branch would show
+    changes, so working on a feature branch doesn't spawn empty branches
+    upstream. Changes the feature branch got from the branch it was cut
+    from count too: when upstream takes changes only through PRs, that's
+    how they get there.
 
---force overwrites the upstream branch with the monorepo's side: when the
-two share no history, or to discard commits only upstream has.
+    On the monorepo's default branch, a default-pin names a tag or a commit,
+    which isn't pushed to: push refuses there.
 
---rebuilt-commit pushes <commit> instead of the rebuild, e.g. one whose
-history was edited after 'git splice rebuild <path>' printed it:
-messages reworded, commits squashed. Only the history: its files must be
-the folder's, and it must contain the synced commit -- with --force, it
-may also replace commits the upstream already has. Either way, a pull
-must be able to record it: a commit of the rebuild's history that isn't
-newer than the synced commit is refused. push checks only that; the
-rest of <commit>'s history -- its parents, the files of the commits
-before it -- is pushed as it is, as with 'git push'. Like every
-push, it records no sync point: the monorepo keeps rebuilding the
-original commits, and a later push publishes them too, unless 'git
-splice pull --bump <path>' records <commit> as the synced commit before
-the next change, as push reminds you.
+    --force overwrites the upstream branch with the monorepo's side: when the
+    two share no history, or to discard commits only upstream has.
 
-Only committed changes are pushed; push warns about uncommitted ones in a
-splice's folder.
+    --rebuilt-commit pushes <commit> instead of the rebuild, e.g. one whose
+    history was edited after 'git splice rebuild <path>' printed it:
+    messages reworded, commits squashed. Only the history: its files must be
+    the folder's, and it must contain the synced commit -- with --force, it
+    may also replace commits the upstream already has. Either way, a pull
+    must be able to record it: a commit of the rebuild's history that isn't
+    newer than the synced commit is refused. push checks only that; the
+    rest of <commit>'s history -- its parents, the files of the commits
+    before it -- is pushed as it is, as with 'git push'. Like every
+    push, it records no sync point: the monorepo keeps rebuilding the
+    original commits, and a later push publishes them too, unless 'git
+    splice pull --bump <path>' records <commit> as the synced commit before
+    the next change, as push reminds you.
 
---upstream names one of the upstreams a splice's .splice names; without
-it, the splice's default upstream. A splice without the named upstream
-stops the command before it starts.
+    Only committed changes are pushed; push warns about uncommitted ones in a
+    splice's folder.
+
+    --branch names another upstream branch to push to, for this push only,
+    as 'git splice pull --branch' pulls from one: with the same checks, and
+    created like the one named like the current branch. It doesn't change
+    .splice, and the splices below keep theirs. --track also tracks
+    it on the current branch, like 'git push -u'; see 'git splice merge
+    --help'.
+
+    --upstream names one of the upstreams a splice's .splice names; without
+    it, the splice's default upstream. A splice without the named upstream
+    stops the command before it starts.
 EOF
 }
 
@@ -58,8 +71,9 @@ push_one() {
     2) log_warn "$path: could not check for uncommitted changes (git status failed) -- only committed ones are pushed" ;;
   esac
   classify_splice "$path" "$branch" || return 1
-  local upstream_branch="$SPLICE_UPSTREAM_BRANCH" label="$SPLICE_UPSTREAM_LABEL" option
+  local upstream_branch="$SPLICE_UPSTREAM_BRANCH" label="$SPLICE_UPSTREAM_LABEL" option selection
   option="$(upstream_option "$path")"
+  selection="$(selection_options "$path")"
   if [[ "$SPLICE_TARGET_KIND" != branch ]]; then
     log_err "$path: pinned at $(target_description) -- a $SPLICE_TARGET_KIND isn't pushed to: push from a feature branch, or follow a branch again: git config --file $(shell_quote "$path/$STATE_FILE") --unset upstream.${SPLICE_UPSTREAM_NAMES[$path]}.default-pin"
     return 1
@@ -71,12 +85,12 @@ push_one() {
       ;;
     up-to-date)
       log_ok "$path: nothing to push"
-      remind_pull "$path" "$option"
+      remind_pull "$path" "$selection"
       return 0
       ;;
     pull)
       if [[ -z "$force" ]]; then
-        log_ok "$path: nothing to push (upstream is ahead -- 'git splice pull $option$path' brings it in)"
+        log_ok "$path: nothing to push (upstream is ahead -- 'git splice pull $selection$path' brings it in)"
         return 0
       fi
       ;;
@@ -111,8 +125,8 @@ push_one() {
       fi
       # A commit given with --rebuilt-commit is pushed even if upstream's
       # default branch has it: it was asked for, and needs recording.
-      if [[ -n "$SPLICE_REBUILT" && -z "${REBUILD_GIVEN[$path]:-}" ]] && ((SPLICE_NEW_COMMITS == 0)); then
-        log_ok "$path: nothing to push (upstream has no '$label' branch, and '$SPLICE_DEFAULT_BRANCH' has every commit)"
+      if [[ -n "$SPLICE_REBUILT" && -z "${REBUILD_GIVEN[$path]:-}" && -n "$SPLICE_NO_CHANGES" ]]; then
+        log_ok "$path: nothing to push (upstream has no '$label' branch, and a PR to '$SPLICE_DEFAULT_BRANCH' would show no changes)"
         return 0
       fi
       [[ -z "$SPLICE_REBUILT" ]] || log_warn "$path: upstream has no '$label' branch yet -- this push creates it"
@@ -141,13 +155,14 @@ push_one() {
     return 1
   fi
   log_ok "$path: pushed ${SPLICE_REBUILT:0:7} to $label"
-  remind_pull "$path" "$option"
+  remind_pull "$path" "$selection"
 }
 
 # Reminds to record the commit given for splice <path> with a pull, if
 # one was given and the monorepo's rebuild isn't that commit already.
 # Also after a retry that finds it upstream: the earlier push may have
-# gone through without its reminder. $2 is the --upstream option, if any.
+# gone through without its reminder. $2 is the --upstream and --branch
+# options, if any (selection_options).
 remind_pull() {
   local path="$1" option="$2"
   [[ -z "${REBUILD_GIVEN[$path]:-}" ]] || given_is_rebuild "$path" ||
@@ -198,7 +213,8 @@ give_rebuild() {
 }
 
 cmd_push() {
-  parse_args usage_push "--force --upstream --rebuilt-commit" "$@"
+  parse_args usage_push "--force --upstream --branch --track --rebuilt-commit" "$@"
+  require_branch_for_track
   local force=""
   has_flag --force && force=force
   open_repository
@@ -228,7 +244,18 @@ cmd_push() {
       failures+=("$path")
       continue
     fi
-    push_one "$path" "$branch" "$force" || failures+=("$path")
+    if ! push_one "$path" "$branch" "$force"; then
+      failures+=("$path")
+    elif has_flag --track; then
+      # A push with nothing to push, e.g. no changes for a PR, creates no
+      # branch, and a missing tracked branch would stop every pull.
+      if ! git rev-parse --verify --quiet "$(splice_ref "$path" "$BRANCH_ARG")" >/dev/null; then
+        log_err "$path: upstream has no '$BRANCH_ARG' branch to track -- the push didn't create it"
+        failures+=("$path")
+      else
+        track_branch "$path" "$branch" "$BRANCH_ARG" || failures+=("$path")
+      fi
+    fi
   done
   rm -rf "$ssh_control_dir"
 

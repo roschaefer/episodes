@@ -2,33 +2,45 @@
 
 usage_status() {
   cat <<'EOF'
-usage: git splice status [--upstream <name>] [path...]
+NAME
+    git-splice-status - Show each splice's sync state
 
-Shows the sync state of every splice. Purely local -- run 'git splice
-fetch' first for up-to-date results. Defaults to every splice when no
-paths are given.
+SYNOPSIS
+    git splice status [--upstream <name>] [path...]
 
-Every splice gets a line: the splices that need something come first,
-most urgent first -- "!!" and "??" mark problems -- and those that are up
-to date or unchanged come last.
+DESCRIPTION
+    Shows the sync state of every splice. Purely local -- run 'git splice
+    fetch' first for up-to-date results. Defaults to every splice when no
+    paths are given.
 
-Like 'git status' against a tracking branch, it counts commits: "ahead"
-is how many 'git splice push' would publish, "behind" how many 'git
-splice pull' would bring in. 'git splice diff --stat' shows the files.
+    Every splice gets a line: the splices that need something come first,
+    most urgent first -- "!!" and "??" mark problems -- and those that are up
+    to date or unchanged come last.
 
-For a splice whose upstream has no branch named like the current one,
-the comparison is with upstream's default branch, as for a PR: "new"
-counts the commits the push that creates the branch would publish, and
-how many the default branch has that this one lacks. "unchanged" means
-the default branch has every commit.
+    Like 'git status' against its upstream branch, it counts commits: "ahead"
+    is how many 'git splice push' would publish, "behind" how many 'git
+    splice pull' would bring in. 'git splice diff --stat' shows the files.
 
-Like every command, status reads splices from the last commit. It warns
-about uncommitted changes in a splice's folder, which push leaves out.
+    For a splice whose upstream has no branch named like the current one,
+    the comparison is with upstream's default branch, as for a PR: "new"
+    counts the commits the push that creates the branch would publish, and
+    how many the default branch has that this one lacks. "unchanged" means
+    a PR from the branch would show no changes: the default branch has
+    every commit, or the others change no files, e.g. a change and its
+    revert.
 
---upstream names one of the upstreams a splice's .splice names; without
-it, the splice's default upstream. A splice without the named upstream
-stops the command before it starts. A splice with several upstreams shows its
-upstream branch as <name>/<branch>.
+    A splice that tracks an upstream branch on the current branch, by
+    'git splice fetch --track' (or push, pull, merge), says so: "tracked on
+    <branch>, local". It's in this repository's config only, so another
+    clone of the monorepo shows the usual branch there.
+
+    Like every command, status reads splices from the last commit. It warns
+    about uncommitted changes in a splice's folder, which push leaves out.
+
+    --upstream names one of the upstreams a splice's .splice names; without
+    it, the splice's default upstream. A splice without the named upstream
+    stops the command before it starts. A splice with several upstreams shows its
+    upstream branch as <name>/<branch>.
 EOF
 }
 
@@ -69,7 +81,7 @@ classify_missing_branch() {
     else
       STATUS_HINT="could not compare with upstream's '$SPLICE_DEFAULT_BRANCH'"
     fi
-  elif ((SPLICE_NEW_COMMITS == 0)); then
+  elif [[ -n "$SPLICE_NO_CHANGES" ]]; then
     STATUS_KIND=unchanged STATUS_LABEL="unchanged, no upstream branch"
   else
     STATUS_KIND=new STATUS_LABEL="new, ahead $SPLICE_NEW_COMMITS" STATUS_HINT="push creates the branch"
@@ -125,6 +137,10 @@ add_status_row() {
       STATUS_KIND=problem STATUS_LABEL="!! unrelated history" STATUS_HINT="see 'git splice merge $option$path' for options"
       ;;
   esac
+
+  if [[ -n "$(tracked_branch "$path" "$branch")" ]]; then
+    STATUS_HINT="${STATUS_HINT:+$STATUS_HINT; }tracked on $branch, local"
+  fi
 
   local rank uncommitted=""
   rank="$(status_rank "$STATUS_KIND")"
