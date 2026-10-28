@@ -62,23 +62,34 @@ so the post shows what the tests check.
 
 `main` is what's published: this folder without the numbered episodes,
 until one is. `development` holds every episode, published or not, and
-is where they're written. Tooling, like `video/` or this README, changes
-on `main`, and `main` is merged into `development`.
+everything is written there, tooling like `video/` or this README too.
+`development` is never merged into `main`: that would publish every
+draft.
 
-To have one or more episodes reviewed, cut a branch from `main`, bring
-only those episodes over from `development`, and open a draft pull
-request to `main`. The review bots then look at nothing else:
+In my monorepo, the branch `studio` tracks `development`, so a plain
+`git splice push episodes` or `pull` goes there:
 
 ```sh
-git switch -c review/submodules main
-git restore --source development -- episodes/01-git-submodules
-git commit -m "docs(episodes): add Git Submodules"
-git splice push episodes   # creates the branch upstream
-gh pr create --draft --repo roschaefer/episodes --base main --head review/submodules
+git splice fetch --branch development --track episodes   # once per clone
 ```
 
-Once the pull request is squash-merged, `git splice pull episodes` on
-`main` brings it back, and `main` is merged into `development`.
+To have episodes or tooling reviewed, cut a branch from `main`, bring
+only those paths over from `development`, and open a draft pull request
+to `main`. The review bots then look at nothing else. In a clone of this
+repository:
+
+```sh
+git switch -c review/submodules origin/main
+git restore --source origin/development -- 01-git-submodules
+git commit -m "docs(episodes): add Git Submodules"
+git push -u origin review/submodules
+gh pr create --draft --base main
+```
+
+Once the pull request is squash-merged, merge `main` into `development`,
+so the next review starts from what's published: in the monorepo,
+`git splice pull --branch main episodes` on `studio`, then
+`git splice push episodes`.
 
 ## Building the blog posts
 
